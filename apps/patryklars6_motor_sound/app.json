@@ -1,0 +1,511 @@
+{
+  "id": "patryklars6_motor_sound",
+  "title": "LUXO Motor Sound",
+  "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
+  "version": "0.1.0",
+  "vendor": "patryklars6",
+  "loggingId": "LUXO",
+  "iconGlyph": "gauge",
+  "iconColor": "#ab91dc",
+  "mguHmi": [
+    "ID7"
+  ],
+  "autostart": true,
+  "cpuLimit": 45,
+  "memoryKB": 153600,
+  "signals": {
+    "de.bmw.infotainment.vehicle.CDS": {
+      "_optional": "Drehzahl und Motorstatus",
+      "statusEngineSpeed2": "rs",
+      "statusEngineStatus": "rs"
+    },
+    "de.bmw.infotainment.vehicle.Vehicle2": {
+      "_optional": "Geschwindigkeit",
+      "statusCarSpeed2": "rs"
+    },
+    "de.bmw.infrastructure.VehicleInformation": {
+      "_optional": "Gang und Wählhebel",
+      "statusGearboxDrive": "rs",
+      "DataPowerTrain2": "rs"
+    },
+    "de.bmw.infotainment.drivingexcitement.FES": {
+      "_optional": "BMW-Fahrmodus und Drehmoment",
+      "statusFESVehicleDynamicSwitchHMI": "rs",
+      "statusActualValueTorque2": "rs"
+    },
+    "de.bmw.powertrain.AcceleratorPedal": {
+      "_optional": "Pedal und Gaswegnahme",
+      "AngleAcceleratorPedal": "rs"
+    }
+  },
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "LUXO Motor Sound",
+      "buttons": [
+        [
+          "BTN_SETTINGS",
+          "Einstellungen"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "enabled",
+      "label": "Motorsound aktiv",
+      "type": "bool",
+      "default": false,
+      "group": "Motorsound"
+    },
+    {
+      "key": "level",
+      "label": "Motorsound-Pegel",
+      "type": "number",
+      "default": 30,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Motorsound"
+    },
+    {
+      "key": "limit",
+      "label": "Pegelgrenze",
+      "type": "number",
+      "default": 55,
+      "steps": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        55,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Motorsound"
+    },
+    {
+      "key": "autoMode",
+      "label": "Automatisch nach Fahrmodus",
+      "type": "bool",
+      "default": true,
+      "group": "Fahrmodi"
+    },
+    {
+      "key": "manualProfile",
+      "label": "Manuelles Profil",
+      "type": "choice",
+      "default": "v8",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Motorsound",
+      "when": {
+        "autoMode": false
+      }
+    },
+    {
+      "key": "eco",
+      "label": "ECO PRO",
+      "type": "choice",
+      "default": "v8",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Fahrmodi",
+      "when": {
+        "autoMode": true
+      }
+    },
+    {
+      "key": "comfort",
+      "label": "COMFORT",
+      "type": "choice",
+      "default": "v8",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Fahrmodi",
+      "when": {
+        "autoMode": true
+      }
+    },
+    {
+      "key": "sport",
+      "label": "SPORT",
+      "type": "choice",
+      "default": "f90",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Fahrmodi",
+      "when": {
+        "autoMode": true
+      }
+    },
+    {
+      "key": "sportPlus",
+      "label": "SPORT PLUS",
+      "type": "choice",
+      "default": "m",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Fahrmodi",
+      "when": {
+        "autoMode": true
+      }
+    },
+    {
+      "key": "individualBase",
+      "label": "Grundklang",
+      "type": "choice",
+      "default": "v8",
+      "options": [
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ]
+      ],
+      "group": "Individual"
+    },
+    {
+      "key": "engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 60,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Individual"
+    },
+    {
+      "key": "turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 30,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Individual"
+    },
+    {
+      "key": "exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 50,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Individual"
+    },
+    {
+      "key": "bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 50,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Individual"
+    },
+    {
+      "key": "lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 30,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Individual"
+    },
+    {
+      "key": "speakers",
+      "label": "Lautsprechersystem",
+      "type": "choice",
+      "default": "standard",
+      "options": [
+        [
+          "standard",
+          "Standard"
+        ],
+        [
+          "hifi",
+          "BMW HiFi"
+        ],
+        [
+          "hk",
+          "Harman Kardon"
+        ],
+        [
+          "bw",
+          "Bowers & Wilkins"
+        ],
+        [
+          "up8",
+          "MATCH UP 8"
+        ],
+        [
+          "up10",
+          "MATCH UP 10"
+        ],
+        [
+          "other",
+          "Sonstiges"
+        ]
+      ],
+      "group": "Lautsprecher"
+    },
+    {
+      "key": "balance",
+      "label": "Balance links / rechts",
+      "type": "number",
+      "default": 0,
+      "steps": [
+        -100,
+        -75,
+        -50,
+        -25,
+        0,
+        25,
+        50,
+        75,
+        100
+      ],
+      "unit": "%",
+      "group": "Lautsprecher"
+    },
+    {
+      "key": "fader",
+      "label": "Fader vorn / hinten",
+      "type": "number",
+      "default": 0,
+      "steps": [
+        -100,
+        -75,
+        -50,
+        -25,
+        0,
+        25,
+        50,
+        75,
+        100
+      ],
+      "unit": "%",
+      "group": "Lautsprecher"
+    },
+    {
+      "key": "rear",
+      "label": "Hintere Lautsprecher",
+      "type": "bool",
+      "default": true,
+      "group": "Lautsprecher",
+      "when": {
+        "speakers": "other"
+      }
+    },
+    {
+      "key": "otherTrim",
+      "label": "Sonstiges: Klangpegel",
+      "type": "number",
+      "default": 70,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Lautsprecher",
+      "when": {
+        "speakers": "other"
+      }
+    },
+    {
+      "key": "otherBass",
+      "label": "Sonstiges: Bass",
+      "type": "number",
+      "default": 50,
+      "steps": [
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100
+      ],
+      "unit": "%",
+      "group": "Lautsprecher",
+      "when": {
+        "speakers": "other"
+      }
+    }
+  ]
+}

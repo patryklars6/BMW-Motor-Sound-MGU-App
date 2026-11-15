@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "components": [
+    {
+      "id": "patryklars6_motor_sound",
+      "kind": "app",
+      "path": "apps/patryklars6_motor_sound",
+      "title": "LUXO Motor Sound",
+      "description": "iDrive 7 · Fahrzeugdaten und Motorsound. Separater Mischpfad erforderlich.",
+      "mguHmi": [
+        "ID7"
+      ],
+      "build": {
+        "python": "tools/build_store.py",
+        "args": [
+          "{id}",
+          "{dir}"
+        ]
+      }
+    }
+  ]
+}
