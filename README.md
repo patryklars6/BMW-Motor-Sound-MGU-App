@@ -1,12 +1,12 @@
 # BMW Motor Sound MGU App
 
-**LUXO Motor Sound** für BMW MGU mit iDrive 7. Die App zeigt reale Fahrzeugdaten über die lesenden SOME/IP-Schnittstellen der Head Unit an und erzeugt daraus einen separat regelbaren Motorsound. Die erste Version **0.1.0** ist für den Fahrzeugtest vorbereitet.
+**LUXO Motor Sound** für BMW MGU mit iDrive 7. Die App zeigt reale Fahrzeugdaten über die lesenden SOME/IP-Schnittstellen der Head Unit an und erzeugt daraus einen separat regelbaren Motorsound. Version **0.1.1** ist für den Fahrzeugtest vorbereitet.
 
 ## Im MGU Store hinzufügen
 
 Vorausgesetzt werden eine mit dem Community-MGU-Store kompatible MGU mit iDrive 7, ein funktionierender Store und die dort verfügbare Python-Buildumgebung. Unter **Einstellungen → Quelle hinzufügen** `patryklars6/BMW-Motor-Sound-MGU-App` eingeben, den Branch **main** wählen, die Quelle aktualisieren und **LUXO Motor Sound** öffnen. Der Store baut das Paket auf der Head Unit mit ihrem eigenen BMW SDK. [MGU-Store-Paketformat](https://github.com/robertnisipeanu/mgu-store/blob/main/docs/PUBLISHING.md)
 
-Für Tests am PC steht das gebaute [ID7-Paket 0.1.0](packages/patryklars6_motor_sound@0.1.0.tgz) bereit. Der Branch-Build passt die Fahrzeugdatenfelder an den Katalog der jeweiligen MGU an.
+Für Tests am PC steht das gebaute [ID7-Paket 0.1.1](packages/patryklars6_motor_sound@0.1.1.tgz) bereit. Der Branch-Build passt die Fahrzeugdatenfelder an den Katalog der jeweiligen MGU an.
 
 ## Funktionen
 
@@ -27,7 +27,7 @@ Der Paketbau und die automatisierten Tests sind lokal prüfbar. Ein Test auf der
 python tools/build_store.py
 node --test tests/runtime.test.js
 python -m unittest discover -s tests -p test_bridge.py
-python tests/verify_package.py dist/patryklars6_motor_sound@0.1.0.tgz
+python tests/verify_package.py dist/patryklars6_motor_sound@0.1.1.tgz
 ```
 
 Der Paketbau braucht Python 3 und das mitgelieferte App-Kit-Archiv. Die Hosttests verwenden Node.js ab Version 20. Die App-Laufzeit zielt auf die Node.js-8-Umgebung der ID7-MGU. [Herkunft des App-Kits](vendor/README.md)

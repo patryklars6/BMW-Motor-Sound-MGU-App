@@ -191,3 +191,60 @@ test('Every vehicle interface only requests subscriptions and getters', () => {
         assert.ok(Object.entries(specFields).every(([k, v]) => k === '_optional' || v === 'rs'));
     }
 });
+
+test('SOME/IP getters and notifications update the app and provider loss clears live data', { timeout: 3000 }, async t => {
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const path = require('node:path');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'luxo-live-test-'));
+    const config = path.join(dir, 'de_bmw_infotainment_vehicle_CDS.json');
+    fs.writeFileSync(config, JSON.stringify({ fields: {
+        statusEngineSpeed2: { getter: {}, notifier: {} },
+        statusEngineStatus: { notifier: {} }
+    } }));
+    t.after(() => { fs.unlinkSync(config); fs.rmdirSync(dir); });
+
+    const notifications = new Map();
+    let available;
+    let finishRead;
+    const reading = new Promise(resolve => { finishRead = resolve; });
+    const proxy = {
+        init() {},
+        subscribeToAvailability(fn) { available = fn; },
+        subscribe({ name, onReceive }) { notifications.set(name, onReceive); },
+        isAvailable() { return false; },
+        getValue() { return reading; }
+    };
+    const { telemetry, tick } = feed();
+    const stop = connectVehicle(telemetry, { warn() {} }, { buildProxy: async () => proxy }, dir);
+    t.after(stop);
+    const waitTick = () => new Promise(resolve => setImmediate(resolve));
+    for (let retries = 0; notifications.size < 2 && retries < 100; retries++) await waitTick();
+    assert.equal(notifications.size, 2);
+    available(true);
+    await waitTick();
+    notifications.get('statusEngineStatus')({ statusEngineRunDrive: 2 });
+    notifications.get('statusEngineSpeed2')({ actualValueRPMEngineCrankshaft: 4320 });
+    finishRead({ actualValueRPMEngineCrankshaft: 4000 });
+    await waitTick();
+    assert.equal(telemetry.snapshot().rpm, 1080);
+    assert.equal(telemetry.snapshot().engine, 'running');
+    tick(8500);
+    assert.equal(telemetry.snapshot().rpm, null);
+    assert.equal(telemetry.snapshot().engine, 'running');
+    available(false);
+    assert.equal(telemetry.snapshot().engine, null);
+    notifications.get('statusEngineSpeed2')({ actualValueRPMEngineCrankshaft: 4560 });
+    assert.equal(telemetry.snapshot().rpm, null);
+});
+
+test('Known textual BMW mode values select the corresponding profile without guessing unknown modes', () => {
+    const { telemetry, add } = feed();
+    const modes = { ECO_PRO_EFFICIENT: 'eco', COMFORT: 'comfort', SPORT_DYNAMIC: 'sport', SPORT_EXPERT: 'sportPlus' };
+    for (const [wire, expected] of Object.entries(modes)) {
+        add(FES, 'statusFESVehicleDynamicSwitchHMI', { actualValueModeDrivingExperience: wire });
+        assert.equal(telemetry.snapshot().mode, expected);
+    }
+    add(FES, 'statusFESVehicleDynamicSwitchHMI', { actualValueModeDrivingExperience: 63 });
+    assert.equal(telemetry.snapshot().mode, null);
+});

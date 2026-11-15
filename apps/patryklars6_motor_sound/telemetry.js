@@ -16,10 +16,11 @@ const ENGINE = {
 const MODE = {
     1: 'sport', 2: 'sportPlus', 3: 'sport', 4: 'comfort', 5: 'comfort', 6: 'comfort',
     7: 'eco', 8: 'eco', 9: 'eco',
-    SPORT_DYNAMIC: 'sport', SPORT_EXPERT: 'sportPlus', SPORT_INDIVIDUAL: 'sport',
-    COMFORT_STANDARD: 'comfort', COMFORT_PLUS: 'comfort', COMFORT_INDIVIDUAL: 'comfort',
-    ECO_PRO_EFFICIENT: 'eco', ECO_PRO_PLUS: 'eco', ECO_PRO_INDIVIDUAL: 'eco'
+    SPORT: 'sport', SPORT_DYNAMIC: 'sport', SPORT_EXPERT: 'sportPlus', SPORT_PLUS: 'sportPlus', SPORT_INDIVIDUAL: 'sport',
+    COMFORT: 'comfort', COMFORT_STANDARD: 'comfort', COMFORT_PLUS: 'comfort', COMFORT_INDIVIDUAL: 'comfort',
+    ECO_PRO: 'eco', ECO_PRO_EFFICIENT: 'eco', ECO_PRO_PLUS: 'eco', ECO_PRO_INDIVIDUAL: 'eco'
 };
+const NOTIFY_ONLY_STATES = new Set(['engine', 'mode', 'gearbox', 'gearSelection', 'speed']);
 const SELECTOR = { 1: 'P', 2: 'R', 3: 'N', 4: 'D', P: 'P', R: 'R', N: 'N', D: 'D' };
 
 function lookup(table, key) {
@@ -58,13 +59,13 @@ class Telemetry {
         this.nextSequence = 0;
     }
 
-    put(key, value) {
+    put(key, value, retainWhileAvailable) {
         if (value === null) delete this.samples[key];
-        else this.samples[key] = { value, at: this.clock(), sequence: this.nextSequence++ };
+        else this.samples[key] = { value, at: this.clock(), retained: !!retainWhileAvailable && NOTIFY_ONLY_STATES.has(key), sequence: this.nextSequence++ };
     }
 
     watchGroups() {
-        const put = (key, decode) => ({ key, decode: v => this.put(key, v ? decode(v) : null) });
+        const put = (key, decode) => ({ key, decode: (v, retain) => this.put(key, v ? decode(v) : null, retain) });
         return {
             [CDS]: {
                 statusEngineSpeed2: put('rpm', v => scaled(v.actualValueRPMEngineCrankshaft, 48000, 0.25)),
@@ -83,7 +84,7 @@ class Telemetry {
     latest(key, age) {
         const sample = this.samples[key];
         const elapsed = sample ? this.clock() - sample.at : Infinity;
-        return elapsed >= 0 && elapsed <= age ? sample : null;
+        return sample && elapsed >= 0 && (sample.retained || elapsed <= age) ? sample : null;
     }
 
     snapshot() {

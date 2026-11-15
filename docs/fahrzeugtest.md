@@ -12,7 +12,7 @@ Der Test an einer Fahrzeug-MGU steht aus. Die Paketprüfung und die Anwendungste
 | Radio, CarPlay und Hintergrund | Erst mit validiertem Audiopfad Radio, CarPlay und Bluetooth einzeln prüfen. Medienwechsel, Anruf, Sprachführung, Warnsignale, Verlassen des Menüs und Aufwachen der MGU kontrollieren. Der Motorsound muss sich separat regeln und abschalten lassen. |
 | Lautsprecher | MATCH UP 10 mit dem verbauten RAM zuerst prüfen. Weitere Anlagen separat auf Abstimmung, Verzerrung und tatsächliche Kanalbelegung prüfen. Presets verändern die App-Samples. |
 
-Die Fahrzeugdaten nutzt die App über den von BMW bereitgestellten SOME/IP-Katalog. Ihr Fahrzeugadapter liest Felder und abonniert Änderungen. Er sendet keine Diagnose-, Codier-, Motor- oder Getriebebefehle. [Feldnamen und Skalierung im iDrive-7-Referenzprojekt](https://github.com/cauliflowermossgrape/idrive7-apps/blob/b2880634eb214e29f008422b970cf22ea2de280f/apps/live_data/signals.js)
+Die Fahrzeugdaten nutzt die App über den von BMW bereitgestellten SOME/IP-Katalog. Ihr Fahrzeugadapter liest Felder und abonniert Änderungen. Bei Feldinhalten, die BMW nur bei einer Änderung meldet, bleiben Gang, Motorstatus, Geschwindigkeit und Fahrmodus sichtbar, solange der Datenanbieter verbunden bleibt. Die Drehzahl muss regelmäßig aktualisiert werden. Er sendet keine Diagnose-, Codier-, Motor- oder Getriebebefehle. [Feldnamen und Skalierung im iDrive-7-Referenzprojekt](https://github.com/cauliflowermossgrape/idrive7-apps/blob/b2880634eb214e29f008422b970cf22ea2de280f/apps/live_data/signals.js)
 
 ## Separater Audiopfad
 

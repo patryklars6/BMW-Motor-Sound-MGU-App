@@ -7,7 +7,8 @@ const { CDS } = require('./telemetry');
 let nativeQueue = Promise.resolve();
 function nativeTick(fn) {
     const run = () => new Promise((resolve, reject) => setImmediate(() => {
-        Promise.resolve().then(fn).then(resolve, reject);
+        try { Promise.resolve(fn()).then(resolve, reject); }
+        catch (error) { reject(error); }
     }));
     const next = nativeQueue.then(run);
     nativeQueue = next.catch(() => {});
@@ -24,13 +25,15 @@ function connectVehicle(telemetry, log, binding, configDir) {
         let timer;
         let provider = false;
         let availabilityObserved = false;
+        let availabilitySubscribed = false;
         let generation = 0;
         const versions = Object.create(null);
         const pending = new Set();
         const configPath = path.join(configDir, iface.replace(/\./g, '_') + '.json');
         const clear = () => Object.keys(fields).forEach(f => fields[f].decode(null));
-        const availability = active => {
+        const availability = value => {
             if (closed) return;
+            const active = !!value;
             availabilityObserved = true;
             if (active === provider) return;
             provider = active;
@@ -46,7 +49,10 @@ function connectVehicle(telemetry, log, binding, configDir) {
                 if (!config.fields[field] || !config.fields[field].getter || pending.has(field)) continue;
                 const version = versions[field] || 0;
                 pending.add(field);
-                Promise.resolve().then(() => proxy.getValue(field, 450)).then(value => {
+                let result;
+                try { result = proxy.getValue(field, 450); }
+                catch (error) { pending.delete(field); continue; }
+                Promise.resolve(result).then(value => {
                     if (!closed && provider && generation === token && (versions[field] || 0) === version) {
                         fields[field].decode(value);
                     }
@@ -72,7 +78,8 @@ function connectVehicle(telemetry, log, binding, configDir) {
                 return;
             }
             if (proxy.subscribeToAvailability) {
-                await nativeTick(() => proxy.subscribeToAvailability(availability)).catch(() => {});
+                availabilitySubscribed = await nativeTick(() => proxy.subscribeToAvailability(availability))
+                    .then(() => true, () => false);
             }
             for (const field of Object.keys(fields)) {
                 if (!config.fields[field] || !config.fields[field].notifier || closed) continue;
@@ -81,7 +88,8 @@ function connectVehicle(telemetry, log, binding, configDir) {
                     onReceive(value) {
                         if (closed || (availabilityObserved && !provider)) return;
                         versions[field] = (versions[field] || 0) + 1;
-                        fields[field].decode(value);
+                        const notificationOnly = availabilitySubscribed && provider && !config.fields[field].getter;
+                        fields[field].decode(value, notificationOnly);
                     }
                 })).catch(e => log.warn('SOME/IP ' + field + ': ' + e.message));
             }

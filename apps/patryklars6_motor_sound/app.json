@@ -2,7 +2,7 @@
   "id": "patryklars6_motor_sound",
   "title": "LUXO Motor Sound",
   "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "vendor": "patryklars6",
   "loggingId": "LUXO",
   "iconGlyph": "gauge",
