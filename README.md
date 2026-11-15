@@ -2,16 +2,17 @@
 
 LUXO Motor Sound ergänzt BMW-MGU-Head-Units mit iDrive 7 um ein Motorsound-Menü und ein Dashboard für verfügbare Fahrzeugdaten. Version **0.2.0** ist für den Fahrzeugtest vorbereitet.
 
-## Voraussetzungen und Installation
+## Installation über den MGU Store
 
-Du brauchst eine mit dem Community-MGU-Store kompatible BMW MGU mit **iDrive 7**, einen funktionierenden Store und die Python-Buildumgebung des Stores. Welche konkrete MGU-Firmware alle Signale liefert, ist erst im Fahrzeug feststellbar.
+[Schritt-für-Schritt-Anleitung für iDrive 7](docs/installation-mgu-store.md)
 
-1. Öffne im MGU Store **Einstellungen → Quelle hinzufügen**.
-2. Gib `patryklars6/BMW-Motor-Sound-MGU-App` ein und wähle **main**. Für einen unveröffentlichten Pull Request wählst du dessen Branch, falls du gezielt die Testversion installieren möchtest.
-3. Aktualisiere die Quelle und installiere **LUXO Motor Sound**. Der Store baut den Quellbaum auf der Head Unit und ergänzt die lokal vorhandene BMW-SDK.
-4. Öffne die App im iDrive-Menü. Der Motorsound ist anfangs ausgeschaltet.
+Für **0.2.0** wähle nach dem Hinzufügen von `patryklars6/BMW-Motor-Sound-MGU-App` den Branch **`codex/luxo-sound-tuning-020`**. Das separat gebaute [ID7-Paket 0.2.0](packages/patryklars6_motor_sound@0.2.0.tgz) steht ebenfalls im Repository.
 
-Das geprüfte [ID7-Paket 0.2.0](packages/patryklars6_motor_sound@0.2.0.tgz) lässt sich separat herunterladen. Für den Einbau ist der Branch-Kanal sinnvoll, weil er den Paketbau an den Schnittstellenkatalog der jeweiligen Head Unit anpasst. [MGU-Store-Paketformat](https://github.com/robertnisipeanu/mgu-store/blob/main/docs/PUBLISHING.md)
+## Vorschau im LUXO-Design
+
+![Hauptmenü im LUXO-Design](docs/screenshots/hauptmenue.png)
+
+[Alle zehn Menüansichten in LUXO-Violett](docs/menuevorschau.md)
 
 ## Erste Einrichtung
 

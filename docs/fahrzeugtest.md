@@ -4,7 +4,7 @@ Der Test an einer Fahrzeug-MGU steht aus. Die Paketprüfung und die Anwendungste
 
 | Bereich | Prüfung am Fahrzeug |
 | --- | --- |
-| Installation und Oberfläche | Quelle auf `main` hinzufügen. Paketbau, Installation, Entfernung und erneute Installation prüfen. Hauptmenü, alle vier Themes, Live-Ansicht und Klangprofilkarten auf den unterstützten Displayformaten prüfen. Profile und Einstellungen mit dem iDrive-Controller und, sofern vorhanden, per Touch bedienen. Gespeicherte Werte nach Neustart kontrollieren. |
+| Installation und Oberfläche | Den Test-Branch aus der [Installationsanleitung](installation-mgu-store.md) hinzufügen. Paketbau, Installation, Entfernung und erneute Installation prüfen. Hauptmenü, alle vier Themes, Live-Ansicht und Klangprofilkarten auf den unterstützten Displayformaten prüfen. Profile und Einstellungen mit dem iDrive-Controller und, sofern vorhanden, per Touch bedienen. Gespeicherte Werte nach Neustart kontrollieren. |
 | Drehzahl und Motor | Drehzahl mit der Instrumentenanzeige vergleichen, vom Start über laufenden Motor bis zum Stopp. Im Stand Start-Stopp testen, soweit vorhanden. Ausbleibende oder ungültige Werte müssen die Wiedergabe stoppen. |
 | Beschleunigung | Längsbeschleunigung im Stand und bei einem kontrollierten Fahrversuch vergleichen. Vorzeichen, Einheit und Datenrate prüfen. |
 | Gang und Leerlauf | P, R, N, D und einzeln gemeldete Gänge prüfen. Der Motorleerlauf wird aus Motorstatus, Drehzahl, Wählhebel, Pedal und Geschwindigkeit abgeleitet. Ein Signal, das P oder N gemeinsam meldet, löst die Auswahl nicht auf. |
