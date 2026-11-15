@@ -42,7 +42,7 @@ function draw(cv, data, prefs, output) {
     cv.roundRect(44, 118, 968, 278, 18, c.panel);
     cv.roundRect(1032, 118, 524, 278, 18, c.panel);
     cv.text('DREHZAHL', 77, 166, 22, c.sub, { font: 'bold', spacing: 2 });
-    cv.text(rpm, 78, 300, 112, c.text, { font: 'num' });
+    cv.text(rpm, 78, 300, 112, c.text, { font: data.rpm === null ? 'bold' : 'num' });
     cv.text('U/min', 435, 298, 28, c.sub);
     cv.roundRect(78, 339, 895, 10, 5, c.line);
     const meter = data.rpm === null ? 0 : Math.min(1, data.rpm / 6500);
@@ -60,7 +60,7 @@ function draw(cv, data, prefs, output) {
     cv.text('Lautsprechersystem', 544, 454, 22, c.sub);
     cv.text(prefs.speaker.label, 544, 492, 28, c.text, { font: 'bold' });
     cv.text('Pegel / Grenze', 1064, 454, 22, c.sub);
-    cv.text(Math.round(prefs.ceiling * 100) + ' %', 1064, 492, 28, c.text, { font: 'bold' });
+    cv.text(Math.round(prefs.level * 100) + ' / ' + Math.round(prefs.limit * 100) + ' %', 1064, 492, 28, c.text, { font: 'bold' });
 }
 
 mgu.run({
@@ -117,7 +117,7 @@ mgu.run({
             const key = JSON.stringify([
                 data.rpm === null ? null : Math.round(data.rpm), data.speed === null ? null : Math.round(data.speed),
                 data.engine, data.stage, data.gear, data.mode, data.idle, output.state, output.channels,
-                cfg.profileLabel, cfg.speaker.label, cfg.enabled, cfg.ceiling
+                cfg.profileLabel, cfg.speaker.label, cfg.enabled, cfg.level, cfg.limit
             ]);
             if (key === previous) return;
             const cv = ctx.canvas(WIDTH, HEIGHT);

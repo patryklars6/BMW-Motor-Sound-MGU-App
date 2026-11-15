@@ -57,10 +57,12 @@ function resolveSettings(get, mode) {
     const front = fader === 1 ? 0 : Math.cos((fader + 1) * Math.PI / 4);
     const rear = fader === -1 ? 0 : Math.sin((fader + 1) * Math.PI / 4);
     const gains = [left * front, right * front, left * rear, right * rear].map(gain => gain < 1e-8 ? 0 : gain);
-    const ceiling = Math.min(percent(get('level'), 0.3), percent(get('limit'), 0.55));
+    const level = percent(get('level'), 0.3);
+    const limit = percent(get('limit'), 0.55);
+    const ceiling = Math.min(level, limit);
     return {
         auto, profileId, profileLabel: individual ? 'Individual' : profileId ? preset.label : null,
-        speaker, voice, gains, ceiling,
+        speaker, voice, gains, level, limit, ceiling,
         gain: ceiling * speaker.trim * (drive ? drive.level : 1),
         enabled: get('enabled') === true
     };
