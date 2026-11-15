@@ -67,7 +67,7 @@ class PcmOutput {
                 if (this.channels || header.length + chunk.length > HEADER_LIMIT) return this.close('waiting');
                 header += chunk.toString('ascii');
                 if (header.indexOf('\n') < 0) return;
-                if (header !== 'READY 2\n' && header !== 'READY 4\n') return this.close('waiting');
+                if (!/^READY [245]\n$/.test(header)) return this.close('waiting');
                 clearTimeout(timer);
                 this.channels = Number(header[6]);
                 this.state = 'connected';

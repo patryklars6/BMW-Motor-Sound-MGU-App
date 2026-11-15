@@ -1,6 +1,7 @@
 'use strict';
 
 const CDS = 'de.bmw.infotainment.vehicle.CDS';
+const CDS2 = 'de.bmw.infotainment.vehicle.CDS2';
 const VEHICLE = 'de.bmw.infotainment.vehicle.Vehicle2';
 const GEAR = 'de.bmw.infrastructure.VehicleInformation';
 const FES = 'de.bmw.infotainment.drivingexcitement.FES';
@@ -14,11 +15,11 @@ const ENGINE = {
     MOTOR_AUS: 'off', MOTOR_STARTET: 'starting', MOTOR_LAEUFT: 'running'
 };
 const MODE = {
-    1: 'sport', 2: 'sportPlus', 3: 'sport', 4: 'comfort', 5: 'comfort', 6: 'comfort',
-    7: 'eco', 8: 'eco', 9: 'eco',
-    SPORT: 'sport', SPORT_DYNAMIC: 'sport', SPORT_EXPERT: 'sportPlus', SPORT_PLUS: 'sportPlus', SPORT_INDIVIDUAL: 'sport',
-    COMFORT: 'comfort', COMFORT_STANDARD: 'comfort', COMFORT_PLUS: 'comfort', COMFORT_INDIVIDUAL: 'comfort',
-    ECO_PRO: 'eco', ECO_PRO_EFFICIENT: 'eco', ECO_PRO_PLUS: 'eco', ECO_PRO_INDIVIDUAL: 'eco'
+    1: 'sport', 2: 'sportPlus', 3: 'individualMode', 4: 'comfort', 5: 'comfort', 6: 'individualMode',
+    7: 'eco', 8: 'eco', 9: 'individualMode',
+    SPORT: 'sport', SPORT_DYNAMIC: 'sport', SPORT_EXPERT: 'sportPlus', SPORT_PLUS: 'sportPlus', SPORT_INDIVIDUAL: 'individualMode',
+    COMFORT: 'comfort', COMFORT_STANDARD: 'comfort', COMFORT_PLUS: 'comfort', COMFORT_INDIVIDUAL: 'individualMode',
+    ECO_PRO: 'eco', ECO_PRO_EFFICIENT: 'eco', ECO_PRO_PLUS: 'eco', ECO_PRO_INDIVIDUAL: 'individualMode', INDIVIDUAL: 'individualMode'
 };
 const NOTIFY_ONLY_STATES = new Set(['engine', 'mode', 'gearbox', 'gearSelection', 'speed']);
 const SELECTOR = { 1: 'P', 2: 'R', 3: 'N', 4: 'D', P: 'P', R: 'R', N: 'N', D: 'D' };
@@ -71,6 +72,10 @@ class Telemetry {
                 statusEngineSpeed2: put('rpm', v => scaled(v.actualValueRPMEngineCrankshaft, 48000, 0.25)),
                 statusEngineStatus: put('engine', v => lookup(ENGINE, v.statusEngineRunDrive))
             },
+            [CDS2]: { statusLongitudinalAccelerationMassCenter: put('acceleration', v => {
+                const value = scaled(v.longitudinalAccelerationCentreOfGravity, 65534, 0.002, -65);
+                return value !== null && Math.abs(value) <= 30 ? value : null;
+            }) },
             [VEHICLE]: { statusCarSpeed2: put('speed', v => scaled(v.speedVehicleCentreOfGravity, 25600, 0.015625)) },
             [GEAR]: { statusGearboxDrive: put('gearbox', gearbox), DataPowerTrain2: put('gearSelection', selection) },
             [FES]: {
@@ -101,13 +106,14 @@ class Telemetry {
         const engine = val('engine', STATE_MAX_AGE);
         const rpm = val('rpm', RPM_MAX_AGE);
         const speed = val('speed', MOVING_MAX_AGE);
+        const acceleration = val('acceleration', MOVING_MAX_AGE);
         const pedal = this.latest('pedal', MOVING_MAX_AGE);
         const neutral = stage === null ? null : stage === 'N';
         const idle = engine === 'running' && rpm !== null && speed !== null && stage !== null && pedal
             ? (stage === 'N' || stage === 'P') && speed < 1 && pedal.value <= 0.03 && rpm >= 400 && rpm <= 1200
             : null;
-        return { rpm, engine, speed, stage, gear, neutral, idle, pedal, mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
+        return { rpm, engine, speed, acceleration, stage, gear, neutral, idle, pedal, mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
     }
 }
 
-module.exports = { Telemetry, CDS, VEHICLE, GEAR, FES, PEDAL };
+module.exports = { Telemetry, CDS, CDS2, VEHICLE, GEAR, FES, PEDAL };

@@ -85,7 +85,7 @@ def serve_client(conn, channels, open_pcm=AlsaOutput):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--channels", type=int, choices=(2, 4), required=True)
+    parser.add_argument("--channels", type=int, choices=(2, 4, 5), required=True)
     args = parser.parse_args()
     if os.environ.get("LISTEN_PID") != str(os.getpid()) or os.environ.get("LISTEN_FDS") != "1":
         parser.error("requires one systemd Unix listen socket")

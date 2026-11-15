@@ -20,6 +20,8 @@ import zlib
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ID = "patryklars6_motor_sound"
 KIT = ROOT / "vendor" / "idrive7-kit.zip"
+FONT_ATLAS = ROOT / "vendor" / "luxo-fonts.zip"
+FONT_ATLAS_SHA256 = "39ccb95d9bec9509f7f9554623fdcb818dcdf394fa1fc3bdfe0eab6549449907"
 KIT_SHA256 = "bd9c0bdf4034ea9b21cbfb5caf867c97a366359e8338d247148ad5748b923ab6"
 
 def write_json(file, value):
@@ -68,6 +70,11 @@ def stage_app(work, app_id, app_dir):
     with zipfile.ZipFile(io.BytesIO(archive)) as kit:
         kit.extractall(work)
     runtime = work / "kit" / "runtime"
+    fonts = FONT_ATLAS.read_bytes()
+    if hashlib.sha256(fonts).hexdigest() != FONT_ATLAS_SHA256:
+        raise ValueError("LUXO glyph atlas checksum mismatch")
+    with zipfile.ZipFile(io.BytesIO(fonts)) as atlas:
+        atlas.extractall(runtime / "fonts")
     # Required by the kit's general-purpose context; LUXO uses its own read-only adapter.
     (runtime / "signals.js").write_text("'use strict';\nmodule.exports = {};\n", encoding="utf-8")
     upstream = work / "kit" / "tools" / "build.py"

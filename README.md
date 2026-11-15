@@ -1,33 +1,78 @@
 # BMW Motor Sound MGU App
 
-**LUXO Motor Sound** für BMW MGU mit iDrive 7. Die App zeigt reale Fahrzeugdaten über die lesenden SOME/IP-Schnittstellen der Head Unit an und erzeugt daraus einen separat regelbaren Motorsound. Version **0.1.1** ist für den Fahrzeugtest vorbereitet.
+LUXO Motor Sound ergänzt BMW-MGU-Head-Units mit iDrive 7 um ein Motorsound-Menü und ein Dashboard für verfügbare Fahrzeugdaten. Version **0.2.0** ist für den Fahrzeugtest vorbereitet.
 
-## Im MGU Store hinzufügen
+## Voraussetzungen und Installation
 
-Vorausgesetzt werden eine mit dem Community-MGU-Store kompatible MGU mit iDrive 7, ein funktionierender Store und die dort verfügbare Python-Buildumgebung. Unter **Einstellungen → Quelle hinzufügen** `patryklars6/BMW-Motor-Sound-MGU-App` eingeben, den Branch **main** wählen, die Quelle aktualisieren und **LUXO Motor Sound** öffnen. Der Store baut das Paket auf der Head Unit mit ihrem eigenen BMW SDK. [MGU-Store-Paketformat](https://github.com/robertnisipeanu/mgu-store/blob/main/docs/PUBLISHING.md)
+Du brauchst eine mit dem Community-MGU-Store kompatible BMW MGU mit **iDrive 7**, einen funktionierenden Store und die Python-Buildumgebung des Stores. Welche konkrete MGU-Firmware alle Signale liefert, ist erst im Fahrzeug feststellbar.
 
-Für Tests am PC steht das gebaute [ID7-Paket 0.1.1](packages/patryklars6_motor_sound@0.1.1.tgz) bereit. Der Branch-Build passt die Fahrzeugdatenfelder an den Katalog der jeweiligen MGU an.
+1. Öffne im MGU Store **Einstellungen → Quelle hinzufügen**.
+2. Gib `patryklars6/BMW-Motor-Sound-MGU-App` ein und wähle **main**. Für einen unveröffentlichten Pull Request wählst du dessen Branch, falls du gezielt die Testversion installieren möchtest.
+3. Aktualisiere die Quelle und installiere **LUXO Motor Sound**. Der Store baut den Quellbaum auf der Head Unit und ergänzt die lokal vorhandene BMW-SDK.
+4. Öffne die App im iDrive-Menü. Der Motorsound ist anfangs ausgeschaltet.
 
-## Funktionen
+Das geprüfte [ID7-Paket 0.2.0](packages/patryklars6_motor_sound@0.2.0.tgz) lässt sich separat herunterladen. Für den Einbau ist der Branch-Kanal sinnvoll, weil er den Paketbau an den Schnittstellenkatalog der jeweiligen Head Unit anpasst. [MGU-Store-Paketformat](https://github.com/robertnisipeanu/mgu-store/blob/main/docs/PUBLISHING.md)
 
-- LUXO-Oberfläche in Dunkelgrau und Weiß mit dezentem Lila. Live-Ansicht für Drehzahl, Geschwindigkeit, Motorstatus, Gang, Fahrmodus und Motorleerlauf. Fehlende Werte erscheinen als Strich.
-- **V8 Sound**, **BMW M5 F90**, **BMW M Sound** und **Individual**. Die Klänge werden synthetisiert. Individual bietet getrennte Regler für Motor, Turbo, Auspuff, Bass und den Effekt bei Gaswegnahme.
-- Automatische Profilzuordnung für **ECO PRO**, **COMFORT**, **SPORT** und **SPORT PLUS**, mit einzeln änderbarer Klangwahl. Alternativ lässt sich ein Profil manuell wählen.
-- **Standard**, **BMW HiFi**, **Harman Kardon**, **Bowers & Wilkins**, **MATCH UP 8**, **MATCH UP 10** und **Sonstiges**. Die Auswahl passt den App-Mix an. Sonstiges bietet eine Startvorlage und Einstellungen für Pegel, Bass und hintere Lautsprecher.
-- Getrennter Motorsound-Pegel mit Obergrenze, Balance und Fader. Der Fader verteilt den Sound auf vordere und hintere Kanäle, wenn der Audiopfad vier Kanäle anbietet.
-- Hintergrundbetrieb über MGU-Autostart angelegt. Für die Wiedergabe müssen der Motor laufen, frische Drehzahldaten anliegen und ein separater Mischpfad verfügbar sein. Der Motorsound ist bei der Erstinstallation ausgeschaltet.
+## Erste Einrichtung
 
-## Stand im Fahrzeug
+1. Öffne **Live-Daten** und prüfe mit laufendem Motor Drehzahl und Motorstatus. Fehlende Signale erscheinen als **Nicht verfügbar**.
+2. Wähle unter **Lautsprecher** dein System. Standard, BMW HiFi, Harman Kardon, Bowers & Wilkins, MATCH UP 8, MATCH UP 10 und Sonstiges / Aftermarket stehen zur Auswahl.
+3. Wähle unter **Soundprofile** einen Klang und stelle in **Einstellungen → Motorsound** zunächst einen niedrigen Pegel und eine passende Obergrenze ein.
+4. Aktiviere den Motorsound mit dem großen Schalter im Hauptmenü. Die Statuszeile zeigt, ob die App auf Fahrzeugdaten oder auf einen freigegebenen Mischpfad wartet.
 
-Der Paketbau und die automatisierten Tests sind lokal prüfbar. Ein Test auf der MGU im BMW G31 530d mit MATCH UP 10 steht aus. Insbesondere ist für Serien-MGU bislang kein separater BMW-Mischpfad verifiziert, der Radio und CarPlay ununterbrochen weiterlaufen lässt. Die App meldet in diesem Fall **Kein freigegebener Audiopfad** und bleibt stumm. Der [Fahrzeugtestplan und Audiopfad](docs/fahrzeugtest.md) enthält die offenen Schritte.
+Auf einem kompatiblen GPU-Renderer kannst du die Karten und Direktregler auf der Oberfläche bedienen. Die iDrive-Tasten bieten die entsprechenden Aktionen für das native RHMI. In den Einstellungen wählst du mit **Menü** die Kategorie und mit **Zeile** den Regler. **Wert −** und **Wert +** ändern seinen Wert.
 
-## Bauen und testen
+## Soundprofile und Regler
+
+**V6 Sound**, **V8 Sound**, **BMW M5 F90**, **BMW M Sound**, **Sport Diesel** und **Individual** besitzen jeweils eigene Einstellungen. Öffne **Tuning** auf der Profilseite oder im Hauptmenü **Individual**. Die Karten **Motor**, **Turbo**, **Auspuff** und **Pop & Bangs** führen zu den jeweiligen Reglern. In den allgemeinen Einstellungen findest du alle Werte auch in der Kategorie des Profils. Bei **Individual** lässt sich zusätzlich der Grundklang wählen. Die App erzeugt die Klänge selbst.
+
+| Regler | Wirkung |
+| --- | --- |
+| Motorsound, Turbosound, Auspuffklang | Schaltet die jeweilige Klangschicht ein oder aus. |
+| Motor, Turbo, Auspuff | Stellt die Intensität der jeweiligen Schicht ein. |
+| Lautstärke Motor, Turbo, Auspuff | Regelt den eigenen Pegel jeder Schicht unabhängig vom App-Gesamtpegel. |
+| Bass und Klangtiefe | Aktiviert den Tieftonanteil und regelt dessen Stärke und Gewichtung im Motor-Klang. |
+| Klangcharakter | Wählt Profiltypisch, Tief, Ausgewogen, Sportlich oder M Performance. Die Auswahl verändert Obertöne, Bass und Klangstruktur. |
+| Turbo-Klang und Turbo-Pfeifen | Wählt Dezent, Klassisch, Hell oder Twin-Scroll. Für Beschleunigung und Gaswegnahme gibt es separate Schalter und Intensitäten. |
+| Pop & Bangs | Spielt bei passender Drehzahl und erfasster Gaswegnahme kurze synthetische Impulse. Intensität und Häufigkeit lassen sich separat ändern. Die Funktion ist anfangs ausgeschaltet. |
+| Pegel und Pegelgrenze | Bestimmt die Lautstärke der Motorsound-App und begrenzt ihren maximalen Ausgangspegel. |
+| Profil-Balance und Profil-Fader | Verteilt die Klangschichten links/rechts und bei geeignetem Mehrkanal-Mischpfad vorn/hinten. `Lautsprechereinstellung` übernimmt die Vorgabe des Systems. |
+
+Änderungen werden automatisch gespeichert. **Reset** im Hauptmenü setzt die Werte des dort angezeigten Klangprofils auf seine Vorgaben zurück. Die Wahl des Lautsprechersystems und das Design bleiben erhalten.
+
+## Lautsprecher und Fahrmodi
+
+Das Lautsprechermenü bietet angepasste Ausgangspegel und Basswerte. Bei **Sonstiges / Aftermarket** kannst du hintere Lautsprecher, Pegel und Bass selbst angeben. Die Auswahl wird gespeichert. Unter **Tuning** hat jeder Effekt eigene Balance-, Fader- und Verteilungspegel. Negative Balancewerte verschieben nach links, positive nach rechts. Ein negativer Faderwert verschiebt nach vorn, ein positiver nach hinten. Die Voreinstellung platziert Motor vorn, Turbo vorn rechts und Auspuff sowie Pop & Bangs hinten. Center-Anteil ist nur bei einem Fünfkanal-Mischpfad einstellbar. Stereo überträgt nur links/rechts. Die Anzeige im Tuning und Lautsprechermenü nennt die aktuell gemeldeten PCM-Kanäle.
+
+Der App-Pegel und seine Obergrenze gelten ausschließlich für den PCM-Strom der App. Der große Schalter im Hauptmenü schaltet ihn sofort stumm. Profilwechsel und Pegelanpassungen werden geglättet. Ob Radio, Bluetooth oder CarPlay parallel laufen und ob der BMW-Lautstärkeregler hinter dem Mischpfad beide Quellen beeinflusst, hängt von der tatsächlichen Audioarchitektur ab. [Fahrzeugtest und Mischpfad](docs/fahrzeugtest.md)
+
+Aktiviere unter **Fahrmodus** die Automatik und wähle pro Modus ein Profil für **ECO PRO**, **COMFORT**, **SPORT**, **SPORT PLUS** und **INDIVIDUAL**. Die Zuordnung folgt dem gemeldeten BMW-Modus. Einzelne Individual-Varianten verwenden dieselbe Individual-Zuordnung. Du kannst die Automatik im Hauptmenü abschalten oder ein Profil direkt auswählen.
+
+## Design und Dashboard
+
+Unter **Design** wählst du **LUXO**, **M-Performance**, **Orange Sport** oder **Ice White**. Orange Sport entspricht der orangefarbenen Hauptmenü-Vorlage. Die Auswahl gilt für Hauptmenü, Live-Daten, Profile, Einstellungen und Hilfe und wird gespeichert. Ebenfalls dort kannst du die Beschleunigung im Dashboard ausblenden.
+
+Die Drehzahlzahl zeigt den letzten real empfangenen, gerundeten Messwert. Nur der Drehzahlbogen wird zwischen empfangenen Messpunkten animiert. Mit einem kompatiblen GPU-Renderer kann die Darstellung bis zu 60 Bilder pro Sekunde erreichen. Im nativen RHMI zielt die Live-Ansicht auf bis zu 12 Bilder pro Sekunde. Die Messrate hängt von der Head Unit ab.
+
+## Fehlerbehebung und Fahrzeugtest
+
+| Anzeige | Prüfung |
+| --- | --- |
+| Nicht verfügbar | Unter Live-Daten prüfen, ob die MGU das betroffene Signal liefert. Fehlende und ungültige Werte werden als solche angezeigt. |
+| Wartet auf Fahrzeugdaten | Motorstatus und Drehzahl in der Live-Ansicht prüfen. Bei unbekanntem oder veraltetem Drehzahlsignal bleibt der Sound stumm. |
+| Wartet auf Fahrmodus | Prüfen, ob der BMW einen unterstützten Modus liefert. Alternativ ein Klangprofil manuell wählen. |
+| Audiopfad nicht verfügbar | Für den Motorsound ist eine auf der konkreten MGU bestätigte parallele Mischroute erforderlich. Die App beansprucht keine Medienquelle. |
+| Stumm | App-Pegel, Pegelgrenze und Schalter der Klangschichten prüfen. |
+
+Eine Installation und ein vollständiger Audiotest im BMW G31 530d mit MATCH UP 10 stehen aus. Die gleichzeitige Wiedergabe mit Radio, Bluetooth und CarPlay ist auf der Serien-MGU bisher nicht bestätigt. Auch Autostart, Hintergrundbetrieb, tatsächlich verfügbare Fahrzeugfelder und physische Kanalzuordnung brauchen einen Fahrzeugtest. Der [Fahrzeugtestplan](docs/fahrzeugtest.md) beschreibt die Prüfung und die optionale ALSA-Brücke.
+
+## Paket bauen und testen
 
 ```sh
 python tools/build_store.py
 node --test tests/runtime.test.js
 python -m unittest discover -s tests -p test_bridge.py
-python tests/verify_package.py dist/patryklars6_motor_sound@0.1.1.tgz
+python tests/verify_package.py dist/patryklars6_motor_sound@0.2.0.tgz
 ```
 
-Der Paketbau braucht Python 3 und das mitgelieferte App-Kit-Archiv. Die Hosttests verwenden Node.js ab Version 20. Die App-Laufzeit zielt auf die Node.js-8-Umgebung der ID7-MGU. [Herkunft des App-Kits](vendor/README.md)
+Der Paketbau nutzt Python 3 und das mitgelieferte iDrive-App-Kit. Die Hosttests nutzen Node.js ab Version 20. Die App-Laufzeit zielt auf die Node.js-8-Umgebung des iDrive 7. [Herkunft des App-Kits](vendor/README.md)
