@@ -14,6 +14,10 @@
   "cpuLimit": 45,
   "memoryKB": 153600,
   "signals": {
+    "de.bmw.infotainment.vehicle.Vehicle": {
+      "_optional": "Sprache der Fahrzeugoberfläche",
+      "statusNewCurrentUnitsStatusExt": "rs"
+    },
     "de.bmw.infotainment.vehicle.CDS": {
       "_optional": "Drehzahl und Motorstatus",
       "statusEngineSpeed2": "rs",
@@ -3115,6 +3119,19 @@
       "when": {
         "speakers": "other"
       }
+    },
+    {
+      "key": "language",
+      "label": "Sprache",
+      "type": "choice",
+      "default": "auto",
+      "group": "Oberfläche",
+      "options": [
+        ["auto", "Automatisch (Fahrzeugsprache)"],
+        ["tr", "Türkçe"],
+        ["en", "English"],
+        ["de", "Deutsch"]
+      ]
     },
     {
       "key": "theme",

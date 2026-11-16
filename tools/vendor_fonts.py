@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bake German-capable Barlow Condensed label and bold atlases for the app."""
+"""Bake German- and Turkish-capable Barlow Condensed label and bold atlases for the app."""
 import hashlib
 import json
 import pathlib
@@ -19,7 +19,7 @@ def main():
     source = download(KIT + "/kit/tools/bake_fonts.py")
     baker = {"__name__": "kit_baker", "__file__": str(ROOT / "tools" / "bake_fonts.py")}
     exec(compile(source, baker["__file__"], "exec"), baker)
-    text = baker["TEXT"] + "ÄÖÜäöüß−‹›"
+    text = baker["TEXT"] + "ÄÖÜäöüßÇçĞğİıŞş−‹›"
     families = (("label", "Regular", (18, 24, 32, 44)), ("bold", "Bold", (24, 32, 44, 64)))
     target = ROOT / "vendor" / "luxo-fonts.zip"
     output = {"OFL-BarlowCondensed.txt": download(FONT + "/OFL.txt")}
@@ -28,7 +28,7 @@ def main():
         for family, weight, sizes in families:
             font = "BarlowCondensed-" + weight + ".ttf"
             (pathlib.Path(staging) / font).write_bytes(download(FONT + "/" + font))
-            data = {"family": family, "source": font, "cacheKey": "luxo-barlow-condensed-de-1",
+            data = {"family": family, "source": font, "cacheKey": "luxo-barlow-condensed-de-en-tr-1",
                     "sizes": [baker["bake"](font, None, size, text) for size in sizes]}
             output[family + ".json"] = json.dumps(data, separators=(",", ":")).encode("utf-8")
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:

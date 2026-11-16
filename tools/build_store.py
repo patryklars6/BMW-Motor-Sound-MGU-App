@@ -21,7 +21,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 ID = "patryklars6_motor_sound"
 KIT = ROOT / "vendor" / "idrive7-kit.zip"
 FONT_ATLAS = ROOT / "vendor" / "luxo-fonts.zip"
-FONT_ATLAS_SHA256 = "39ccb95d9bec9509f7f9554623fdcb818dcdf394fa1fc3bdfe0eab6549449907"
+FONT_ATLAS_SHA256 = "da098bcb4a4337a3a86bffcf027d648b077ff394f50b576f6766482e1186e062"
 KIT_SHA256 = "bd9c0bdf4034ea9b21cbfb5caf867c97a366359e8338d247148ad5748b923ab6"
 
 def write_json(file, value):

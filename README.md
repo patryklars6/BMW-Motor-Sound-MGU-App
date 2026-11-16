@@ -49,6 +49,14 @@ Die Installation im Fahrzeug steht noch zur Prüfung aus. Für hörbaren Motorso
 | Der Store meldet einen Paketbaufehler | Prüfe die Detailmeldung im Store. Für diesen Branch benötigt der Store seinen Python-Build-Support `mgu-python`. |
 | Die App öffnet sich, aber es kommt kein Ton | Prüfe den Motorsound-Schalter und die Meldung zum Audiopfad. |
 
+## Sprache / Language / Dil
+
+Unter **Einstellungen → Oberfläche → Sprache** lässt sich **Automatisch (Fahrzeugsprache)**, **Türkçe**, **English** oder **Deutsch** wählen. Automatisch folgt der gemeldeten Fahrzeugsprache; bei fehlender oder nicht unterstützter Sprache wird Englisch verwendet. Eine manuelle Auswahl bleibt gespeichert und hat Vorrang. Die Anzeige umfasst Menüs, Einstellungen, Hilfe und Audiostatus; die Fahrzeugsprache und Klangparameter werden nicht verändert.
+
+Choose **Settings → Interface → Language** for automatic vehicle language, Turkish, English or German. Unsupported/unavailable vehicle languages fall back to English. See [language support and translation notes](docs/languages.md).
+
+**Ayarlar → Arayüz → Dil** bölümünden Otomatik, Türkçe, English veya Deutsch seçilebilir. Elle seçim kaydedilir; otomatik mod araç dilini takip eder. Desteklenmeyen veya okunamayan dilde İngilizce kullanılır.
+
 ## Menüs im LUXO-Design
 
 Alle Bilder zeigen dieselbe Einstellung **LUXO** mit dunkelgrauem Hintergrund und violetten Akzenten. Die Vorschauen stammen aus dem ID7-Paket 0.2.0. In der Live-Ansicht fehlen Messwerte, weil bei der Aufnahme keine Fahrzeugverbindung bestand.
@@ -147,8 +155,8 @@ Eine Installation und ein vollständiger Audiotest im BMW G31 530d mit MATCH UP 
 
 ```sh
 python tools/build_store.py
-node --test tests/runtime.test.js
-python -m unittest discover -s tests -p test_bridge.py
+node --test tests/*.test.js
+python -m unittest discover -s tests -p 'test_*.py'
 python tests/verify_package.py dist/patryklars6_motor_sound@0.2.0.tgz
 ```
 
