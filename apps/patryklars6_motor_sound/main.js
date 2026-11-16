@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const { resolveLanguage, translate, localizeCanvas } = require('./i18n');
 const mgu = require('./kit/mgu');
 const themes = require('./kit/themes');
 const { Telemetry } = require('./telemetry');
@@ -68,6 +69,8 @@ mgu.run({
         const { vehicle, output, effective } = ctx.background;
         const { ui, settings } = ctx;
         let screen = 'MAIN';
+        let currentLanguage = null;
+        const language = () => resolveLanguage(settings.get('language'), vehicle.snapshot().language);
         let sliders = [];
         let group = 'Motorsound';
         let row = 0;
@@ -250,17 +253,23 @@ mgu.run({
             'BTN_CONFIG_DOWN', 'BTN_CONFIG_ROW'].forEach(id => ctx.hideButton(id));
 
         function labelNativeButtons() {
+            currentLanguage = language();
+            const t = value => translate(value, currentLanguage);
+            ctx.spec.screens.forEach(page => (page.buttons || []).forEach(button => { void ui.text(button[0], t(button[1])); }));
             const power = settings.get('enabled') ? 'Sound aus' : 'Sound ein';
-            void ui.text('BTN_POWER', power);
-            void ui.text('BTN_LIVE_POWER', power);
-            void ui.text('BTN_AUTO', settings.get('autoMode') === false ? 'Automatik ein' : 'Automatik aus');
+            void ui.text('BTN_POWER', t(power));
+            void ui.text('BTN_LIVE_POWER', t(power));
+            void ui.text('BTN_AUTO', t(settings.get('autoMode') === false ? 'Automatik ein' : 'Automatik aus'));
         }
         labelNativeButtons();
 
         const last = Object.create(null);
         function paint(name, key, draw) {
+            const locale = language();
+            if (locale !== currentLanguage) labelNativeButtons();
+            key = locale + '/' + key;
             if (last[name] === key) return;
-            return Promise.resolve(ui.image(name + '_GFX', draw(ctx.canvas(WIDTH, HEIGHT)))).then(() => {
+            return Promise.resolve(ui.image(name + '_GFX', draw(localizeCanvas(ctx.canvas(WIDTH, HEIGHT), locale)))).then(() => {
                 last[name] = key;
             });
         }
@@ -358,7 +367,7 @@ mgu.run({
             if (!visible) last[name] = null;
         });
         settings.onChange(key => {
-            if (key === 'enabled' || key === 'autoMode') labelNativeButtons();
+            if (key === 'enabled' || key === 'autoMode' || key === 'language') labelNativeButtons();
             homeTick.kick();
             liveTick.kick();
             profileTick.kick();

@@ -1,5 +1,7 @@
 'use strict';
 
+const { languageOf } = require('./i18n');
+const UNITS = 'de.bmw.infotainment.vehicle.Vehicle';
 const CDS = 'de.bmw.infotainment.vehicle.CDS';
 const CDS2 = 'de.bmw.infotainment.vehicle.CDS2';
 const VEHICLE = 'de.bmw.infotainment.vehicle.Vehicle2';
@@ -21,7 +23,7 @@ const MODE = {
     COMFORT: 'comfort', COMFORT_STANDARD: 'comfort', COMFORT_PLUS: 'comfort', COMFORT_INDIVIDUAL: 'individualMode',
     ECO_PRO: 'eco', ECO_PRO_EFFICIENT: 'eco', ECO_PRO_PLUS: 'eco', ECO_PRO_INDIVIDUAL: 'individualMode', INDIVIDUAL: 'individualMode'
 };
-const NOTIFY_ONLY_STATES = new Set(['engine', 'mode', 'gearbox', 'gearSelection', 'speed']);
+const NOTIFY_ONLY_STATES = new Set(['engine', 'mode', 'gearbox', 'gearSelection', 'speed', 'language']);
 const SELECTOR = { 1: 'P', 2: 'R', 3: 'N', 4: 'D', P: 'P', R: 'R', N: 'N', D: 'D' };
 
 function lookup(table, key) {
@@ -68,6 +70,7 @@ class Telemetry {
     watchGroups() {
         const put = (key, decode) => ({ key, decode: (v, retain) => this.put(key, v ? decode(v) : null, retain) });
         return {
+            [UNITS]: { statusNewCurrentUnitsStatusExt: put('language', v => languageOf(v.language)) },
             [CDS]: {
                 statusEngineSpeed2: put('rpm', v => scaled(v.actualValueRPMEngineCrankshaft, 48000, 0.25)),
                 statusEngineStatus: put('engine', v => lookup(ENGINE, v.statusEngineRunDrive))
@@ -112,7 +115,7 @@ class Telemetry {
         const idle = engine === 'running' && rpm !== null && speed !== null && stage !== null && pedal
             ? (stage === 'N' || stage === 'P') && speed < 1 && pedal.value <= 0.03 && rpm >= 400 && rpm <= 1200
             : null;
-        return { rpm, engine, speed, acceleration, stage, gear, neutral, idle, pedal, mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
+        return { language: val('language', STATE_MAX_AGE), rpm, engine, speed, acceleration, stage, gear, neutral, idle, pedal, mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
     }
 }
 
