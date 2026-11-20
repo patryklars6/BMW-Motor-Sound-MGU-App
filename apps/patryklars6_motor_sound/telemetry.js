@@ -103,8 +103,11 @@ class Telemetry {
         if (second && (!first || (second.value.stage !== null && second.sequence > first.sequence))) current = second;
         const stage = current ? current.value.stage : null;
         const gear = current ? current.value.gear : null;
-        const engine = val('engine', STATE_MAX_AGE);
         const rpm = val('rpm', RPM_MAX_AGE);
+        const engineSignal = val('engine', STATE_MAX_AGE);
+        // A fresh measured crankshaft speed is also direct evidence of an
+        // operating engine when this firmware omits statusEngineStatus.
+        const engine = engineSignal || (rpm === null ? null : rpm >= 400 ? 'running' : rpm === 0 ? 'off' : 'starting');
         const speed = val('speed', MOVING_MAX_AGE);
         const acceleration = val('acceleration', MOVING_MAX_AGE);
         const pedal = this.latest('pedal', MOVING_MAX_AGE);

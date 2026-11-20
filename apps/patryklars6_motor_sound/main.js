@@ -7,6 +7,7 @@ const { Telemetry } = require('./telemetry');
 const { connectVehicle } = require('./vehicle');
 const { resolveSettings, Synth, profileSetting } = require('./sound');
 const { PcmOutput } = require('./output');
+const { NativeMenu } = require('./native-menu');
 const { WIDTH, HEIGHT, PROFILE_CARDS, smoothGauge, audioStatus, drawLive, drawProfiles } = require('./view');
 
 const { drawHome, drawInfo } = require('./home');
@@ -46,7 +47,8 @@ mgu.run({
             const cfg = effective(data.mode);
             const active = cfg.enabled && cfg.profileId && cfg.gain > 0 && data.engine === 'running' && data.rpm !== null && data.rpm >= 400;
             if (!active) {
-                if (output.socket) output.close();
+                if (output.channels) output.close();
+                output.tick(false);
                 synth.reset();
                 return;
             }
@@ -82,12 +84,46 @@ mgu.run({
         const groups = { modes: 'Fahrmodi', speakers: 'Lautsprecher', design: 'Oberfläche' };
         const categories = [...new Set(settings.schema.filter(item => !item.hidden).map(item => item.group))];
 
+        const viewTicks = {};
+        let physicalTick;
+        let nativeMenu;
+        let nativeVisible = false;
+        let opening = null;
+
+        function graphicsReady() {
+            return !!(ctx.display && !ctx.display.blocked && ctx.display.ownable() && ctx.display.gpu.native && ctx.display.gpu.touch);
+        }
+
+        function graphicsStatus() {
+            if (graphicsReady()) {
+                return ctx.display.gpu.info && ctx.display.gpu.info.controller ? 'Touch und Controller verfügbar' : 'Touch verfügbar · Controller über BMW-Menü';
+            }
+            return 'BMW-Menü aktiv · mgu-render/1 mit Touch erforderlich';
+        }
+
+        function openNative() {
+            if (opening) return opening;
+            nativeVisible = true;
+            opening = Promise.resolve(ui.close('MAIN')).then(() => {
+                if (nativeMenu) return nativeMenu.render();
+            }).then(() => {
+                if (!ui.isVisible('NATIVE')) return ui.open('NATIVE');
+            }).then(() => { opening = null; }, error => { opening = null; throw error; });
+            return opening;
+        }
+
         function go(to) {
-            if (screen === to) return;
-            const before = screen;
             screen = to;
-            if (before === 'MAIN') return ui.open(to);
-            return ui.close(before).then(() => to === 'MAIN' ? undefined : ui.open(to));
+            Object.keys(last).forEach(key => { last[key] = null; });
+            if (!graphicsReady()) return openNative();
+            nativeVisible = false;
+            if (physicalTick) physicalTick.kick();
+            return ui.isVisible('MAIN') ? Promise.resolve() : ui.open('MAIN');
+        }
+
+        function loop(name, fps, fn) {
+            viewTicks[name] = fn;
+            return { kick() { if (screen === name && physicalTick) physicalTick.kick(); } };
         }
 
         function chooseGroup(value) {
@@ -97,9 +133,11 @@ mgu.run({
             refreshSettings();
         }
 
-        function offered() {
-            return settings.schema.filter(item => item.group === group && settings.shown(item)
-                && (!effectSettings || effectSettings.settings.some(key => profileSetting(tuneProfile, key) === item.key))
+        function offered(groupName, profile, effectId) {
+            const effect = effectId ? EFFECTS.find(item => item.id === effectId) : groupName ? null : effectSettings;
+            const selectedProfile = profile || tuneProfile;
+            return settings.schema.filter(item => item.group === (groupName || group) && settings.shown(item)
+                && (!effect || effect.settings.some(key => profileSetting(selectedProfile, key) === item.key))
                 && (output.channels === 5 || !item.key.endsWith('_engineCenter')));
         }
 
@@ -135,7 +173,7 @@ mgu.run({
         }
 
         function openTuning(profile) {
-            tuneProfile = profile;
+            tuneProfile = editing(profile);
             tuneEffect = 0;
             refreshTuning();
             return go('TUNING');
@@ -184,6 +222,7 @@ mgu.run({
             auto: () => settings.set('autoMode', settings.get('autoMode') === false),
             power: () => actions.toggle(),
             nav(key) {
+                if (key === 'native') return openNative();
                 if (key === 'individual') return openTuning('individual');
                 return pages[key] ? go(pages[key]) : goSettings(groups[key]);
             },
@@ -201,8 +240,8 @@ mgu.run({
                 const key = profileSetting(currentProfile(), layer + 'On');
                 settings.set(key, setting(key) !== true);
             },
-            reset() {
-                const profile = currentProfile();
+            reset(requestedProfile) {
+                const profile = editing(requestedProfile || currentProfile());
                 const card = PROFILE_CARDS.find(row => row.id === profile);
                 settings.schema.filter(row => row.group === card.name).forEach(row => {
                     if (settings.get(row.key) !== row.default) settings.set(row.key, row.default);
@@ -210,62 +249,22 @@ mgu.run({
             }
         };
 
-        const buttons = {
-            BTN_POWER: actions.power,
-            BTN_LIVE_POWER: actions.power,
-            BTN_AUTO: actions.auto,
-            BTN_OPEN_PROFILES: () => {
-                choice = PROFILE_CARDS.findIndex(card => card.id === currentProfile());
-                return go('PROFILES');
-            },
-            BTN_CONFIG: () => goSettings(),
-            BTN_CONFIG_GROUP: () => chooseGroup(categories[(categories.indexOf(group) + 1) % categories.length]),
-            BTN_CONFIG_ROW: moveRow,
-            BTN_CONFIG_UP: () => changeRow(row, 1),
-            BTN_CONFIG_DOWN: () => changeRow(row, -1),
-            BTN_CONFIG_HOME: () => go(effectSettings ? 'TUNING' : 'MAIN'),
-            BTN_PROFILE_PREV: () => moveProfile(-1),
-            BTN_PROFILE_NEXT: () => moveProfile(1),
-            BTN_PROFILE_USE: () => actions.select(PROFILE_CARDS[choice].id),
-            BTN_PROFILE_TUNE: () => openTuning(PROFILE_CARDS[choice].id),
-            BTN_TUNE_PROFILE: () => {
-                const index = PROFILE_CARDS.findIndex(card => card.id === tuneProfile);
-                tuneProfile = PROFILE_CARDS[(index + 1) % PROFILE_CARDS.length].id;
-                refreshTuning();
-            },
-            BTN_TUNE_EFFECT: () => { tuneEffect = (tuneEffect + 1) % EFFECTS.length; refreshTuning(); },
-            BTN_TUNE_OPEN: () => openEffect(tuneEffect),
-            BTN_TUNE_SWITCH: () => toggleEffect(tuneEffect),
-            BTN_TUNE_HOME: () => go('MAIN'),
-            BTN_OPEN_LIVE: () => go('LIVE'),
-            BTN_OPEN_INFO: () => go('INFO'),
-            BTN_LIVE_HOME: () => go('MAIN'),
-            BTN_PROFILES_HOME: () => go('MAIN'),
-            BTN_INFO_HOME: () => go('MAIN'),
-            BTN_RESET: actions.reset
-        };
-        Object.keys(buttons).forEach(id => ui.onClick(id, buttons[id]));
-        ['BTN_POWER', 'BTN_LIVE_POWER', 'BTN_AUTO', 'BTN_RESET', 'BTN_OPEN_PROFILES', 'BTN_OPEN_LIVE', 'BTN_OPEN_INFO',
-            'BTN_CONFIG', 'BTN_PROFILE_PREV', 'BTN_PROFILE_NEXT', 'BTN_PROFILE_USE', 'BTN_CONFIG_GROUP', 'BTN_CONFIG_UP',
-            'BTN_CONFIG_DOWN', 'BTN_CONFIG_ROW'].forEach(id => ctx.hideButton(id));
-
-        function labelNativeButtons() {
-            const power = settings.get('enabled') ? 'Sound aus' : 'Sound ein';
-            void ui.text('BTN_POWER', power);
-            void ui.text('BTN_LIVE_POWER', power);
-            void ui.text('BTN_AUTO', settings.get('autoMode') === false ? 'Automatik ein' : 'Automatik aus');
-        }
-        labelNativeButtons();
+        ui.onClick('BTN_BMW_MENU', openNative);
+        ui.onClick('BTN_MUTE', () => settings.set('enabled', false));
 
         const last = Object.create(null);
+        nativeMenu = new NativeMenu(ui, settings, ctx.background, {
+            select: actions.select, reset: actions.reset, offered,
+            graphicsStatus, canGraphics: graphicsReady, graphics: () => go('MAIN')
+        });
         function paint(name, key, draw) {
             if (last[name] === key) return;
-            return Promise.resolve(ui.image(name + '_GFX', draw(ctx.canvas(WIDTH, HEIGHT)))).then(() => {
+            return Promise.resolve(ui.image('MAIN_GFX', draw(ctx.canvas(WIDTH, HEIGHT)))).then(() => {
                 last[name] = key;
             });
         }
 
-        const homeTick = ctx.loop('MAIN', 8, () => {
+        const homeTick = loop('MAIN', 8, () => {
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
             const profile = editing(cfg.profileId);
@@ -288,7 +287,7 @@ mgu.run({
 
         let at = clock();
         let needle = null;
-        const liveTick = ctx.loop('LIVE', 12, () => {
+        const liveTick = loop('LIVE', 12, () => {
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
             const now = clock();
@@ -305,7 +304,7 @@ mgu.run({
             ]);
             return paint('LIVE', key, cv => { drawLive(cv, data, cfg, output, needle, actions, theme, showAcceleration); return cv; });
         });
-        const profileTick = ctx.loop('PROFILES', 6, () => {
+        const profileTick = loop('PROFILES', 6, () => {
             const cfg = effective(vehicle.snapshot().mode);
             const theme = settings.get('theme');
             return paint('PROFILES', [cfg.profileId, cfg.auto, theme, choice].join('/'), cv => {
@@ -313,12 +312,12 @@ mgu.run({
                 return cv;
             });
         });
-        const infoTick = ctx.loop('INFO', 2, () =>
+        const infoTick = loop('INFO', 2, () =>
             paint('INFO', ctx.spec.version + settings.get('theme'), cv => {
                 drawInfo(cv, actions.nav, ctx.spec.version, settings.get('theme'));
                 return cv;
             }));
-        const configTick = ctx.loop('CONFIG', 6, () => {
+        const configTick = loop('CONFIG', 6, () => {
             const rows = offered().map(item => ({
                 key: item.key, label: item.label,
                 value: item.type === 'bool' ? settings.get(item.key) ? 'Ein' : 'Aus' : settings.display(item.key)
@@ -335,7 +334,7 @@ mgu.run({
                 return cv;
             });
         });
-        const tuningTick = ctx.loop('TUNING', 6, () => {
+        const tuningTick = loop('TUNING', 6, () => {
             const model = {
                 theme: settings.get('theme'), channels: output.channels, focus: tuneEffect,
                 label: PROFILE_CARDS.find(card => card.id === tuneProfile).name,
@@ -352,19 +351,30 @@ mgu.run({
         refreshTuning = () => tuningTick.kick();
         refreshSettings = () => configTick.kick();
         refreshProfiles = () => profileTick.kick();
-        ctx.onLayout(() => { Object.keys(last).forEach(name => { last[name] = null; }); });
+        physicalTick = ctx.loop('MAIN', 12, () => {
+            if (!graphicsReady()) return openNative();
+            const tick = viewTicks[screen] || viewTicks.MAIN;
+            return tick();
+        });
+        const nativeTimer = setInterval(() => {
+            if (nativeVisible && ui.isVisible('NATIVE')) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
+        }, 500);
+        ctx.app.once('shutdown', () => clearInterval(nativeTimer));
+        ctx.onLayout(() => {
+            Object.keys(last).forEach(name => { last[name] = null; });
+            if (!graphicsReady() && ui.isVisible('MAIN')) void openNative();
+        });
         ui.onVisible((name, visible) => {
-            if (!visible && screen === name) screen = 'MAIN';
-            if (!visible) last[name] = null;
+            if (name === 'NATIVE') {
+                nativeVisible = visible;
+                if (visible) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
+            }
         });
-        settings.onChange(key => {
-            if (key === 'enabled' || key === 'autoMode') labelNativeButtons();
-            homeTick.kick();
-            liveTick.kick();
-            profileTick.kick();
-            infoTick.kick();
-            configTick.kick();
-            tuningTick.kick();
+        settings.onChange(() => {
+            Object.keys(last).forEach(name => { last[name] = null; });
+            if (physicalTick) physicalTick.kick();
+            if (nativeVisible) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
         });
+        return nativeMenu.render();
     }
-}).catch(() => {});
+}).catch(error => mgu.log.error('LUXO-Start: ' + (error && error.stack || error)));

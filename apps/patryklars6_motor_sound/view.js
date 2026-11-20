@@ -28,10 +28,10 @@ function audioStatus(prefs, data, output) {
     if (data.engine === 'off' || data.rpm < 400) return 'Motor steht';
     if (!prefs.profileId) return 'Wartet auf Fahrmodus';
     if (!prefs.gain) return 'Stumm';
-    if (output.channels === 5) return 'Audio aktiv · 5 PCM-Kanäle';
-    if (output.channels === 4) return 'Audio aktiv · 4 PCM-Kanäle';
-    if (output.channels === 2) return 'Audio aktiv · Stereo';
-    return output.state === 'connecting' ? 'Verbindet Audiopfad' : 'Audiopfad nicht verfügbar';
+    if (output.channels === 5) return 'PCM verbunden · 5 Kanäle';
+    if (output.channels === 4) return 'PCM verbunden · 4 Kanäle';
+    if (output.channels === 2) return 'PCM verbunden · Stereo';
+    return output.state === 'connecting' ? 'Verbindet Audio-Dienst' : 'Audiopfad fehlt · Details im BMW-Menü';
 }
 
 function header(cv, page, status, C) {

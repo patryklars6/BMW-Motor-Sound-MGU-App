@@ -7,7 +7,7 @@ const { themeFor } = require('./themes');
 const NAV = [
     ['home', 'Hauptmenü'], ['profiles', 'Soundprofile'], ['individual', 'Individual'],
     ['modes', 'Fahrmodus'], ['speakers', 'Lautsprecher'], ['design', 'Design'], ['settings', 'Einstellungen'],
-    ['live', 'Live-Daten'], ['info', 'Info']
+    ['live', 'Live-Daten'], ['info', 'Info'], ['native', 'BMW-Menü']
 ];
 const ROWS = [
     ['turbo', 'Turbosound'], ['exhaust', 'Auspuffklang'], ['bang', 'Pop & Bangs']

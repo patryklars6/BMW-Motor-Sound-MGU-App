@@ -77,6 +77,19 @@ test('Invalid samples invalidate immediately and ambiguous P/N is left unresolve
     assert.equal(telemetry.snapshot().gear, null);
 });
 
+test('Measured crankshaft speed supplies engine state only while RPM is fresh', () => {
+    const { telemetry, add, tick } = feed();
+    add(CDS, 'statusEngineSpeed2', { actualValueRPMEngineCrankshaft: 2800 });
+    assert.equal(telemetry.snapshot().engine, 'running');
+    tick(1001);
+    assert.equal(telemetry.snapshot().engine, null);
+    add(CDS, 'statusEngineSpeed2', { actualValueRPMEngineCrankshaft: 0 });
+    assert.equal(telemetry.snapshot().engine, 'off');
+    add(CDS, 'statusEngineStatus', { statusEngineRunDrive: 'MOTOR_AUS' });
+    add(CDS, 'statusEngineSpeed2', { actualValueRPMEngineCrankshaft: 2800 });
+    assert.equal(telemetry.snapshot().engine, 'off');
+});
+
 test('BMW drive modes choose independent assignments and their configured intensity', () => {
     const choices = { eco: 'm', comfort: 'f90', sport: 'v8', sportPlus: 'individual', individualMode: 'f90' };
     let last = -1;
@@ -183,6 +196,33 @@ test('Unix output never opens an untrusted endpoint and rejects an invalid chann
     output.tick();
     bad.emit('data', Buffer.from('READY 8\n'));
     assert.equal(bad.destroyed, true);
+});
+
+test('Missing audio service and missing ALSA route are reported without claiming playback', () => {
+    const unavailable = new PcmOutput(() => 0, { trusted: () => false, open: () => assert.fail('No service') });
+    unavailable.tick(false);
+    assert.match(unavailable.detail, /Audio-Dienst nicht erreichbar/);
+    const socket = new Peer();
+    const out = new PcmOutput(() => 0, { trusted: () => true, open: () => socket });
+    out.tick(false);
+    socket.emit('connect');
+    assert.equal(socket.packets[0], 'PROBE\n');
+    socket.emit('data', Buffer.from('ERROR ALSA_ROUTE_MISSING\n'));
+    assert.equal(out.channels, 0);
+    assert.match(out.detail, /luxo_overlay fehlt/);
+    assert.equal(socket.destroyed, true);
+});
+
+test('A successful probe never sends audio or marks the stream as connected', () => {
+    const socket = new Peer();
+    const out = new PcmOutput(() => 0, { trusted: () => true, open: () => socket });
+    out.tick(false);
+    socket.emit('connect');
+    socket.emit('data', Buffer.from('STATUS available 2\n'));
+    out.write(Buffer.alloc(FRAMES * 4));
+    assert.equal(out.state, 'available');
+    assert.equal(out.channels, 0);
+    assert.equal(socket.packets.length, 1);
 });
 
 test('Every vehicle interface only requests subscriptions and getters', () => {

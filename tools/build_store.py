@@ -16,6 +16,7 @@ import tarfile
 import tempfile
 import zipfile
 import zlib
+from patch_runtime import patch_runtime
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ID = "patryklars6_motor_sound"
@@ -56,6 +57,7 @@ def patch_builder(path):
         "    shutil.copy(os.path.join(SDK, 'index.js'), os.path.join(src, 'node_modules', 'oap-sdk', 'index.js'))\n": "",
         "    shutil.copy(os.path.join(SDK, 'package.json'), os.path.join(src, 'node_modules', 'oap-sdk', 'package.json'))\n": "",
         "    shutil.copytree(os.path.join(KIT, 'tools', 'oapgen'), os.path.join(stage, 'oapgen'))\n": "",
+        "                elif kindi in ('graphic',):": "                elif kindi == 'tworow':\n                    rows = [{'Text1stRow': {'value': label, 'type': 'Text'}, 'Text2ndRow': {'value': '', 'type': 'Text'}}]\n                elif kindi in ('graphic',):",
     }
     for old, new in edits.items():
         if source.count(old) != 1:
@@ -77,6 +79,7 @@ def stage_app(work, app_id, app_dir):
         atlas.extractall(runtime / "fonts")
     # Required by the kit's general-purpose context; LUXO uses its own read-only adapter.
     (runtime / "signals.js").write_text("'use strict';\nmodule.exports = {};\n", encoding="utf-8")
+    patch_runtime(runtime)
     upstream = work / "kit" / "tools" / "build.py"
     patch_builder(upstream)
     target = work / "apps" / app_id

@@ -2,7 +2,7 @@
   "id": "patryklars6_motor_sound",
   "title": "LUXO Motor Sound",
   "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "vendor": "patryklars6",
   "loggingId": "LUXO",
   "iconGlyph": "gauge",
@@ -44,151 +44,82 @@
   },
   "screens": [
     {
+      "name": "NATIVE",
+      "kind": "menu",
+      "settings": false,
+      "title": "LUXO Motor Sound · BMW-Menü",
+      "items": [
+        [
+          "tworow",
+          "NATIVE_ROW_0",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_1",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_2",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_3",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_4",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_5",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_6",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_7",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_BACK",
+          "Zurück / Hauptmenü"
+        ],
+        [
+          "tworow",
+          "NATIVE_PREV",
+          "Vorherige Seite"
+        ],
+        [
+          "tworow",
+          "NATIVE_NEXT",
+          "Weitere Einträge"
+        ]
+      ]
+    },
+    {
       "name": "MAIN",
       "kind": "canvas",
       "chrome": false,
-      "title": "Hauptmenü",
+      "settings": true,
+      "title": "LUXO Motor Sound",
       "buttons": [
         [
-          "BTN_POWER",
-          "Motorsound"
+          "BTN_BMW_MENU",
+          "BMW-Menü"
         ],
         [
-          "BTN_OPEN_PROFILES",
-          "Soundprofile"
-        ],
-        [
-          "BTN_OPEN_LIVE",
-          "Live-Daten"
-        ],
-        [
-          "BTN_CONFIG",
-          "Einstellungen"
-        ],
-        [
-          "BTN_OPEN_INFO",
-          "Info"
-        ],
-        [
-          "BTN_RESET",
-          "Reset"
-        ]
-      ],
-      "settings": true
-    },
-    {
-      "name": "LIVE",
-      "kind": "canvas",
-      "chrome": false,
-      "title": "Live-Daten",
-      "buttons": [
-        [
-          "BTN_LIVE_POWER",
-          "Motorsound"
-        ],
-        [
-          "BTN_LIVE_HOME",
-          "Hauptmenü"
-        ]
-      ]
-    },
-    {
-      "name": "PROFILES",
-      "kind": "canvas",
-      "chrome": false,
-      "title": "Soundprofile",
-      "buttons": [
-        [
-          "BTN_PROFILE_PREV",
-          "Vorheriges"
-        ],
-        [
-          "BTN_PROFILE_NEXT",
-          "Nächstes"
-        ],
-        [
-          "BTN_PROFILE_USE",
-          "Auswählen"
-        ],
-        [
-          "BTN_AUTO",
-          "Automatik"
-        ],
-        [
-          "BTN_PROFILE_TUNE",
-          "Tuning"
-        ],
-        [
-          "BTN_PROFILES_HOME",
-          "Hauptmenü"
-        ]
-      ]
-    },
-    {
-      "name": "INFO",
-      "kind": "canvas",
-      "chrome": false,
-      "title": "Info",
-      "buttons": [
-        [
-          "BTN_INFO_HOME",
-          "Hauptmenü"
-        ]
-      ]
-    },
-    {
-      "name": "CONFIG",
-      "kind": "canvas",
-      "chrome": false,
-      "title": "Einstellungen",
-      "buttons": [
-        [
-          "BTN_CONFIG_GROUP",
-          "Menü"
-        ],
-        [
-          "BTN_CONFIG_ROW",
-          "Zeile"
-        ],
-        [
-          "BTN_CONFIG_DOWN",
-          "Wert −"
-        ],
-        [
-          "BTN_CONFIG_UP",
-          "Wert +"
-        ],
-        [
-          "BTN_CONFIG_HOME",
-          "Zurück"
-        ]
-      ]
-    },
-    {
-      "name": "TUNING",
-      "kind": "canvas",
-      "chrome": false,
-      "title": "Sound-Tuning",
-      "buttons": [
-        [
-          "BTN_TUNE_PROFILE",
-          "Profil"
-        ],
-        [
-          "BTN_TUNE_EFFECT",
-          "Effekt"
-        ],
-        [
-          "BTN_TUNE_OPEN",
-          "Bearbeiten"
-        ],
-        [
-          "BTN_TUNE_SWITCH",
-          "Schalter"
-        ],
-        [
-          "BTN_TUNE_HOME",
-          "Hauptmenü"
+          "BTN_MUTE",
+          "Stumm"
         ]
       ]
     }
@@ -3139,7 +3070,10 @@
           "Ice White"
         ]
       ],
-      "group": "Oberfläche"
+      "group": "Oberfläche",
+      "aliases": {
+        "m_tricolour": "mperformance"
+      }
     },
     {
       "key": "dashboardAccel",
@@ -3148,5 +3082,11 @@
       "default": true,
       "group": "Oberfläche"
     }
-  ]
+  ],
+  "config": {
+    "nativeSettings": true
+  },
+  "requires": {
+    "luxo-motor-audio": "0.2.1"
+  }
 }
