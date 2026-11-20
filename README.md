@@ -1,5 +1,11 @@
 # BMW Motor Sound MGU App
 
+## Neues Update 0.2.1 · 20. November 2026
+
+**Für das Update im MGU Store den Zweig `codex/luxo-sound-tuning-020` auswählen.** Dort liegen das App-Paket 0.2.1 und der neue Audio-Dienst. Die Änderungen sind in [Pull Request #1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/pull/1) einsehbar.
+
+Neu sind die reparierte Grafikbedienung, das native BMW-Menü als Start und Rückfallebene sowie die Audio-Diagnose. **35 Node-Tests und vier Python-Tests bestanden.** Installation, Bedienung und Audioausgabe auf der Fahrzeug-MGU sind weiter zu bestätigen. Unten stehen **14 neue LUXO-Aufnahmen aus Paket 0.2.1**, einschließlich Motor-, Turbo-, Auspuff- und Pop-&-Bangs-Einstellungen.
+
 LUXO Motor Sound ergänzt BMW-MGU-Head-Units mit iDrive 7 um ein Motorsound-Menü und ein Dashboard für verfügbare Fahrzeugdaten. Version **0.2.1** enthält die Reparatur der Bedienung und einen Store-installierbaren Audio-Dienst.
 
 ## Installation und Update über den MGU Store
@@ -21,53 +27,71 @@ Beim ersten Hinzufügen der Quelle verwende **Einstellungen → Quelle hinzufüg
 
 Für hörbaren Ton ist weiterhin ein auf deiner MGU bestätigter ALSA-Mischpfad `luxo_overlay` erforderlich. Der Dienst liefert den erzeugten PCM-Strom an diesen Pfad. Paralleler Betrieb mit Radio/CarPlay, akustisch unabhängige Lautstärke und Center-Ausgabe sind auf deinem Fahrzeug weiterhin offen. [Reparaturbericht mit Tests und Fahrzeugprüfung](docs/reparatur-0.2.1.md)
 
-[ID7-Updatepaket 0.2.1](packages/patryklars6_motor_sound@0.2.1.tgz) · [Audio-Dienst 0.2.1](packages/luxo-motor-audio@0.2.1.tgz)
+[ID7-Updatepaket 0.2.1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.1.tgz) · [Audio-Dienst 0.2.1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/luxo-motor-audio@0.2.1.tgz)
 
-## Menüs im LUXO-Design
+## Neue Menübilder · Version 0.2.1 · LUXO
 
-Alle Bilder zeigen dieselbe Einstellung **LUXO** mit dunkelgrauem Hintergrund und violetten Akzenten. Die folgenden Bilder zeigen das LUXO-Design aus Version 0.2.0. Version 0.2.1 ergänzt den Start im BMW-Menü und die Audio-Diagnose. In der Live-Ansicht fehlen Messwerte, weil bei der Aufnahme keine Fahrzeugverbindung bestand.
+Alle 14 Aufnahmen wurden neu aus dem gebauten **Paket 0.2.1** auf dem Entwicklungsrechner erzeugt. Sie zeigen die tatsächlichen Zeichenfunktionen der App im selben **LUXO**-Design: Dunkelgrau, Weiß und Violett. Es sind **keine Fahrzeugfotos**. Ohne Fahrzeugverbindung bleiben Live-Werte auf **Nicht verfügbar** und Audiokanäle auf **nicht bestätigt**. MATCH UP 10 ist als Soundsystem ausgewählt.
+
+Die Bilder zeigen die optionale LUXO-Grafik. Die App startet zuerst im nativen BMW-Menü; dessen Darstellung wird von der Head Unit vorgegeben. Zum Öffnen der Grafik ist ein kompatibler Renderer mit Touch-Routing erforderlich. Eine Aufnahme des nativen Menüs im echten Fahrzeug steht aus. Aufnahmeverfahren und Bildprüfsummen stehen in [capture.json](docs/screenshots/0.2.1/capture.json).
 
 ### Hauptmenü
 
-![Hauptmenü im LUXO-Design](docs/screenshots/hauptmenue.png)
+![Hauptmenü 0.2.1 im LUXO-Design mit BMW-Menü-Zugang](docs/screenshots/0.2.1/hauptmenue.png)
 
 ### Live-Daten
 
-![Live-Daten im LUXO-Design](docs/screenshots/live-daten.png)
+![Live-Daten 0.2.1 ohne Fahrzeugverbindung](docs/screenshots/0.2.1/live-daten.png)
 
 ### Soundprofile
 
-![Soundprofile im LUXO-Design](docs/screenshots/soundprofile.png)
+![Sechs Soundprofile in Version 0.2.1 im LUXO-Design](docs/screenshots/0.2.1/soundprofile.png)
 
 ### Sound-Tuning
 
-![Sound-Tuning im LUXO-Design](docs/screenshots/sound-tuning.png)
+![Sound-Tuning 0.2.1 mit vier Effektkarten](docs/screenshots/0.2.1/sound-tuning.png)
+
+### Motor-Einstellungen
+
+![Separate Motorlautstärke und Klangcharakter in 0.2.1](docs/screenshots/0.2.1/motor-einstellungen.png)
 
 ### Turbo-Einstellungen
 
-![Turbo-Einstellungen im LUXO-Design](docs/screenshots/turbo-einstellungen.png)
+![Separate Turbo-Einstellungen in 0.2.1](docs/screenshots/0.2.1/turbo-einstellungen.png)
+
+### Turbo-Varianten und Verteilung
+
+![Turbo-Varianten und räumliche Vorgaben in 0.2.1](docs/screenshots/0.2.1/turbo-varianten.png)
+
+### Auspuff-Einstellungen
+
+![Separate Auspufflautstärke und Verteilung in 0.2.1](docs/screenshots/0.2.1/auspuff-einstellungen.png)
+
+### Künstliche Pop & Bangs
+
+![Pop-and-Bangs-Einstellungen in 0.2.1](docs/screenshots/0.2.1/pop-bangs.png)
 
 ### Lautsprecher
 
-![Lautsprecher im LUXO-Design](docs/screenshots/lautsprecher.png)
+![MATCH UP 10 und Lautsprechereinstellungen in 0.2.1](docs/screenshots/0.2.1/lautsprecher.png)
 
 ### Fahrmodi
 
-![Fahrmodi im LUXO-Design](docs/screenshots/fahrmodi.png)
+![Automatische Profilzuordnung zu fünf Fahrmodi in 0.2.1](docs/screenshots/0.2.1/fahrmodi.png)
 
 ### Allgemeine Einstellungen
 
-![Allgemeine Einstellungen im LUXO-Design](docs/screenshots/einstellungen.png)
+![App-Pegel und Pegelgrenze in 0.2.1](docs/screenshots/0.2.1/einstellungen.png)
 
 ### Design
 
-![Design im LUXO-Design](docs/screenshots/design.png)
+![Designauswahl in 0.2.1 mit gewähltem LUXO-Theme](docs/screenshots/0.2.1/design.png)
 
 ### Info und Hilfe
 
-![Info und Hilfe im LUXO-Design](docs/screenshots/info.png)
+![Info und Hilfe mit sichtbarer Versionsnummer 0.2.1](docs/screenshots/0.2.1/info.png)
 
-[ID7-Paket 0.2.1 herunterladen](packages/patryklars6_motor_sound@0.2.1.tgz)
+[ID7-Paket 0.2.1 herunterladen](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.1.tgz)
 
 Im **Lautsprecher**-Menü stehen Standard, BMW HiFi, Harman Kardon, Bowers & Wilkins, MATCH UP 8, MATCH UP 10 und Sonstiges / Aftermarket zur Auswahl.
 
@@ -119,7 +143,10 @@ Version 0.2.0 wurde im BMW G31 530d mit MATCH UP 10 gestartet. Der erneute Bedie
 
 ## Paket bauen und testen
 
+Wechsle für den Paketbau und die Tests in den Installationszweig mit Version 0.2.1:
+
 ```sh
+git switch codex/luxo-sound-tuning-020
 python tests/run_checks.py
 ```
 

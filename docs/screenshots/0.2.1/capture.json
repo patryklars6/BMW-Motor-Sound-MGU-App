@@ -1,0 +1,128 @@
+{
+  "version": "0.2.1",
+  "theme": "luxo",
+  "capture": "packaged software renderer",
+  "vehicleConnected": false,
+  "vehicleSignals": "unavailable",
+  "note": "No vehicle photo; native BMW menu appearance depends on head unit. Audio rows below are runtime text only.",
+  "nativeAudioRows": [
+    {
+      "Text1stRow": "Audioausgabe",
+      "Text2ndRow": "Audio-Dienst nicht erreichbar · luxo-motor-audio im Store prüfen"
+    },
+    {
+      "Text1stRow": "Kanäle",
+      "Text2ndRow": "Audiokanäle nicht bestätigt"
+    },
+    {
+      "Text1stRow": "App-Pegel",
+      "Text2ndRow": "30 %"
+    },
+    {
+      "Text1stRow": "Pegelgrenze",
+      "Text2ndRow": "55 %"
+    },
+    {
+      "Text1stRow": "Audio erneut prüfen",
+      "Text2ndRow": "Verbindung zum Audio-Dienst testen"
+    },
+    {
+      "Text1stRow": "Parallele Musik",
+      "Text2ndRow": "Benötigt bestätigten ALSA-Mischpfad luxo_overlay"
+    },
+    {
+      "Text1stRow": "BMW-Lautstärke",
+      "Text2ndRow": "Unabhängigkeit hängt vom RAM- und Verstärkerpfad ab"
+    },
+    {
+      "Text1stRow": "Zurück / Hauptmenü",
+      "Text2ndRow": ""
+    }
+  ],
+  "images": [
+    {
+      "file": "hauptmenue.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "d33a7da68863e5d04f272475f6753c07a629053c7645dcf64f2d6cd7343eb796"
+    },
+    {
+      "file": "live-daten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "eac6445db1e1b5669e4bca83f3db321b0a76a324c076e9546a99cfdc71e4b26b"
+    },
+    {
+      "file": "soundprofile.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "6604fbaaf06f082cd12da7fb38490f2673af2c04ffe3cd8b6a3bf0f44a00f9e5"
+    },
+    {
+      "file": "sound-tuning.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "c20ded31561f7743db6e3c2473457da01cffecd19b6ccb4eb7add1f68bb3e80d"
+    },
+    {
+      "file": "turbo-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "0119239d9ab612c3faa6ea24f8a94f97f99e32e668f4e865fc5a66f148a8e4dd"
+    },
+    {
+      "file": "turbo-varianten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "62440cc625adf4bceab2df0fd29c5ffba396c9ecd3a1ad7bfb7ec44b9ffb8c80"
+    },
+    {
+      "file": "motor-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "c065190ccc3a44e3ff125cc738770c0ee998c1931f0d1faf6c744e464fa2b62b"
+    },
+    {
+      "file": "auspuff-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "39083a77818640b9365942f89337066af425ff3b437ad249f3e6b53e5dcab493"
+    },
+    {
+      "file": "pop-bangs.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "e5b8bde853fab2f810b0839ba74478ce6ab46ef902e87bda8bee573dc542fb0c"
+    },
+    {
+      "file": "lautsprecher.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "907906bb9687137af8425b726f488af3939ef7ba82f62ad81ec8e47f20a96c1a"
+    },
+    {
+      "file": "fahrmodi.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "faf968c22a04d9148fc85003f690a9416b5a1fb460b696015238188f5deb33d3"
+    },
+    {
+      "file": "einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "2c7429a305772dbc40e9c11fadf518a066e021152c4b8192b9d11bad1f692f34"
+    },
+    {
+      "file": "design.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "c0dfb948cc3b72363e07f2c79202bf783238f436307e695c54a6ced5887bc70c"
+    },
+    {
+      "file": "info.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "49e0f2c061ea51427563a6064e068bda3743028197d611589d6e24decbe589d4"
+    }
+  ]
+}
