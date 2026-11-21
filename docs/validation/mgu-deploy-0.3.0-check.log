@@ -1,0 +1,49 @@
+CHECK luxo-motor-audio@0.2.1.tgz
+running as root (fake root)
+node: v24.22.3
+head unit: iDrive 7 (<repository>\dist\store-preflight-MBQA36\head-unit\usr\lib\oap-mainapp), firmware unknown
+systemd: unknown
+NOT systemd 237 (found: unknown)
+/ mount: unknown
+<repository>\dist\store-preflight-MBQA36\head-unit\var\opt writable
+free space: df unavailable, skipped
+group mgu_wayland present
+group tm_oap_app present
+NOT winston.service unit file present
+oapcontroller: unknown; app manager pid: not found
+NOT base.json readable at <repository>\dist\store-preflight-MBQA36\head-unit\usr\lib\oap-mainapp\config\base.json
+app-privacy: not installed (<repository>\dist\store-preflight-MBQA36\head-unit\no-privacy-tool)
+display-bridge socket unit: unknown; service: unknown; socket file: absent
+fallback: inactive
+NOT artifact <repository>\packages\luxo-motor-audio@0.2.1.tgz valid: <repository>\packages\luxo-motor-audio@0.2.1.tgz: bad enable entry
+exit=2
+
+CHECK luxo-motor-audio@0.3.0.tgz
+running as root (fake root)
+node: v24.22.3
+head unit: iDrive 7 (<repository>\dist\store-preflight-MBQA36\head-unit\usr\lib\oap-mainapp), firmware unknown
+systemd: unknown
+NOT systemd 237 (found: unknown)
+/ mount: unknown
+<repository>\dist\store-preflight-MBQA36\head-unit\var\opt writable
+free space: df unavailable, skipped
+group mgu_wayland present
+group tm_oap_app present
+NOT winston.service unit file present
+oapcontroller: unknown; app manager pid: not found
+NOT base.json readable at <repository>\dist\store-preflight-MBQA36\head-unit\usr\lib\oap-mainapp\config\base.json
+app-privacy: not installed (<repository>\dist\store-preflight-MBQA36\head-unit\no-privacy-tool)
+display-bridge socket unit: unknown; service: unknown; socket file: absent
+fallback: inactive
+artifact <repository>\dist\luxo-motor-audio@0.3.0.tgz: tool luxo-motor-audio 0.3.0 ok (for iDrive 7)
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\var\opt\luxo-motor-audio\current
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\recmgr-restartlist.conf
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\systemd\system\luxo-motor-audio.socket
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\systemd\system\luxo-motor-audio.service
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\systemd\system\sockets.target.wants\luxo-motor-audio.socket
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\systemd\system\luxo-motor-audio.socket.d\zz-mgu-deploy-limits.conf
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\etc\systemd\system\luxo-motor-audio.service.d\zz-mgu-deploy-limits.conf
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\var\opt\luxo-motor-audio\versions\0.3.0
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\var\opt\mgu-uplink\uids.d\luxo-motor-audio
+  would touch <repository>\dist\store-preflight-MBQA36\head-unit\var\opt\mgu-uplink\apps.d\luxo-motor-audio
+exit=0
