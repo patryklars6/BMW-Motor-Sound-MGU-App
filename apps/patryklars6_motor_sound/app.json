@@ -2,7 +2,7 @@
   "id": "patryklars6_motor_sound",
   "title": "LUXO Motor Sound",
   "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
-  "version": "0.1.1",
+  "version": "0.2.2",
   "vendor": "patryklars6",
   "loggingId": "LUXO",
   "iconGlyph": "gauge",
@@ -36,17 +36,90 @@
     "de.bmw.powertrain.AcceleratorPedal": {
       "_optional": "Pedal und Gaswegnahme",
       "AngleAcceleratorPedal": "rs"
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "_optional": "Längsbeschleunigung",
+      "statusLongitudinalAccelerationMassCenter": "rs"
     }
   },
   "screens": [
     {
+      "name": "NATIVE",
+      "kind": "menu",
+      "settings": false,
+      "title": "LUXO Motor Sound · BMW-Menü",
+      "items": [
+        [
+          "tworow",
+          "NATIVE_ROW_0",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_1",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_2",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_3",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_4",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_5",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_6",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_ROW_7",
+          ""
+        ],
+        [
+          "tworow",
+          "NATIVE_BACK",
+          "Zurück / Hauptmenü"
+        ],
+        [
+          "tworow",
+          "NATIVE_PREV",
+          "Vorherige Seite"
+        ],
+        [
+          "tworow",
+          "NATIVE_NEXT",
+          "Weitere Einträge"
+        ]
+      ]
+    },
+    {
       "name": "MAIN",
       "kind": "canvas",
+      "chrome": false,
+      "settings": true,
       "title": "LUXO Motor Sound",
       "buttons": [
         [
-          "BTN_SETTINGS",
-          "Einstellungen"
+          "BTN_BMW_MENU",
+          "BMW-Menü"
+        ],
+        [
+          "BTN_MUTE",
+          "Stumm"
         ]
       ]
     }
@@ -64,19 +137,7 @@
       "label": "Motorsound-Pegel",
       "type": "number",
       "default": 30,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Motorsound"
     },
@@ -85,19 +146,7 @@
       "label": "Pegelgrenze",
       "type": "number",
       "default": 55,
-      "steps": [
-        10,
-        20,
-        30,
-        40,
-        50,
-        55,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Motorsound"
     },
@@ -115,6 +164,10 @@
       "default": "v8",
       "options": [
         [
+          "v6",
+          "V6 Sound"
+        ],
+        [
           "v8",
           "V8 Sound"
         ],
@@ -125,6 +178,10 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ],
         [
           "individual",
@@ -143,6 +200,10 @@
       "default": "v8",
       "options": [
         [
+          "v6",
+          "V6 Sound"
+        ],
+        [
           "v8",
           "V8 Sound"
         ],
@@ -153,6 +214,10 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ],
         [
           "individual",
@@ -171,6 +236,10 @@
       "default": "v8",
       "options": [
         [
+          "v6",
+          "V6 Sound"
+        ],
+        [
           "v8",
           "V8 Sound"
         ],
@@ -181,6 +250,10 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ],
         [
           "individual",
@@ -199,6 +272,10 @@
       "default": "f90",
       "options": [
         [
+          "v6",
+          "V6 Sound"
+        ],
+        [
           "v8",
           "V8 Sound"
         ],
@@ -209,6 +286,10 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ],
         [
           "individual",
@@ -227,6 +308,10 @@
       "default": "m",
       "options": [
         [
+          "v6",
+          "V6 Sound"
+        ],
+        [
           "v8",
           "V8 Sound"
         ],
@@ -237,6 +322,10 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ],
         [
           "individual",
@@ -249,11 +338,15 @@
       }
     },
     {
-      "key": "individualBase",
-      "label": "Grundklang",
+      "key": "individualMode",
+      "label": "INDIVIDUAL",
       "type": "choice",
-      "default": "v8",
+      "default": "individual",
       "options": [
+        [
+          "v6",
+          "V6 Sound"
+        ],
         [
           "v8",
           "V8 Sound"
@@ -265,6 +358,2374 @@
         [
           "m",
           "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
+        ],
+        [
+          "individual",
+          "Individual"
+        ]
+      ],
+      "group": "Fahrmodi",
+      "when": {
+        "autoMode": true
+      }
+    },
+    {
+      "key": "v6_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "V6 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v6_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "V6 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v6_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "V6 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v6_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "V6 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v6_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "V6 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v6_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "V6 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v6_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "V6 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v6_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "V6 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v6_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "V6 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "V6 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "v6_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "V6 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "v6_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "V6 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "v6_engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 75,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 75, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 23,
+      "steps": [ 0, 10, 20, 23, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 56,
+      "steps": [ 0, 10, 20, 30, 40, 50, 56, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 43,
+      "steps": [ 0, 10, 20, 30, 40, 43, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 25,
+      "steps": [ 0, 10, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "V6 Sound",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "v6_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v6_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V6 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "V8 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v8_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "V8 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v8_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "V8 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v8_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "V8 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v8_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "V8 Sound",
+      "type": "bool"
+    },
+    {
+      "key": "v8_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "V8 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v8_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "V8 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v8_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "V8 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "v8_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "V8 Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "V8 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "v8_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "V8 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "v8_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "V8 Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "v8_engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 77,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 77, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 13,
+      "steps": [ 0, 10, 13, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 75,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 75, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 62,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 62, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 17,
+      "steps": [ 0, 10, 17, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "V8 Sound",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "v8_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "v8_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "V8 Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "BMW M5 F90",
+      "type": "bool"
+    },
+    {
+      "key": "f90_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "BMW M5 F90",
+      "type": "bool"
+    },
+    {
+      "key": "f90_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "BMW M5 F90",
+      "type": "bool"
+    },
+    {
+      "key": "f90_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "BMW M5 F90",
+      "type": "bool"
+    },
+    {
+      "key": "f90_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "BMW M5 F90",
+      "type": "bool"
+    },
+    {
+      "key": "f90_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "BMW M5 F90",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "f90_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "BMW M5 F90",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "f90_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "BMW M5 F90",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "f90_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "BMW M5 F90",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "BMW M5 F90",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "f90_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "BMW M5 F90",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "f90_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "BMW M5 F90",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "f90_engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 82,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 82, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 35,
+      "steps": [ 0, 10, 20, 30, 35, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 64,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 64, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 51,
+      "steps": [ 0, 10, 20, 30, 40, 50, 51, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 33,
+      "steps": [ 0, 10, 20, 30, 33, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "BMW M5 F90",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "f90_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "f90_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M5 F90",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "BMW M Sound",
+      "type": "bool"
+    },
+    {
+      "key": "m_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "BMW M Sound",
+      "type": "bool"
+    },
+    {
+      "key": "m_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "BMW M Sound",
+      "type": "bool"
+    },
+    {
+      "key": "m_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "BMW M Sound",
+      "type": "bool"
+    },
+    {
+      "key": "m_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "BMW M Sound",
+      "type": "bool"
+    },
+    {
+      "key": "m_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "BMW M Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "m_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "BMW M Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "m_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "BMW M Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "m_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "BMW M Sound",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "BMW M Sound",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "m_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "BMW M Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "m_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "BMW M Sound",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "m_engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 73,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 73, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 22,
+      "steps": [ 0, 10, 20, 22, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 69,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 69, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 39,
+      "steps": [ 0, 10, 20, 30, 39, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 27,
+      "steps": [ 0, 10, 20, 27, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "BMW M Sound",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "m_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "m_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "m_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "m_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "BMW M Sound",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "Sport Diesel",
+      "type": "bool"
+    },
+    {
+      "key": "diesel_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "Sport Diesel",
+      "type": "bool"
+    },
+    {
+      "key": "diesel_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "Sport Diesel",
+      "type": "bool"
+    },
+    {
+      "key": "diesel_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "Sport Diesel",
+      "type": "bool"
+    },
+    {
+      "key": "diesel_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "Sport Diesel",
+      "type": "bool"
+    },
+    {
+      "key": "diesel_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "Sport Diesel",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "diesel_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "Sport Diesel",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "diesel_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "Sport Diesel",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "diesel_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "Sport Diesel",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "Sport Diesel",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "diesel_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "Sport Diesel",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "diesel_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "Sport Diesel",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "diesel_engine",
+      "label": "Motor",
+      "type": "number",
+      "default": 66,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 66, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_turbo",
+      "label": "Turbo",
+      "type": "number",
+      "default": 43,
+      "steps": [ 0, 10, 20, 30, 40, 43, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_exhaust",
+      "label": "Auspuff",
+      "type": "number",
+      "default": 60,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_bass",
+      "label": "Bass",
+      "type": "number",
+      "default": 70,
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_lift",
+      "label": "Turbo bei Gaswegnahme",
+      "type": "number",
+      "default": 36,
+      "steps": [ 0, 10, 20, 30, 36, 40, 50, 60, 70, 80, 90, 100 ],
+      "unit": "%",
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "Sport Diesel",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "diesel_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Sport Diesel",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_engineOn",
+      "label": "Motorsound ein",
+      "default": true,
+      "group": "Individual",
+      "type": "bool"
+    },
+    {
+      "key": "individual_turboOn",
+      "label": "Turbosound ein",
+      "default": true,
+      "group": "Individual",
+      "type": "bool"
+    },
+    {
+      "key": "individual_exhaustOn",
+      "label": "Auspuffklang ein",
+      "default": true,
+      "group": "Individual",
+      "type": "bool"
+    },
+    {
+      "key": "individual_liftOn",
+      "label": "Turbo-Pfeifen ein",
+      "default": true,
+      "group": "Individual",
+      "type": "bool"
+    },
+    {
+      "key": "individual_bangOn",
+      "label": "Pop & Bangs ein",
+      "default": false,
+      "group": "Individual",
+      "type": "bool"
+    },
+    {
+      "key": "individual_engineVolume",
+      "label": "Lautstärke Motor",
+      "default": 100,
+      "group": "Individual",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "individual_turboVolume",
+      "label": "Lautstärke Turbo",
+      "default": 100,
+      "group": "Individual",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "individual_exhaustVolume",
+      "label": "Lautstärke Auspuff",
+      "default": 100,
+      "group": "Individual",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 25, 50, 75, 100 ]
+    },
+    {
+      "key": "individual_bang",
+      "label": "Pop & Bangs – Intensität",
+      "default": 50,
+      "group": "Individual",
+      "type": "number",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_character",
+      "label": "Klangcharakter",
+      "default": "natural",
+      "group": "Individual",
+      "type": "choice",
+      "options": [
+        [
+          "natural",
+          "Profiltypisch"
+        ],
+        [
+          "deep",
+          "Tief"
+        ],
+        [
+          "balanced",
+          "Ausgewogen"
+        ],
+        [
+          "sport",
+          "Sportlich"
+        ],
+        [
+          "mperformance",
+          "M Performance"
+        ]
+      ]
+    },
+    {
+      "key": "individual_balance",
+      "label": "Profil-Balance links / rechts",
+      "default": "global",
+      "group": "Individual",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "individual_fader",
+      "label": "Profil-Fader vorn / hinten",
+      "default": "global",
+      "group": "Individual",
+      "type": "choice",
+      "options": [
+        [
+          "global",
+          "Lautsprechereinstellung"
+        ],
+        [
+          "-100",
+          "-100 %"
+        ],
+        [
+          "-75",
+          "-75 %"
+        ],
+        [
+          "-50",
+          "-50 %"
+        ],
+        [
+          "-25",
+          "-25 %"
+        ],
+        [
+          "0",
+          "0 %"
+        ],
+        [
+          "25",
+          "25 %"
+        ],
+        [
+          "50",
+          "50 %"
+        ],
+        [
+          "75",
+          "75 %"
+        ],
+        [
+          "100",
+          "100 %"
+        ]
+      ]
+    },
+    {
+      "key": "individualBase",
+      "label": "Grundklang",
+      "type": "choice",
+      "default": "v8",
+      "options": [
+        [
+          "v6",
+          "V6 Sound"
+        ],
+        [
+          "v8",
+          "V8 Sound"
+        ],
+        [
+          "f90",
+          "BMW M5 F90"
+        ],
+        [
+          "m",
+          "BMW M Sound"
+        ],
+        [
+          "diesel",
+          "Sport Diesel"
         ]
       ],
       "group": "Individual"
@@ -274,19 +2735,7 @@
       "label": "Motor",
       "type": "number",
       "default": 60,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Individual"
     },
@@ -295,19 +2744,7 @@
       "label": "Turbo",
       "type": "number",
       "default": 30,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Individual"
     },
@@ -316,19 +2753,7 @@
       "label": "Auspuff",
       "type": "number",
       "default": 50,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Individual"
     },
@@ -337,19 +2762,7 @@
       "label": "Bass",
       "type": "number",
       "default": 50,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Individual"
     },
@@ -358,21 +2771,192 @@
       "label": "Turbo bei Gaswegnahme",
       "type": "number",
       "default": 30,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Individual"
+    },
+    {
+      "key": "individual_boostOn",
+      "label": "Turbo-Pfeifen beim Beschleunigen",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_boost",
+      "label": "Pfeifen beim Beschleunigen",
+      "type": "number",
+      "default": 40,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_bangRate",
+      "label": "Pop & Bangs – Häufigkeit",
+      "type": "number",
+      "default": 30,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_bassOn",
+      "label": "Bass ein",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_depth",
+      "label": "Klangtiefe",
+      "type": "number",
+      "default": 50,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_engineCenter",
+      "label": "Motor: Center-Anteil",
+      "type": "number",
+      "default": 55,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 55, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_turboStyle",
+      "label": "Turbo-Klang",
+      "type": "choice",
+      "default": "classic",
+      "group": "Individual",
+      "options": [
+        [
+          "soft",
+          "Dezent"
+        ],
+        [
+          "classic",
+          "Klassisch"
+        ],
+        [
+          "high",
+          "Hell"
+        ],
+        [
+          "twin",
+          "Twin-Scroll"
+        ]
+      ]
+    },
+    {
+      "key": "individual_enginePan",
+      "label": "Motor · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_engineFader",
+      "label": "Motor · Vorn / Hinten",
+      "type": "number",
+      "default": -85,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -85, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_engineRouteGain",
+      "label": "Motor · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_turboPan",
+      "label": "Turbo · Balance",
+      "type": "number",
+      "default": 70,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 70, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_turboFader",
+      "label": "Turbo · Vorn / Hinten",
+      "type": "number",
+      "default": -80,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -80, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_turboRouteGain",
+      "label": "Turbo · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_exhaustPan",
+      "label": "Auspuff · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_exhaustFader",
+      "label": "Auspuff · Vorn / Hinten",
+      "type": "number",
+      "default": 80,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_exhaustRouteGain",
+      "label": "Auspuff · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_bangPan",
+      "label": "Pop & Bangs · Balance",
+      "type": "number",
+      "default": 0,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_bangFader",
+      "label": "Pop & Bangs · Vorn / Hinten",
+      "type": "number",
+      "default": 90,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ -100, -90, -75, -50, -25, 0, 25, 50, 75, 90, 100 ]
+    },
+    {
+      "key": "individual_bangRouteGain",
+      "label": "Pop & Bangs · Verteilungspegel",
+      "type": "number",
+      "default": 100,
+      "unit": "%",
+      "group": "Individual",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
     },
     {
       "key": "speakers",
@@ -406,7 +2990,7 @@
         ],
         [
           "other",
-          "Sonstiges"
+          "Sonstiges / Aftermarket"
         ]
       ],
       "group": "Lautsprecher"
@@ -416,17 +3000,7 @@
       "label": "Balance links / rechts",
       "type": "number",
       "default": 0,
-      "steps": [
-        -100,
-        -75,
-        -50,
-        -25,
-        0,
-        25,
-        50,
-        75,
-        100
-      ],
+      "steps": [ -100, -75, -50, -25, 0, 25, 50, 75, 100 ],
       "unit": "%",
       "group": "Lautsprecher"
     },
@@ -435,17 +3009,7 @@
       "label": "Fader vorn / hinten",
       "type": "number",
       "default": 0,
-      "steps": [
-        -100,
-        -75,
-        -50,
-        -25,
-        0,
-        25,
-        50,
-        75,
-        100
-      ],
+      "steps": [ -100, -75, -50, -25, 0, 25, 50, 75, 100 ],
       "unit": "%",
       "group": "Lautsprecher"
     },
@@ -464,19 +3028,7 @@
       "label": "Sonstiges: Klangpegel",
       "type": "number",
       "default": 70,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Lautsprecher",
       "when": {
@@ -488,24 +3040,53 @@
       "label": "Sonstiges: Bass",
       "type": "number",
       "default": 50,
-      "steps": [
-        0,
-        10,
-        20,
-        30,
-        40,
-        50,
-        60,
-        70,
-        80,
-        90,
-        100
-      ],
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ],
       "unit": "%",
       "group": "Lautsprecher",
       "when": {
         "speakers": "other"
       }
+    },
+    {
+      "key": "theme",
+      "label": "Design",
+      "type": "choice",
+      "default": "luxo",
+      "options": [
+        [
+          "luxo",
+          "LUXO"
+        ],
+        [
+          "mperformance",
+          "M-Performance"
+        ],
+        [
+          "orange",
+          "Orange Sport"
+        ],
+        [
+          "ice_white",
+          "Ice White"
+        ]
+      ],
+      "group": "Oberfläche",
+      "aliases": {
+        "m_tricolour": "mperformance"
+      }
+    },
+    {
+      "key": "dashboardAccel",
+      "label": "Beschleunigung im Dashboard",
+      "type": "bool",
+      "default": true,
+      "group": "Oberfläche"
     }
-  ]
+  ],
+  "config": {
+    "nativeSettings": true
+  },
+  "requires": {
+    "luxo-motor-audio": "0.2.2"
+  }
 }

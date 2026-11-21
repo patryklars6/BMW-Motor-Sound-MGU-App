@@ -16,6 +16,20 @@
           "{id}",
           "{dir}"
         ]
+      },
+      "requires": {
+        "luxo-motor-audio": "0.2.2"
+      }
+    },
+    {
+      "id": "luxo-motor-audio",
+      "kind": "tool",
+      "path": "tools",
+      "mguHmi": [
+        "ID7"
+      ],
+      "requires": {
+        "mgu-python": "1.0.2"
       }
     }
   ]

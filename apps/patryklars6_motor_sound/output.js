@@ -8,8 +8,16 @@ const { FRAMES } = require('./sound');
 const SOCKET = '/run/luxo-motor-sound/pcm.sock';
 const HELLO = 'LUXO/1 S16LE 48000\n';
 const RETRY_MS = 3500;
-const HANDSHAKE_MS = 500;
-const HEADER_LIMIT = 32;
+const HANDSHAKE_MS = 3000;
+const HEADER_LIMIT = 160;
+const ERRORS = {
+    ALSA_UNAVAILABLE: 'ALSA-Bibliothek des Audio-Dienstes ist nicht verfügbar',
+    ALSA_ROUTE_MISSING: 'Audio-Dienst vorhanden · ALSA-Mischpfad luxo_overlay fehlt',
+    ALSA_OPEN_FAILED: 'Audio-Mischpfad lässt sich nicht öffnen · Dienstprotokoll prüfen',
+    ALSA_FORMAT_UNSUPPORTED: 'Audio-Mischpfad unterstützt das PCM-Format nicht',
+    CONFIG_INVALID: 'Konfiguration des Audio-Dienstes ist ungültig',
+    AUDIO_WRITE_FAILED: 'Schreibfehler am Audio-Mischpfad · Dienstprotokoll prüfen'
+};
 
 function trustedSocket(socketPath) {
     try {
@@ -31,46 +39,77 @@ class PcmOutput {
         this.channels = 0;
         this.blockedAt = null;
         this.state = 'waiting';
+        this.detail = 'Audio-Dienst wird geprüft';
+        this.timer = null;
+        this.probing = false;
     }
 
-    tick() {
+    tick(active) {
+        active = active !== false;
         const now = this.clock();
+        if (this.socket && this.probing === active) this.close('waiting');
         if (this.socket) {
-            if (this.blockedAt !== null && now - this.blockedAt > 40) this.close('waiting');
+            if (this.blockedAt !== null && now - this.blockedAt > 40) {
+                this.detail = 'Audioausgabe überlastet · Verbindung wird erneuert';
+                this.close('waiting');
+            }
             return;
         }
         if (now < this.nextAttempt) return;
         this.nextAttempt = now + RETRY_MS;
-        if (!this.endpoint.trusted()) return;
+        if (!this.endpoint.trusted()) {
+            this.detail = 'Audio-Dienst nicht erreichbar · luxo-motor-audio im Store prüfen';
+            return;
+        }
         try {
             const socket = this.endpoint.open();
             this.socket = socket;
+            this.probing = !active;
             let header = '';
-            const timer = setTimeout(() => {
-                if (this.socket === socket && this.channels === 0) this.close('waiting');
+            this.timer = setTimeout(() => {
+                if (this.socket === socket && this.channels === 0) {
+                    this.detail = 'Audio-Dienst antwortet nicht rechtzeitig';
+                    this.close('waiting');
+                }
             }, HANDSHAKE_MS);
             const disconnected = () => {
-                clearTimeout(timer);
-                if (this.socket === socket) this.close('waiting');
+                if (this.socket === socket) {
+                    this.detail = 'Verbindung zum Audio-Dienst unterbrochen';
+                    this.close('waiting');
+                }
             };
             socket.on('error', disconnected);
             socket.on('end', disconnected);
             socket.on('close', disconnected);
             socket.on('connect', () => {
-                if (this.socket === socket) socket.write(HELLO);
+                if (this.socket === socket) socket.write(active ? HELLO : 'PROBE\n');
             });
             socket.on('drain', () => {
                 if (this.socket === socket) this.blockedAt = null;
             });
             socket.on('data', chunk => {
                 if (this.socket !== socket) return;
-                if (this.channels || header.length + chunk.length > HEADER_LIMIT) return this.close('waiting');
+                if (header.length + chunk.length > HEADER_LIMIT) return this.close('waiting');
                 header += chunk.toString('ascii');
                 if (header.indexOf('\n') < 0) return;
-                if (header !== 'READY 2\n' && header !== 'READY 4\n') return this.close('waiting');
-                clearTimeout(timer);
+                const error = /^ERROR ([A-Z_]+)\n$/.exec(header);
+                if (error) {
+                    this.detail = ERRORS[error[1]] || 'Audio-Dienst meldet einen Fehler';
+                    return this.close('unavailable');
+                }
+                if (!active && /^STATUS available [245]\n$/.test(header)) {
+                    this.detail = 'ALSA-Mischpfad vorhanden · Lautsprecherverbindung im Fahrzeug prüfen';
+                    return this.close('available');
+                }
+                if (this.channels || !/^READY [245]\n$/.test(header)) {
+                    this.detail = 'Audio-Dienst verwendet ein unbekanntes Protokoll';
+                    return this.close('unavailable');
+                }
+                clearTimeout(this.timer);
                 this.channels = Number(header[6]);
+                header = '';
                 this.state = 'connected';
+                this.detail = 'PCM verbunden · ' + this.channels + ' Kanäle · Fahrzeugausgabe prüfen';
             });
             this.state = 'connecting';
         } catch (e) {
@@ -88,6 +127,8 @@ class PcmOutput {
     }
 
     close(state) {
+        clearTimeout(this.timer);
+        this.timer = null;
         const socket = this.socket;
         if (socket) {
             this.nextAttempt = this.clock() + RETRY_MS;
@@ -97,6 +138,11 @@ class PcmOutput {
         this.channels = 0;
         this.blockedAt = null;
         this.state = state || 'waiting';
+    }
+
+    retry() {
+        this.close();
+        this.nextAttempt = 0;
     }
 }
 
