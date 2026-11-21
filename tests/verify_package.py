@@ -28,7 +28,9 @@ with tarfile.open(archive, "r:gz") as tar:
     assert meta["mguHmi"] == component["mguHmi"] == ["ID7"]
     assert meta["mguAppStartType"] == "autostart"
     assert component["id"] == "patryklars6_motor_sound"
-    assert component["requires"]["luxo-motor-audio"] == "0.2.1"
+    audio = json.loads((ROOT / "tools/component.json").read_text(encoding="utf-8"))
+    assert spec["version"] == audio["version"] == "0.2.2"
+    assert component["requires"]["luxo-motor-audio"] == spec["requires"]["luxo-motor-audio"] == audio["version"]
     assert data("config/base.json")["rhmiLoadingEnabled"]
     assert b"require('oap-sdk')" in read("javascript/kit/mgu.js")
     application = data("rhmiData/application.json")["application"]

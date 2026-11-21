@@ -1,10 +1,10 @@
 # Fahrzeugtest für BMW G31 530d und MATCH UP 10
 
-Version 0.2.0 wurde im Fahrzeug geöffnet. Für Version 0.2.1 steht der erneute Test an der Fahrzeug-MGU aus. Die Paketprüfung und die Anwendungstests laufen außerhalb des Fahrzeugs. Testdaten sind auf die Tests beschränkt.
+Version 0.2.0 wurde im Fahrzeug geöffnet. Bei 0.2.1 meldete der Nutzer den Installationsfehler des Audio-Dienstes. Version 0.2.2 besteht die Vorprüfung des echten Deployers auf dem Entwicklungsrechner; der vollständige Installations- und Audiotest an der Fahrzeug-MGU steht aus. Testdaten sind auf die Tests beschränkt.
 
 | Bereich | Prüfung am Fahrzeug |
 | --- | --- |
-| Installation und Oberfläche | Den Test-Branch aus der [Installationsanleitung](installation-mgu-store.md) hinzufügen. Paketbau und Aktualisierung der bestehenden Installation auf 0.2.1 prüfen. Gespeicherte Werte müssen dabei erhalten bleiben. Hauptmenü, alle vier Themes, Live-Ansicht und Klangprofilkarten auf den unterstützten Displayformaten prüfen. Profile und Einstellungen mit dem iDrive-Controller und, sofern vorhanden, per Touch bedienen. Gespeicherte Werte nach Neustart kontrollieren. |
+| Installation und Oberfläche | Die Quelle auf dem Test-Branch aus der [Installationsanleitung](installation-mgu-store.md) aktualisieren. App 0.2.2 und Audio-Dienst 0.2.2 installieren. Der Fehler `bad enable entry` darf nicht mehr auftreten. Gespeicherte Werte müssen dabei erhalten bleiben. Hauptmenü, alle vier Themes, Live-Ansicht und Klangprofilkarten auf den unterstützten Displayformaten prüfen. Profile und Einstellungen mit dem iDrive-Controller und, sofern vorhanden, per Touch bedienen. Gespeicherte Werte nach Neustart kontrollieren. |
 | Drehzahl und Motor | Drehzahl mit der Instrumentenanzeige vergleichen, vom Start über laufenden Motor bis zum Stopp. Im Stand Start-Stopp testen, soweit vorhanden. Ausbleibende oder ungültige Werte müssen die Wiedergabe stoppen. |
 | Beschleunigung | Längsbeschleunigung im Stand und bei einem kontrollierten Fahrversuch vergleichen. Vorzeichen, Einheit und Datenrate prüfen. |
 | Gang und Leerlauf | P, R, N, D und einzeln gemeldete Gänge prüfen. Der Motorleerlauf wird aus Motorstatus, Drehzahl, Wählhebel, Pedal und Geschwindigkeit abgeleitet. Ein Signal, das P oder N gemeinsam meldet, löst die Auswahl nicht auf. |
@@ -29,4 +29,4 @@ Die MATCH UP 10DSP hat eigene DSP-Ausgänge und ein Virtual Channel Processing. 
 
 Beim Fahrzeugtest zunächst je einen Effekt bei geringem App-Pegel abhören. Links/rechts, Front/Heck und gegebenenfalls Center über den tatsächlich gemessenen Mischpfad prüfen. Mit einer aktiven Musikquelle den BMW-Medienpegel getrennt vom App-Pegel ändern und prüfen, ob der Motorsound am Lautsprecher konstant bleibt. Die Prüfung für Radio, Bluetooth und CarPlay wiederholen.
 
-[Reparaturbericht 0.2.1 mit Tests, Dienstdiagnose und konkretem Fahrzeugtest](reparatur-0.2.1.md)
+[Installationskorrektur 0.2.2 und Vorprüfungsnachweis](reparatur-0.2.2.md) · [Bedienungsreparatur 0.2.1](reparatur-0.2.1.md)

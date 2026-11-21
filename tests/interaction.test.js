@@ -10,7 +10,7 @@ const Module = require('node:module');
 const { EventEmitter } = require('node:events');
 const spec = require('../apps/patryklars6_motor_sound/app.json');
 const packageRoot = process.env.LUXO_TEST_PACKAGE;
-assert.ok(packageRoot, 'Set LUXO_TEST_PACKAGE to the extracted 0.2.1 package');
+assert.ok(packageRoot, 'Set LUXO_TEST_PACKAGE to the extracted app package');
 const kit = path.join(packageRoot, 'javascript', 'kit');
 const { Recorder } = require(path.join(kit, 'record'));
 

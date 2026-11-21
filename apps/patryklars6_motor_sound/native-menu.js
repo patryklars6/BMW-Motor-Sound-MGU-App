@@ -132,7 +132,7 @@ class NativeMenu {
             row('Einstellungen', 'Jede Änderung wird automatisch in data/settings.json gespeichert.'),
             row('Kein Ton', out.detail || 'Audio-Dienst und Mischpfad luxo_overlay prüfen.'),
             row('Fahrzeugdaten', 'Ohne frische Drehzahl und laufenden Motor bleibt der Motorsound stumm.'),
-            row('MGU-Store-Update', 'Quelle aktualisieren und Version 0.2.1 aktualisieren. App-ID bleibt gleich.')];
+            row('MGU-Store-Update', 'Quelle aktualisieren und Version 0.2.2 aktualisieren. App-ID bleibt gleich.')];
     }
 
     async render() {

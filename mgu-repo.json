@@ -18,7 +18,7 @@
         ]
       },
       "requires": {
-        "luxo-motor-audio": "0.2.1"
+        "luxo-motor-audio": "0.2.2"
       }
     },
     {
