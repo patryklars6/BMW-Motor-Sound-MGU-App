@@ -1,19 +1,19 @@
 # BMW Motor Sound MGU App
 
-## Neues Update 0.2.1 · 20. November 2026
+## Installationskorrektur 0.2.2 · 21. November 2026
 
-**Für das Update im MGU Store den Zweig `codex/luxo-sound-tuning-020` auswählen.** Dort liegen das App-Paket 0.2.1 und der neue Audio-Dienst. Die Änderungen sind in [Pull Request #1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/pull/1) einsehbar.
+**Für das Update im MGU Store den Zweig `codex/luxo-sound-tuning-020` auswählen.** Dort liegen das App-Paket 0.2.2 und der Audio-Dienst 0.2.2. Die Änderungen sind in [Pull Request #1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/pull/1) einsehbar.
 
-Neu sind die reparierte Grafikbedienung, das native BMW-Menü als Start und Rückfallebene sowie die Audio-Diagnose. **35 Node-Tests und vier Python-Tests bestanden.** Installation, Bedienung und Audioausgabe auf der Fahrzeug-MGU sind weiter zu bestätigen. Unten stehen **14 neue LUXO-Aufnahmen aus Paket 0.2.1**, einschließlich Motor-, Turbo-, Auspuff- und Pop-&-Bangs-Einstellungen.
+Version 0.2.2 behebt **`bad enable entry: nothing changed`**: Der Audio-Dienst aktiviert seinen Socket mit `{"unit":"luxo-motor-audio.socket","target":"sockets.target"}`. Die App fordert nun den Audio-Dienst **0.2.2 oder neuer** an. App-ID, Profile und Einstellungsstruktur bleiben erhalten. **35 Node-Tests, vier Python-Tests und zehn Prüfungen mit dem unveränderten Store-/Deployer-Code bestanden.** Der echte Deployer weist das alte Paket ab und akzeptiert die korrigierte Audio-Dienst-Vorprüfung. [Prüfbericht 0.2.2](docs/reparatur-0.2.2.md)
 
-LUXO Motor Sound ergänzt BMW-MGU-Head-Units mit iDrive 7 um ein Motorsound-Menü und ein Dashboard für verfügbare Fahrzeugdaten. Version **0.2.1** enthält die Reparatur der Bedienung und einen Store-installierbaren Audio-Dienst.
+LUXO Motor Sound ergänzt BMW-MGU-Head-Units mit iDrive 7 um ein Motorsound-Menü und ein Dashboard für verfügbare Fahrzeugdaten. Die Bedienungsreparatur, das native BMW-Menü und die Audio-Diagnose bleiben in **0.2.2** enthalten. Der vollständige Installationslauf, systemd-Dienststart und die hörbare Ausgabe sind am Fahrzeug noch zu bestätigen. Die 14 LUXO-Aufnahmen unten stammen weiterhin aus Paket 0.2.1.
 
 ## Installation und Update über den MGU Store
 
 1. Öffne im BMW den **MGU Store** und aktualisiere die bestehende Quelle `patryklars6/BMW-Motor-Sound-MGU-App`.
 2. Wähle weiterhin den Branch **`codex/luxo-sound-tuning-020`**.
-3. Öffne **LUXO Motor Sound**. Prüfe, dass der Store **0.2.1** anbietet, und wähle **Aktualisieren**. Die App-ID bleibt `patryklars6_motor_sound`. Der Store kann damit die vorhandene Installation zuordnen.
-4. Der Store installiert zusätzlich **LUXO Audio-Dienst** (`luxo-motor-audio`). Falls der Store die Dienste als ausstehend meldet, werden sie beim nächsten regulären Start der Head Unit aktiviert.
+3. Öffne **LUXO Motor Sound**. Prüfe, dass der Store **0.2.2** anbietet, und wähle **Aktualisieren** beziehungsweise bei der noch fehlenden App **Installieren**. Die App-ID bleibt `patryklars6_motor_sound`. Der Store kann damit die vorhandene Installation zuordnen.
+4. Der Store installiert als Abhängigkeit **LUXO Audio-Dienst 0.2.2** (`luxo-motor-audio`). Falls der Store die Dienste als ausstehend meldet, werden sie beim nächsten regulären Start der Head Unit aktiviert.
 5. Öffne die App. Sie startet mit dem vollständig bedienbaren **BMW-Menü**. Profile, Tuning, Pegel, Verstärker, Fahrmodi, Design, Live-Daten und Hilfe sind dort per Touch und Controller erreichbar.
 6. Der Menüpunkt **LUXO-Oberfläche** zeigt, ob ein kompatibler `mgu-render/1` mit Touch-Routing bereitsteht. Bei verfügbarer Unterstützung kannst du die LUXO-Grafik öffnen. Bei Renderer-Ausfall kehrt die App in das BMW-Menü zurück.
 
@@ -27,7 +27,7 @@ Beim ersten Hinzufügen der Quelle verwende **Einstellungen → Quelle hinzufüg
 
 Für hörbaren Ton ist weiterhin ein auf deiner MGU bestätigter ALSA-Mischpfad `luxo_overlay` erforderlich. Der Dienst liefert den erzeugten PCM-Strom an diesen Pfad. Paralleler Betrieb mit Radio/CarPlay, akustisch unabhängige Lautstärke und Center-Ausgabe sind auf deinem Fahrzeug weiterhin offen. [Reparaturbericht mit Tests und Fahrzeugprüfung](docs/reparatur-0.2.1.md)
 
-[ID7-Updatepaket 0.2.1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.1.tgz) · [Audio-Dienst 0.2.1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/luxo-motor-audio@0.2.1.tgz)
+[ID7-Updatepaket 0.2.2](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.2.tgz) · [Audio-Dienst 0.2.2](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/luxo-motor-audio@0.2.2.tgz)
 
 ## Neue Menübilder · Version 0.2.1 · LUXO
 
@@ -91,7 +91,7 @@ Die Bilder zeigen die optionale LUXO-Grafik. Die App startet zuerst im nativen B
 
 ![Info und Hilfe mit sichtbarer Versionsnummer 0.2.1](docs/screenshots/0.2.1/info.png)
 
-[ID7-Paket 0.2.1 herunterladen](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.1.tgz)
+[ID7-Paket 0.2.2 herunterladen](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/blob/codex/luxo-sound-tuning-020/packages/patryklars6_motor_sound@0.2.2.tgz)
 
 Im **Lautsprecher**-Menü stehen Standard, BMW HiFi, Harman Kardon, Bowers & Wilkins, MATCH UP 8, MATCH UP 10 und Sonstiges / Aftermarket zur Auswahl.
 
@@ -139,11 +139,11 @@ Die Drehzahlzahl zeigt den letzten real empfangenen, gerundeten Messwert. Nur de
 | Audiopfad nicht verfügbar | Für den Motorsound ist eine auf der konkreten MGU bestätigte parallele Mischroute erforderlich. Die App beansprucht keine Medienquelle. |
 | Stumm | App-Pegel, Pegelgrenze und Schalter der Klangschichten prüfen. |
 
-Version 0.2.0 wurde im BMW G31 530d mit MATCH UP 10 gestartet. Der erneute Bedienungs- und Audiotest mit 0.2.1 steht aus. Die gleichzeitige Wiedergabe mit Radio, Bluetooth und CarPlay ist auf der Serien-MGU bisher nicht bestätigt. Auch Autostart, Hintergrundbetrieb, tatsächlich verfügbare Fahrzeugfelder und physische Kanalzuordnung brauchen einen Fahrzeugtest. Der [Fahrzeugtestplan](docs/fahrzeugtest.md) beschreibt die Prüfung und den Audio-Dienst.
+Version 0.2.0 wurde im BMW G31 530d mit MATCH UP 10 gestartet. Der Nutzer meldete bei 0.2.1 den Audio-Dienst-Installationsfehler. Die Installationsvorprüfung des Audio-Dienstes besteht mit 0.2.2 auf dem Entwicklungsrechner; der vollständige Fahrzeuglauf steht aus. Die gleichzeitige Wiedergabe mit Radio, Bluetooth und CarPlay ist auf der Serien-MGU bisher nicht bestätigt. Auch Autostart, Hintergrundbetrieb, tatsächlich verfügbare Fahrzeugfelder und physische Kanalzuordnung brauchen einen Fahrzeugtest. Der [Fahrzeugtestplan](docs/fahrzeugtest.md) beschreibt die Prüfung und den Audio-Dienst.
 
 ## Paket bauen und testen
 
-Wechsle für den Paketbau und die Tests in den Installationszweig mit Version 0.2.1:
+Wechsle für den Paketbau und die Tests in den Installationszweig mit Version 0.2.2:
 
 ```sh
 git switch codex/luxo-sound-tuning-020
@@ -151,3 +151,5 @@ python tests/run_checks.py
 ```
 
 Der Paketbau nutzt Python 3 und das mitgelieferte iDrive-App-Kit. Die Hosttests nutzen Node.js ab Version 20. Die App-Laufzeit zielt auf die Node.js-8-Umgebung des iDrive 7. [Herkunft des App-Kits](vendor/README.md)
+
+Die Prüfung lädt beim ersten Lauf vier unveränderte Dateien aus dem in `tests/store_upstream.json` festgelegten MGU-Store-Commit und verifiziert deren Git-Blob-Prüfsummen. Danach nutzt sie den Cache unter `dist/`. Mit `--store-source /pfad/zum/mgu-store` kann ein vorhandener Checkout dieses Commits verwendet werden. Der Audio-Dienst wird mit dem echten Store-Packer gebaut und durch `check --artifact` sowie `preflightApp` des echten Deployers geprüft. Die Hardwarepfade liegen dabei in einem isolierten Testverzeichnis; es wird kein Fahrzeug und kein systemd-Dienst gestartet.
