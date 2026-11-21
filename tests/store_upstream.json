@@ -1,6 +1,6 @@
 {
   "repository": "robertnisipeanu/mgu-store",
-  "revision": "3ecfafd4b6b2492c1776f53e3b74add5653c5c61",
+  "revision": "d878bed5ce5848d0c1ce852be23fac539e434a0b",
   "files": {
     "deploy/unit/mgu-deploy.js": "c4a21d32cca730f4ee5ef45ad6058ca176f3c434",
     "native/mgu-updater/js/sources.js": "b7f9da0fa92c5747e363c52b6ac889f7021d6f8d",

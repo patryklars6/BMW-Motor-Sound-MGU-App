@@ -11,6 +11,9 @@ def patch_runtime(runtime):
     file = runtime / "display.js"
     source = file.read_text(encoding="utf-8")
     source = replace_once(source,
+        "Promise.resolve(this.ui.close(this.screen.name)).catch((e) => this.log.warn('back: ' + e));",
+        "Promise.resolve(this.onBack ? this.onBack() : this.ui.close(this.screen.name)).catch((e) => this.log.warn('back: ' + e));")
+    source = replace_once(source,
         "const native = this.screen.chrome !== false && process.env.MGU_RENDERD_PROTO !== 'upstream';",
         "const native = process.env.MGU_RENDERD_PROTO !== 'upstream';")
     source = replace_once(source,

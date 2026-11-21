@@ -7,8 +7,10 @@ import os
 import socket
 import sys
 import json
+import array
+import threading
+from audio_backend import AudioManager, AudioError, allowed_peer, usb_mounts, export_usb
 
-DEVICE = b"luxo_overlay"
 HELLO = b"LUXO/1 S16LE 48000\n"
 RATE = 48000
 FRAMES = 960
@@ -16,9 +18,12 @@ SND_PCM_PLAYBACK = 0
 SND_PCM_NONBLOCK = 1
 SND_PCM_FORMAT_S16_LE = 2
 SND_PCM_ACCESS_RW_INTERLEAVED = 3
+SUSPENDED = getattr(errno, "ESTRPIPE", 86)  # Linux ALSA code; absent from Windows' errno module.
 
 class AlsaOutput:
-    def __init__(self, channels):
+    def __init__(self, channels, device=None):
+        if not device:
+            raise OSError(errno.ENODEV, "No approved PCM route")
         self.lib = c.CDLL("libasound.so.2")
         self.handle = c.c_void_p()
         p, i, u = c.c_void_p, c.c_int, c.c_uint
@@ -35,8 +40,11 @@ class AlsaOutput:
             function = getattr(self.lib, name)
             function.argtypes = args
             function.restype = result
-        self._check(self.lib.snd_pcm_open(c.byref(self.handle), DEVICE, SND_PCM_PLAYBACK, SND_PCM_NONBLOCK))
+        self.channels = channels
+        self.supported_channels = None
+        self._check(self.lib.snd_pcm_open(c.byref(self.handle), device.encode("utf-8"), SND_PCM_PLAYBACK, SND_PCM_NONBLOCK))
         try:
+            self.supported_channels = self._channels()
             self._check(self.lib.snd_pcm_set_params(
                 self.handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED,
                 channels, RATE, 0, 40000,
@@ -50,11 +58,49 @@ class AlsaOutput:
             raise OSError(-result, self.lib.snd_strerror(result).decode("utf-8", errors="replace"))
 
     def write(self, frame):
-        result = self.lib.snd_pcm_writei(self.handle, c.c_char_p(frame), FRAMES)
-        if result in (-errno.EPIPE, -errno.ESTRPIPE):
-            self._check(self.lib.snd_pcm_recover(self.handle, result, 1))
-        elif result != -errno.EAGAIN:
-            self._check(result)
+        buf = c.create_string_buffer(frame)
+        total = len(frame) // (2 * self.channels)
+        written = 0
+        recovered = False
+        while written < total:
+            result = self.lib.snd_pcm_writei(self.handle, c.byref(buf, written * self.channels * 2), total - written)
+            if result in (-errno.EPIPE, -SUSPENDED) and not recovered:
+                self._check(self.lib.snd_pcm_recover(self.handle, result, 1))
+                recovered = True
+            elif result == -errno.EAGAIN or result == 0:
+                break
+            else:
+                self._check(result)
+                written += result
+        return written
+
+    def _channels(self):
+        params = c.c_void_p()
+        p = c.c_void_p
+        functions = {
+            "snd_pcm_hw_params_malloc": ([c.POINTER(p)], c.c_int),
+            "snd_pcm_hw_params_any": ([p, p], c.c_int),
+            "snd_pcm_hw_params_set_access": ([p, p, c.c_int], c.c_int),
+            "snd_pcm_hw_params_set_format": ([p, p, c.c_int], c.c_int),
+            "snd_pcm_hw_params_set_rate": ([p, p, c.c_uint, c.c_int], c.c_int),
+            "snd_pcm_hw_params_test_channels": ([p, p, c.c_uint], c.c_int),
+            "snd_pcm_hw_params_free": ([p], None),
+        }
+        try:
+            for name, (args, result) in functions.items():
+                getattr(self.lib, name).argtypes = args
+                getattr(self.lib, name).restype = result
+            self._check(self.lib.snd_pcm_hw_params_malloc(c.byref(params)))
+            self._check(self.lib.snd_pcm_hw_params_any(self.handle, params))
+            self._check(self.lib.snd_pcm_hw_params_set_access(self.handle, params, SND_PCM_ACCESS_RW_INTERLEAVED))
+            self._check(self.lib.snd_pcm_hw_params_set_format(self.handle, params, SND_PCM_FORMAT_S16_LE))
+            self._check(self.lib.snd_pcm_hw_params_set_rate(self.handle, params, RATE, 0))
+            return [count for count in (2, 4, 5) if self.lib.snd_pcm_hw_params_test_channels(self.handle, params, count) == 0]
+        except (OSError, AttributeError):
+            return None
+        finally:
+            if params.value:
+                self.lib.snd_pcm_hw_params_free(params)
 
     def close(self):
         self.lib.snd_pcm_drop(self.handle)
@@ -68,37 +114,6 @@ def read_exact(conn, length):
             return None
         data.extend(part)
     return bytes(data)
-
-def route_exists():
-    """Enumerate ALSA names without opening a BMW/SmartX PCM."""
-    lib = c.CDLL("libasound.so.2")
-    hints = c.c_void_p()
-    lib.snd_device_name_hint.argtypes = [c.c_int, c.c_char_p, c.POINTER(c.c_void_p)]
-    lib.snd_device_name_hint.restype = c.c_int
-    lib.snd_device_name_get_hint.argtypes = [c.c_void_p, c.c_char_p]
-    lib.snd_device_name_get_hint.restype = c.c_void_p
-    lib.snd_device_name_free_hint.argtypes = [c.c_void_p]
-    libc = c.CDLL(None)
-    libc.free.argtypes = [c.c_void_p]
-    libc.free.restype = None
-    if lib.snd_device_name_hint(-1, b"pcm", c.byref(hints)) < 0:
-        return False
-    try:
-        entries = c.cast(hints, c.POINTER(c.c_void_p))
-        index = 0
-        while entries[index]:
-            name = lib.snd_device_name_get_hint(entries[index], b"NAME")
-            index += 1
-            if name:
-                try:
-                    if c.string_at(name) == DEVICE:
-                        return True
-                finally:
-                    libc.free(name)
-        return False
-    finally:
-        lib.snd_device_name_free_hint(hints)
-
 
 def serve_client(conn, channels, open_pcm=AlsaOutput, inspect_route=None):
     conn.settimeout(0.25)
@@ -142,9 +157,81 @@ def serve_client(conn, channels, open_pcm=AlsaOutput, inspect_route=None):
     finally:
         pcm.close()
 
+def serve_connection(conn, manager):
+    conn.settimeout(2)
+    message = bytearray()
+    while len(message) <= 131072 and not message.endswith(b"\n"):
+        part = conn.recv(1)
+        if not part:
+            return
+        message.extend(part)
+    if len(message) > 131072:
+        return
+    try:
+        request = None
+        if message.startswith(b"LUXO/2 "):
+            request = json.loads(message[7:].decode("utf-8"))
+            if not isinstance(request, dict):
+                raise AudioError("BAD_REQUEST")
+            operation = request.get("op")
+            if operation == "diagnose":
+                result = manager.diagnostics(extended=request.get("extended", True) is not False)
+                result["usbMounts"] = usb_mounts()
+            elif operation == "select":
+                result = manager.select(request)
+            elif operation == "confirm":
+                result = manager.confirm(request)
+            elif operation == "export":
+                report = request.get("report")
+                if not isinstance(report, dict):
+                    raise AudioError("BAD_REQUEST")
+                report["serviceAtExport"] = manager.diagnostics()
+                result = {"path": export_usb(report, request.get("target"))}
+            elif operation != "test":
+                raise AudioError("BAD_REQUEST")
+            if operation != "test":
+                conn.sendall((json.dumps({"ok": True, "data": result}, ensure_ascii=True) + "\n").encode())
+                return
+        elif message == b"PROBE\n":
+            route = manager.route()
+            conn.sendall(("STATUS available " + str(route["channels"]) + "\n").encode())
+            return
+        elif message != HELLO:
+            raise AudioError("BAD_REQUEST")
+        test = bool(request and request.get("op") == "test")
+        pcm, _ = manager.open(test=test, guard=request)
+        conn.settimeout(0.5)
+        result = None
+        try:
+            conn.sendall(("READY " + str(pcm.channels) + "\n").encode())
+            while True:
+                frame = read_exact(conn, FRAMES * pcm.channels * 2)
+                if frame is None:
+                    break
+                if test:
+                    samples = array.array("h", frame)
+                    if sys.byteorder != "little":
+                        samples.byteswap()
+                    samples = array.array("h", (min(655, max(-655, value)) for value in samples))
+                    if sys.byteorder != "little":
+                        samples.byteswap()
+                    frame = samples.tobytes()
+                pcm.write(frame)
+        finally:
+            result = manager.close(pcm, test=test)
+        if test:
+            conn.sendall(("TEST_DONE " + json.dumps(result) + "\n").encode())
+    except (AudioError, OSError, ValueError, TypeError) as error:
+        code = getattr(error, "code", "AUDIO_IO_FAILED")
+        manager.last_error = {"code": code, "message": str(error)[:256]}
+        if message.startswith(b"LUXO/2 ") and (not isinstance(locals().get("request"), dict) or request.get("op") != "test"):
+            conn.sendall((json.dumps({"ok": False, "error": code, "detail": str(error)[:256]}) + "\n").encode())
+        else:
+            conn.sendall(("ERROR " + code + "\n").encode())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--channels", type=int, choices=(2, 4, 5), default=None)
     parser.add_argument("--config", default="/var/opt/luxo-motor-audio/config.json")
     args = parser.parse_args()
     if os.environ.get("LISTEN_PID") != str(os.getpid()) or os.environ.get("LISTEN_FDS") != "1":
@@ -152,25 +239,25 @@ def main():
     with socket.socket(fileno=3) as server:
         if server.family != socket.AF_UNIX or not server.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN):
             parser.error("fd 3 must be a listening Unix socket")
+        manager = AudioManager(args.config)
+        clients = threading.BoundedSemaphore(8)
+        def handle(client):
+            try:
+                with client:
+                    if allowed_peer(client):
+                        serve_connection(client, manager)
+                    else:
+                        client.sendall(b"ERROR PEER_DENIED\n")
+            except (OSError, TimeoutError) as error:
+                print(f"LUXO audio client: {error}", file=sys.stderr, flush=True)
+            finally:
+                clients.release()
         while True:
             client, _ = server.accept()
-            with client:
-                try:
-                    channels = args.channels or 2
-                    if args.channels is None and os.path.exists(args.config):
-                        with open(args.config, encoding="utf-8") as config:
-                            value = json.load(config)
-                        if not isinstance(value, dict):
-                            raise ValueError("configuration must be an object")
-                        channels = value.get("channels", 2)
-                    if type(channels) is not int or channels not in (2, 4, 5):
-                        client.sendall(b"ERROR CONFIG_INVALID\n")
-                        continue
-                    serve_client(client, channels, inspect_route=route_exists)
-                except (ValueError, TypeError):
-                    client.sendall(b"ERROR CONFIG_INVALID\n")
-                except (OSError, TimeoutError) as error:
-                    print(f"LUXO overlay: {error}", file=sys.stderr, flush=True)
+            if clients.acquire(blocking=False):
+                threading.Thread(target=handle, args=(client,), daemon=True).start()
+            else:
+                client.close()
 
 if __name__ == "__main__":
     main()

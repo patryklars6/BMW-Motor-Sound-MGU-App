@@ -1,16 +1,20 @@
 {
   "id": "luxo-motor-audio",
   "kind": "tool",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "title": "LUXO Audio-Dienst",
-  "description": "PCM-Ausgabe über den lokal eingerichteten ALSA-Mischpfad luxo_overlay.",
+  "description": "Audio-Diagnose und PCM-Ausgabe über einen vor Ort bestätigten ALSA-Mischpfad.",
   "mguHmi": ["ID7"],
   "requires": {"mgu-python": "1.0.2"},
-  "files": [{"path": "overlay_bridge.py", "from": "overlay_bridge.py", "mode": "0644"}],
+  "files": [
+    {"path": "overlay_bridge.py", "from": "overlay_bridge.py", "mode": "0644"},
+    {"path": "audio_backend.py", "from": "audio_backend.py", "mode": "0644"},
+    {"path": "audio_probe.js", "from": "audio_probe.js", "mode": "0644"}
+  ],
   "units": [
     {"name": "luxo-motor-audio.socket", "from": "systemd/luxo-motor-audio.socket"},
     {"name": "luxo-motor-audio.service", "from": "systemd/luxo-motor-audio.service"}
   ],
   "enable": [{"unit": "luxo-motor-audio.socket", "target": "sockets.target"}],
-  "restart": ["luxo-motor-audio.socket"]
+  "restart": ["luxo-motor-audio.socket", "luxo-motor-audio.service"]
 }

@@ -22,9 +22,9 @@ def main():
     with tempfile.TemporaryDirectory(prefix="luxo-check-", dir=ROOT / "dist") as temp:
         with tarfile.open(archive) as tar:
             tar.extractall(temp, filter="data")
-        env = dict(os.environ, LUXO_TEST_PACKAGE=str(Path(temp) / "package"))
-        subprocess.run([args.node, "--test", str(ROOT / "tests/runtime.test.js"), str(ROOT / "tests/interaction.test.js")], env=env, check=True)
-    subprocess.run([sys.executable, "-B", "-m", "unittest", "discover", "-s", str(ROOT / "tests"), "-p", "test_bridge.py"], check=True)
+        env = dict(os.environ, LUXO_TEST_PACKAGE=str(Path(temp) / "package"), LUXO_TEST_PYTHON=sys.executable)
+        subprocess.run([args.node, "--test", str(ROOT / "tests/runtime.test.js"), str(ROOT / "tests/interaction.test.js"), str(ROOT / "tests/diagnostics.test.js")], env=env, check=True)
+    subprocess.run([sys.executable, "-B", "-m", "unittest", "discover", "-s", str(ROOT / "tests"), "-p", "test_*.py"], check=True)
     subprocess.run([sys.executable, "-B", str(ROOT / "tests/verify_package.py"), str(archive)], check=True)
     store_check = [sys.executable, "-B", str(ROOT / "tests/verify_store.py"), "--node", args.node]
     if args.store_source:

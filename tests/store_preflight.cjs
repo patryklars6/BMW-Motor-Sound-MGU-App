@@ -82,13 +82,13 @@ async function main() {
     }), null, null);
     const appEntry = catalog.components.find(entry => entry.id === spec.id);
     const toolEntry = catalog.components.find(entry => entry.id === audio.id);
-    check('real Store catalog agrees on app, tool and required version 0.2.2', () => {
+    check('real Store catalog agrees on app, tool and required version 0.3.0', () => {
         assert.deepEqual(catalog.skipped, []);
-        assert.equal(appEntry.version, '0.2.2'); assert.equal(toolEntry.version, '0.2.2');
-        assert.equal(appEntry.requires[audio.id], '0.2.2'); assert.equal(spec.requires[audio.id], '0.2.2');
+        assert.equal(appEntry.version, '0.3.0'); assert.equal(toolEntry.version, '0.3.0');
+        assert.equal(appEntry.requires[audio.id], '0.3.0'); assert.equal(spec.requires[audio.id], '0.3.0');
         assert.equal(toolEntry.requires['mgu-python'], '1.0.2');
     });
-    const files = ['component.json', 'overlay_bridge.py', 'systemd/luxo-motor-audio.service', 'systemd/luxo-motor-audio.socket']
+    const files = ['component.json'].concat(audio.files.map(item => item.from || item.path), audio.units.map(item => item.from || item.name))
         .map(name => ({ name, data: fs.readFileSync(path.join(root, 'tools', name)), mode: 0o644 }));
     const packed = await source.packComponent(toolEntry, files);
     const audioFile = path.join(root, 'dist', audio.id + '@' + audio.version + '.tgz');
@@ -100,12 +100,12 @@ async function main() {
         refusal(() => old.context.preflightApp(oldFile), /bad enable entry/);
     });
     const good = deploy(audioFile);
-    check('real deployer check accepts the complete rebuilt 0.2.2 audio archive', () => {
+    check('real deployer check accepts the complete rebuilt 0.3.0 audio archive', () => {
         assert.equal(good.exit, 0, good.stdout + good.stderr);
-        assert.match(good.stdout, /luxo-motor-audio 0\.2\.2 ok/);
+        assert.ok(good.stdout.includes('luxo-motor-audio ' + spec.version + ' ok'));
         assert.match(good.stdout, /sockets\.target\.wants/);
     });
-    check('real deployer installation preflight accepts 0.2.2 without installing it', () => {
+    check('real deployer installation preflight accepts 0.3.0 without installing it', () => {
         good.context.preflightApp(audioFile);
         assert.equal(fs.existsSync(path.join(work, 'head-unit/var/opt/luxo-motor-audio/current')), false);
     });
@@ -113,7 +113,7 @@ async function main() {
     const manifest = JSON.parse(members.find(item => item.name === 'component.json').data);
     check('packed enable, units, restart and file digest describe the actual audio payload', () => {
         assert.deepEqual(manifest.enable, [{ unit: 'luxo-motor-audio.socket', target: 'sockets.target' }]);
-        assert.deepEqual(manifest.restart, ['luxo-motor-audio.socket']);
+        assert.deepEqual(manifest.restart, ['luxo-motor-audio.socket', 'luxo-motor-audio.service']);
         assert.deepEqual(manifest.units.map(item => item.name).sort(), ['luxo-motor-audio.service', 'luxo-motor-audio.socket']);
         assert.ok(members.find(item => item.name === 'units/luxo-motor-audio.socket').data.toString().includes('WantedBy=sockets.target'));
     });
@@ -135,7 +135,7 @@ async function main() {
     check('real deployer validates the app archive with its unchanged ID and ID7 declaration', () => {
         const stage = path.join(work, 'app-stage'); fs.mkdirSync(stage);
         const descriptor = good.context.validateArtifact(appFile, stage);
-        assert.equal(descriptor.id, 'patryklars6_motor_sound'); assert.equal(descriptor.version, '0.2.2');
+        assert.equal(descriptor.id, 'patryklars6_motor_sound'); assert.equal(descriptor.version, '0.3.0');
         assert.equal(JSON.stringify(descriptor.hmi), '["ID7"]');
     });
     const previousApp = await tar.untgz(fs.readFileSync(path.join(root, 'packages', 'patryklars6_motor_sound@0.2.1.tgz')), 20 << 20);
@@ -143,13 +143,13 @@ async function main() {
     check('settings schema and app ID remain identical to installed 0.2.1', () => {
         assert.equal(spec.id, previousSpec.id); assert.deepEqual(spec.settings, previousSpec.settings);
     });
-    fs.writeFileSync(path.join(root, 'dist', 'store-preflight-0.2.2.json'), JSON.stringify({
+    fs.writeFileSync(path.join(root, 'dist', 'store-preflight-0.3.0.json'), JSON.stringify({
         upstream: pin.repository, revision: pin.revision, deployerVersion: good.context.VERSION,
         host: process.platform, node: process.version, vehicleTest: false, checks: passed,
         limits: 'Unmodified upstream check/preflight in an isolated fake root; no systemd service start, donor linking, or vehicle install.',
         audioSha256: crypto.createHash('sha256').update(packed).digest('hex')
     }, null, 2) + '\n');
-    fs.writeFileSync(path.join(root, 'dist', 'mgu-deploy-0.2.2-check.log'), logs.join('\n'));
+    fs.writeFileSync(path.join(root, 'dist', 'mgu-deploy-0.3.0-check.log'), logs.join('\n'));
     console.log('Passed ' + passed.length + ' upstream Store/deployer checks; source ' + pin.revision);
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => {

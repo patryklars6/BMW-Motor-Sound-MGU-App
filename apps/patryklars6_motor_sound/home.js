@@ -7,7 +7,7 @@ const { themeFor } = require('./themes');
 const NAV = [
     ['home', 'Hauptmenü'], ['profiles', 'Soundprofile'], ['individual', 'Individual'],
     ['modes', 'Fahrmodus'], ['speakers', 'Lautsprecher'], ['design', 'Design'], ['settings', 'Einstellungen'],
-    ['live', 'Live-Daten'], ['info', 'Info'], ['native', 'BMW-Menü']
+    ['live', 'Live-Daten'], ['audio', 'Audio-Diagnose'], ['info', 'Info'], ['native', 'BMW-Menü']
 ];
 const ROWS = [
     ['turbo', 'Turbosound'], ['exhaust', 'Auspuffklang'], ['bang', 'Pop & Bangs']
@@ -196,13 +196,15 @@ function drawInfo(cv, nav, version, accentName) {
     const help = [
         ['1. Klangprofil wählen', 'Im Hauptmenü oder unter Soundprofile auswählen. Änderungen werden gespeichert.'],
         ['2. Sound einstellen', 'Tuning pro Profil öffnen, Pegelgrenze einstellen und das Soundsystem wählen.'],
-        ['3. Fahrzeugdaten prüfen', 'Unter Live-Daten erscheinen die von deiner MGU gelieferten Werte.'],
-        ['4. Wenn der Ton fehlt', 'Motorsound einschalten. Der Fahrzeugmotor und ein freigegebener Audiopfad sind erforderlich.']
+        ['3. Zurück und Hauptmenü', 'Jede Grafikseite hat beide Tasten. BMW-Menü öffnet die native Bedienung.'],
+        ['4. Fahrzeugdaten', 'Live-Daten zeigt empfangene Werte. Fehlende Signale bleiben nicht verfügbar.'],
+        ['5. Wenn der Ton fehlt', 'Audio-Diagnose öffnen. Geräteanzeige allein bestätigt noch keinen Lautsprecherpfad.'],
+        ['6. Diagnosebericht', 'In Audio-Diagnose speichern oder auf einen dort erkannten USB-Datenträger exportieren.']
     ];
     help.forEach(([title, description], i) => {
-        const line = y + 155 + 63 * i;
-        cv.text(title, x + 36, line, 22, accent.text, { font: 'bold' });
-        cv.text(description, x + 36, line + 25, 19, accent.dim);
+        const line = y + 145 + 44 * i;
+        cv.text(title, x + 36, line, 21, accent.text, { font: 'bold' });
+        cv.text(description, x + 36, line + 21, 18, accent.dim);
     });
 }
 

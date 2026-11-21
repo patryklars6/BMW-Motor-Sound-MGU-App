@@ -11,8 +11,8 @@ const root = path.resolve(__dirname, '..');
 assert.ok(process.argv[2], 'Usage: node tools/render_screenshots.cjs EXTRACTED_PACKAGE [OUTPUT]');
 const packageRoot = path.resolve(process.argv[2]);
 const dir = path.join(packageRoot, 'javascript');
-const output = path.resolve(process.argv[3] || path.join(root, 'docs', 'screenshots', '0.2.1'));
 const spec = require(path.join(dir, 'kit', 'app-spec.json'));
+const output = path.resolve(process.argv[3] || path.join(root, 'docs', 'screenshots', spec.version));
 const sourceSpec = require(path.join(root, 'apps', 'patryklars6_motor_sound', 'app.json'));
 assert.equal(spec.version, sourceSpec.version);
 assert.ok(fs.readFileSync(path.join(dir, 'app.js'), 'utf8').replace(/\r\n/g, '\n') ===
@@ -23,6 +23,7 @@ const { Recorder, play } = require(path.join(dir, 'kit', 'record'));
 const { Telemetry } = require(path.join(dir, 'telemetry'));
 const { PcmOutput } = require(path.join(dir, 'output'));
 const { resolveSettings } = require(path.join(dir, 'sound'));
+const { AudioDiagnostics } = require(path.join(dir, 'audio-diagnostics'));
 
 let implementation;
 const original = Module._load;
@@ -53,6 +54,7 @@ const vehicle = new Telemetry(() => 0);
 const pcm = new PcmOutput(() => 0);
 pcm.tick(false); // A missing local audio service is reported honestly.
 const background = { vehicle, output: pcm, effective: mode => resolveSettings(key => settings.get(key), mode) };
+background.diagnostics = new AudioDiagnostics({ vehicle, output: pcm, settings, spec, effective: background.effective });
 const app = new EventEmitter();
 const handlers = new Map(), cells = new Map(), visible = new Map(), frames = new Map();
 let active = 'NATIVE', visibilityChanged, tick;
@@ -162,6 +164,20 @@ async function main() {
     await home();
     await target('nav-info');
     await draw('info.png');
+    await home();
+    await background.diagnostics.refresh();
+    await target('nav-audio');
+    while (background.diagnostics.busy) await new Promise(resolve => setTimeout(resolve, 5));
+    background.diagnostics.nextRefresh = Date.now() + 60000;
+    await draw('audio-diagnose.png');
+    await target('diag-page-1');
+    await draw('audio-geraete.png');
+    await target('diag-page-1');
+    await draw('audio-tests.png');
+    await target('diag-page-1');
+    await draw('audio-export.png');
+    await target('diag-page-1');
+    await draw('audio-fehler.png');
     await target('nav-native');
     assert.equal(active, 'NATIVE');
     await nativeClick('Lautstärke und Audio');

@@ -81,6 +81,7 @@ async function harness(t, touch) {
             await handlers.get(name[0])();
         },
         async button(name) { await handlers.get(name)(); },
+        async hardwareBack() { physical = 'NATIVE'; await visibilityChanged('NATIVE', true); await new Promise(resolve => setImmediate(resolve)); },
         tick: () => tick(), physical: () => physical,
         loseTouch() { canTouch = false; context.display.gpu.touch = false; layoutChanged(); }
     };
@@ -110,6 +111,50 @@ test('Native BMW menus expose profiles, values, pagination and theme without a G
     assert.equal(restored.get('manualProfile'), 'diesel');
     assert.equal(restored.get('level'), 90);
     assert.equal(restored.get('theme'), 'ice_white');
+});
+
+test('Every graphical submenu has working touch Back, Home and BMW fallback across repeated visits', async t => {
+    const h = await harness(t, true);
+    const draw = async () => { await h.tick(); return h.frames.get('MAIN_GFX'); };
+    const tap = async key => { const frame = await draw(); const target = frame.targets.find(item => item.key === key); assert.ok(target, key); await target.run(); };
+    await h.click('LUXO-Oberfläche');
+    for (let repeat = 0; repeat < 4; repeat++) {
+        for (const section of ['modes', 'profiles', 'individual', 'speakers', 'settings', 'design', 'live', 'info', 'audio']) {
+            await tap('nav-' + section);
+            const page = await draw();
+            for (const key of ['nav-back', 'nav-home', 'nav-native']) assert.ok(page.targets.some(item => item.key === key), section + ': ' + key);
+            await tap('nav-back');
+            assert.ok((await draw()).targets.some(item => item.key === 'home-v8'), section + ' returned home');
+        }
+    }
+    await tap('nav-individual');
+    for (const effect of ['engine', 'turbo', 'exhaust', 'bang']) {
+        await tap(effect + '-tune');
+        await tap('nav-back');
+        assert.ok((await draw()).targets.some(item => item.key === effect + '-tune'));
+    }
+    await tap('nav-home');
+    await tap('nav-modes');
+    await h.context.display.onBack();
+    assert.ok((await draw()).targets.some(item => item.key === 'home-v8'));
+    await tap('nav-modes');
+    await h.hardwareBack();
+    assert.equal(h.physical(), 'MAIN');
+    assert.ok((await draw()).targets.some(item => item.key === 'home-v8'));
+    await tap('nav-speakers');
+    await tap('nav-native');
+    assert.equal(h.physical(), 'NATIVE');
+});
+
+test('BMW native Back and Home buttons use the same graphical history', async t => {
+    const h = await harness(t, true);
+    await h.click('LUXO-Oberfläche'); await h.tick();
+    await h.frames.get('MAIN_GFX').targets.find(item => item.key === 'nav-modes').run();
+    await h.button('BTN_BACK'); await h.tick();
+    assert.ok(h.frames.get('MAIN_GFX').targets.some(item => item.key === 'home-v8'));
+    await h.frames.get('MAIN_GFX').targets.find(item => item.key === 'nav-individual').run();
+    await h.button('BTN_HOME'); await h.tick();
+    assert.ok(h.frames.get('MAIN_GFX').targets.some(item => item.key === 'home-v8'));
 });
 
 test('All graphical pages share the active canvas and fall back on renderer loss', async t => {

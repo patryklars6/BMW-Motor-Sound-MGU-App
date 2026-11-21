@@ -8,23 +8,45 @@ const { FRAMES } = require('./sound');
 const SOCKET = '/run/luxo-motor-sound/pcm.sock';
 const HELLO = 'LUXO/1 S16LE 48000\n';
 const RETRY_MS = 3500;
-const HANDSHAKE_MS = 3000;
+const HANDSHAKE_MS = 6000;
 const HEADER_LIMIT = 160;
 const ERRORS = {
     ALSA_UNAVAILABLE: 'ALSA-Bibliothek des Audio-Dienstes ist nicht verfügbar',
-    ALSA_ROUTE_MISSING: 'Audio-Dienst vorhanden · ALSA-Mischpfad luxo_overlay fehlt',
+    ALSA_ROUTE_MISSING: 'Audio-Dienst vorhanden · bestätigter ALSA-Mischpfad fehlt',
     ALSA_OPEN_FAILED: 'Audio-Mischpfad lässt sich nicht öffnen · Dienstprotokoll prüfen',
     ALSA_FORMAT_UNSUPPORTED: 'Audio-Mischpfad unterstützt das PCM-Format nicht',
     CONFIG_INVALID: 'Konfiguration des Audio-Dienstes ist ungültig',
     AUDIO_WRITE_FAILED: 'Schreibfehler am Audio-Mischpfad · Dienstprotokoll prüfen'
 };
+Object.assign(ERRORS, {
+    ENOENT: 'Audio-Socket fehlt · Dienstinstallation und Start prüfen',
+    EACCES: 'Zugriff auf Audio-Dienst verweigert · UID und Socketrechte prüfen',
+    ECONNREFUSED: 'Audio-Socket vorhanden, aber Dienst nimmt keine Verbindung an',
+    UNTRUSTED_ENDPOINT: 'Audio-Socket oder sein Verzeichnis ist nicht vertrauenswürdig',
+    DIAG_TIMEOUT: 'Audio-Diagnose antwortet nicht rechtzeitig',
+    NO_RESPONSE: 'Audio-Dienst hat keine Diagnoseantwort gesendet',
+    TEST_REQUIRED: 'Passender abgeschlossener Kanaltest fehlt oder ist abgelaufen',
+    HEARING_CONFIRMATION_REQUIRED: 'Gehörte Zuordnung aller Kanäle muss ausdrücklich bestätigt werden',
+    NO_APPROVED_ROUTE: 'Kein separat freigegebener Mischpfad ausgewählt', ROUTE_MISSING: 'Ausgewähltes ALSA-Gerät fehlt',
+    ROUTE_CHANGED: 'Audioaufbau geändert · Pfadfreigabe erneut prüfen', PEER_DENIED: 'App-UID vom Audio-Dienst abgewiesen',
+    ALSA_OPEN_TIMEOUT: 'Audiogerät antwortet beim Öffnen nicht', AUDIO_BUSY: 'Ein Audiostream ist bereits aktiv',
+    AUDIO_WORKER_EXITED: 'ALSA-Ausgabeprozess beendet', PARK_REQUIRED: 'Audiotest benötigt Motor aus, P und Stillstand',
+    ROUTE_NOT_SELECTABLE: 'Diese OEM- oder Standardquelle ist kein freigegebener Mischpfad',
+    APPROVAL_REQUIRED: 'Separate Mischroute muss ausdrücklich freigegeben sein', NO_USB: 'Kein beschreibbarer USB-Datenträger erkannt'
+});
+
+function inspectSocket(socketPath) {
+    try {
+        const dir = fs.lstatSync(path.dirname(socketPath)), socket = fs.lstatSync(socketPath);
+        const trusted = dir.isDirectory() && dir.uid === 0 && (dir.mode & 0o022) === 0 && socket.isSocket() && socket.uid === 0;
+        return { exists: true, trusted, uid: socket.uid, gid: socket.gid, mode: (socket.mode & 0o777).toString(8),
+            error: trusted ? null : 'UNTRUSTED_ENDPOINT' };
+    } catch (error) { return { exists: error.code === 'ENOENT' ? false : null, trusted: false, error: error.code || 'STAT_FAILED' }; }
+}
 
 function trustedSocket(socketPath) {
     try {
-        const dir = fs.lstatSync(path.dirname(socketPath));
-        const socket = fs.lstatSync(socketPath);
-        return dir.isDirectory() && dir.uid === 0 && (dir.mode & 0o022) === 0 &&
-            socket.isSocket() && socket.uid === 0 && (socket.mode & 0o002) === 0;
+        return inspectSocket(socketPath).trusted;
     } catch (e) {
         return false;
     }
@@ -42,6 +64,8 @@ class PcmOutput {
         this.detail = 'Audio-Dienst wird geprüft';
         this.timer = null;
         this.probing = false;
+        this.acceptedBytes = 0;
+        this.blocks = 0;
     }
 
     tick(active) {
@@ -72,9 +96,9 @@ class PcmOutput {
                     this.close('waiting');
                 }
             }, HANDSHAKE_MS);
-            const disconnected = () => {
+            const disconnected = error => {
                 if (this.socket === socket) {
-                    this.detail = 'Verbindung zum Audio-Dienst unterbrochen';
+                    this.detail = error && error.code ? 'Audio-Socket: ' + error.code : 'Verbindung zum Audio-Dienst unterbrochen';
                     this.close('waiting');
                 }
             };
@@ -121,6 +145,8 @@ class PcmOutput {
         if (!this.socket || !this.channels || this.blockedAt !== null || pcm.length !== FRAMES * this.channels * 2) return;
         try {
             if (!this.socket.write(pcm)) this.blockedAt = this.clock();
+            this.acceptedBytes += pcm.length;
+            this.blocks++;
         } catch (e) {
             this.close('waiting');
         }
@@ -146,4 +172,4 @@ class PcmOutput {
     }
 }
 
-module.exports = { PcmOutput };
+module.exports = { PcmOutput, inspectSocket, SOCKET, audioErrorText: code => ERRORS[code] || code };

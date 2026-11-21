@@ -8,6 +8,8 @@ const { connectVehicle } = require('./vehicle');
 const { resolveSettings, Synth, profileSetting } = require('./sound');
 const { PcmOutput } = require('./output');
 const { NativeMenu } = require('./native-menu');
+const { AudioDiagnostics } = require('./audio-diagnostics');
+const { navigation, drawDiagnostics } = require('./navigation');
 const { WIDTH, HEIGHT, PROFILE_CARDS, smoothGauge, audioStatus, drawLive, drawProfiles } = require('./view');
 
 const { drawHome, drawInfo } = require('./home');
@@ -21,10 +23,12 @@ for (const id of Object.keys(THEMES)) {
 }
 
 mgu.run({
-    background({ app, settings, log }) {
+    background({ app, settings, log, spec, dataDir }) {
         const vehicle = new Telemetry(clock);
         const output = new PcmOutput(clock);
         const synth = new Synth();
+        const engine = { blocks: 0, frames: 0, active: false, lastPeak: 0 };
+        const diagnostics = new AudioDiagnostics({ vehicle, output, settings, spec, dataDir, engine, effective: mode => effective(mode) });
         const get = key => settings.get(key);
         let stopVehicle = () => {};
         try {
@@ -43,31 +47,44 @@ mgu.run({
             return prefs;
         }
         const timer = setInterval(() => {
+            if (diagnostics.testing) { engine.active = false; return; }
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
             const active = cfg.enabled && cfg.profileId && cfg.gain > 0 && data.engine === 'running' && data.rpm !== null && data.rpm >= 400;
             if (!active) {
+                engine.active = false;
                 if (output.channels) output.close();
                 output.tick(false);
                 synth.reset();
                 return;
             }
             output.tick();
-            if (output.channels) output.write(synth.render(data, cfg, output.channels));
-            else synth.reset();
+            if (output.channels) {
+                const pcm = synth.render(data, cfg, output.channels);
+                let peak = 0;
+                for (let at = 0; at < pcm.length; at += 2) peak = Math.max(peak, Math.abs(pcm.readInt16LE(at)));
+                engine.lastPeak = peak;
+                output.write(pcm);
+                engine.blocks++; engine.frames += 960; engine.active = true;
+            }
+            else { engine.active = false; synth.reset(); }
         }, 20);
         app.once('shutdown', () => {
             clearInterval(timer);
             output.close();
+            diagnostics.cancelTest();
+            clearTimeout(diagnosticStart);
             stopVehicle();
         });
-        return { vehicle, output, effective };
+        const diagnosticStart = setTimeout(() => diagnostics.refresh().catch(error => log.warn(error.message)), 2000);
+        return { vehicle, output, effective, diagnostics };
     },
 
 
     start(ctx) {
         if (!ctx.background) return;
         const { vehicle, output, effective } = ctx.background;
+        const diagnostics = ctx.background.diagnostics || new AudioDiagnostics({ vehicle, output, effective, settings: ctx.settings, spec: ctx.spec, dataDir: ctx.dataDir });
         const { ui, settings } = ctx;
         let screen = 'MAIN';
         let sliders = [];
@@ -80,7 +97,7 @@ mgu.run({
         let refreshTuning = () => {};
         let refreshSettings = () => {};
         let refreshProfiles = () => {};
-        const pages = { home: 'MAIN', live: 'LIVE', profiles: 'PROFILES', info: 'INFO' };
+        const pages = { home: 'MAIN', live: 'LIVE', profiles: 'PROFILES', info: 'INFO', audio: 'DIAG' };
         const groups = { modes: 'Fahrmodi', speakers: 'Lautsprecher', design: 'Oberfläche' };
         const categories = [...new Set(settings.schema.filter(item => !item.hidden).map(item => item.group))];
 
@@ -89,6 +106,19 @@ mgu.run({
         let nativeMenu;
         let nativeVisible = false;
         let opening = null;
+        const history = [];
+        const capture = () => ({ screen, group, row, choice, tuneProfile, tuneEffect, effectSettings });
+        function back() {
+            if (screen === 'DIAG' && diagnostics.backSub()) return;
+            diagnostics.cancelTest();
+            const previous = history.pop();
+            if (!previous) return screen === 'MAIN' ? openNative() : home();
+            ({ screen, group, row, choice, tuneProfile, tuneEffect, effectSettings } = previous);
+            return show(screen);
+        }
+        function home() {
+            history.length = 0; diagnostics.cancelTest(); return show('MAIN');
+        }
 
         function graphicsReady() {
             return !!(ctx.display && !ctx.display.blocked && ctx.display.ownable() && ctx.display.gpu.native && ctx.display.gpu.touch);
@@ -103,6 +133,7 @@ mgu.run({
 
         function openNative() {
             if (opening) return opening;
+            diagnostics.cancelTest();
             nativeVisible = true;
             opening = Promise.resolve(ui.close('MAIN')).then(() => {
                 if (nativeMenu) return nativeMenu.render();
@@ -112,13 +143,20 @@ mgu.run({
             return opening;
         }
 
-        function go(to) {
+        function show(to) {
             screen = to;
             Object.keys(last).forEach(key => { last[key] = null; });
             if (!graphicsReady()) return openNative();
             nativeVisible = false;
             if (physicalTick) physicalTick.kick();
             return ui.isVisible('MAIN') ? Promise.resolve() : ui.open('MAIN');
+        }
+        function go(to, configure) {
+            const previous = capture();
+            if (configure) configure();
+            if (to !== previous.screen || configure) history.push(previous);
+            if (to === 'DIAG') { diagnostics.page = 'root'; diagnostics.offset = 0; void diagnostics.refresh(); }
+            return show(to);
         }
 
         function loop(name, fps, fn) {
@@ -163,8 +201,7 @@ mgu.run({
         }
 
         function goSettings(value) {
-            chooseGroup(value || 'Motorsound');
-            return go('CONFIG');
+            return go('CONFIG', () => chooseGroup(value || 'Motorsound'));
         }
 
         function moveProfile(step) {
@@ -173,18 +210,20 @@ mgu.run({
         }
 
         function openTuning(profile) {
+            return go('TUNING', () => {
             tuneProfile = editing(profile);
             tuneEffect = 0;
             refreshTuning();
-            return go('TUNING');
+            });
         }
 
         function openEffect(index) {
+            return go('CONFIG', () => {
             tuneEffect = index;
             const card = PROFILE_CARDS.find(item => item.id === tuneProfile);
             chooseGroup(card.name);
             effectSettings = EFFECTS[index];
-            return go('CONFIG');
+            });
         }
 
         function toggleEffect(index) {
@@ -223,6 +262,7 @@ mgu.run({
             power: () => actions.toggle(),
             nav(key) {
                 if (key === 'native') return openNative();
+                if (key === 'home') return home();
                 if (key === 'individual') return openTuning('individual');
                 return pages[key] ? go(pages[key]) : goSettings(groups[key]);
             },
@@ -250,16 +290,24 @@ mgu.run({
         };
 
         ui.onClick('BTN_BMW_MENU', openNative);
+        ui.onClick('BTN_BACK', back);
+        ui.onClick('BTN_HOME', home);
+        ui.onClick('BTN_AUDIO', () => go('DIAG'));
+        if (ctx.display) ctx.display.onBack = back;
         ui.onClick('BTN_MUTE', () => settings.set('enabled', false));
 
         const last = Object.create(null);
         nativeMenu = new NativeMenu(ui, settings, ctx.background, {
             select: actions.select, reset: actions.reset, offered,
-            graphicsStatus, canGraphics: graphicsReady, graphics: () => go('MAIN')
+            diagnostics, graphicsStatus, canGraphics: graphicsReady, graphics: home
         });
         function paint(name, key, draw) {
             if (last[name] === key) return;
-            return Promise.resolve(ui.image('MAIN_GFX', draw(ctx.canvas(WIDTH, HEIGHT)))).then(() => {
+            const canvas = draw(ctx.canvas(WIDTH, HEIGHT));
+            if (name !== 'MAIN') navigation(canvas, ({ LIVE: 'Live-Fahrzeugdaten', PROFILES: 'Soundprofile',
+                TUNING: 'Sound-Tuning', CONFIG: group, INFO: 'Hilfe und Anleitung', DIAG: 'Audio-Diagnose' })[name], settings.get('theme'),
+                { back, home, native: openNative });
+            return Promise.resolve(ui.image('MAIN_GFX', canvas)).then(() => {
                 last[name] = key;
             });
         }
@@ -317,6 +365,9 @@ mgu.run({
                 drawInfo(cv, actions.nav, ctx.spec.version, settings.get('theme'));
                 return cv;
             }));
+        loop('DIAG', 6, () => { diagnostics.maybeRefresh(); return paint('DIAG', diagnostics.version + '/' + diagnostics.offset + '/' + diagnostics.page + '/' + settings.get('theme'), cv => {
+            drawDiagnostics(cv, diagnostics, settings.get('theme')); return cv;
+        }); });
         const configTick = loop('CONFIG', 6, () => {
             const rows = offered().map(item => ({
                 key: item.key, label: item.label,
@@ -351,7 +402,7 @@ mgu.run({
         refreshTuning = () => tuningTick.kick();
         refreshSettings = () => configTick.kick();
         refreshProfiles = () => profileTick.kick();
-        physicalTick = ctx.loop('MAIN', 12, () => {
+        physicalTick = ctx.loop('MAIN', 60, () => {
             if (!graphicsReady()) return openNative();
             const tick = viewTicks[screen] || viewTicks.MAIN;
             return tick();
@@ -365,11 +416,15 @@ mgu.run({
             if (!graphicsReady() && ui.isVisible('MAIN')) void openNative();
         });
         ui.onVisible((name, visible) => {
+            if (name === 'MAIN' && !visible) diagnostics.cancelTest();
             if (name === 'NATIVE') {
+                const hardwareBack = visible && !nativeVisible && screen !== 'MAIN' && graphicsReady();
+                if (hardwareBack) { void back(); return; }
                 nativeVisible = visible;
                 if (visible) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
             }
         });
+        ctx.app.once('shutdown', () => diagnostics.cancelTest());
         settings.onChange(() => {
             Object.keys(last).forEach(name => { last[name] = null; });
             if (physicalTick) physicalTick.kick();

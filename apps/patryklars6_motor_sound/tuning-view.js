@@ -15,10 +15,10 @@ const EFFECTS = [
 ];
 
 function channelStatus(count) {
-    if (count === 2) return 'Stereo · nur links/rechts';
-    if (count === 4) return '4 PCM-Kanäle · Front und Heck · kein Center';
-    if (count === 5) return '5 PCM-Kanäle · Front, Heck und Center am Mischpfad';
-    return 'Audiokanäle nicht bestätigt';
+    if (count === 2) return '2 PCM-Kanäle · Lautsprecher ungeprüft';
+    if (count === 4) return '4 PCM-Kanäle · Lautsprecher ungeprüft';
+    if (count === 5) return '5 PCM-Kanäle · Lautsprecher ungeprüft';
+    return 'PCM: noch nicht geöffnet';
 }
 
 function drawTuning(cv, model, actions) {

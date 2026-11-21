@@ -2,7 +2,7 @@
   "id": "patryklars6_motor_sound",
   "title": "LUXO Motor Sound",
   "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "vendor": "patryklars6",
   "loggingId": "LUXO",
   "iconGlyph": "gauge",
@@ -113,6 +113,9 @@
       "settings": true,
       "title": "LUXO Motor Sound",
       "buttons": [
+        ["BTN_BACK", "Zurück"],
+        ["BTN_HOME", "Hauptmenü"],
+        ["BTN_AUDIO", "Audio-Diagnose"],
         [
           "BTN_BMW_MENU",
           "BMW-Menü"
@@ -3087,6 +3090,6 @@
     "nativeSettings": true
   },
   "requires": {
-    "luxo-motor-audio": "0.2.2"
+    "luxo-motor-audio": "0.3.0"
   }
 }

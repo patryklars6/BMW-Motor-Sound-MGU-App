@@ -33,6 +33,7 @@ class NativeMenu {
     }
 
     back() {
+        if (this.page.kind === 'diagnostics' && this.callbacks.diagnostics.backSub()) return this.render();
         this.page = this.stack.pop() || { kind: 'root', offset: 0 };
         return this.render();
     }
@@ -63,6 +64,9 @@ class NativeMenu {
                 row('Soundprofile', cfg.profileLabel || 'Automatik wartet auf Fahrmodus', () => this.open({ kind: 'profiles' })),
                 row('Sound-Tuning', 'Motor, Turbo, Auspuff, Pop & Bangs', () => this.open({ kind: 'tuningProfiles' })),
                 row('Lautstärke und Audio', out.detail || 'Audiopfad prüfen', () => this.open({ kind: 'audio' })),
+                row('Audio-Diagnose', 'Dienst, Geräte, Kanaltest und JSON-/USB-Bericht', () => {
+                    void this.callbacks.diagnostics.refresh(); return this.open({ kind: 'diagnostics' });
+                }),
                 row('Live-Fahrzeugdaten', 'Empfangene Werte anzeigen', () => this.open({ kind: 'live' })),
                 row('Lautsprecher', cfg.speaker.label, () => group('Lautsprecher')),
                 row('Fahrmodi', s.get('autoMode') ? 'Automatik ein' : 'Manuell', () => group('Fahrmodi')),
@@ -110,13 +114,16 @@ class NativeMenu {
             }));
         }
         if (this.page.kind === 'audio') {
-            return [row('Audioausgabe', out.detail || 'Wird geprüft'), row('Kanäle', channelStatus(out.channels)),
+            return [row('Audio-Diagnose', 'Geräte und Fehlerursache prüfen', () => {
+                void this.callbacks.diagnostics.refresh(); return this.open({ kind: 'diagnostics' });
+            }), row('Audioausgabe', out.detail || 'Wird geprüft'), row('Kanäle', channelStatus(out.channels)),
                 row('App-Pegel', s.display('level'), () => this.open({ kind: 'values', key: 'level' })),
                 row('Pegelgrenze', s.display('limit'), () => this.open({ kind: 'values', key: 'limit' })),
                 row('Audio erneut prüfen', 'Verbindung zum Audio-Dienst testen', () => out.retry()),
-                row('Parallele Musik', 'Benötigt bestätigten ALSA-Mischpfad luxo_overlay'),
+                row('Parallele Musik', 'Benötigt einen separat bestätigten Mischpfad'),
                 row('BMW-Lautstärke', 'Unabhängigkeit hängt vom RAM- und Verstärkerpfad ab')];
         }
+        if (this.page.kind === 'diagnostics') return this.callbacks.diagnostics.rows();
         if (this.page.kind === 'live') {
             const unknown = 'Nicht verfügbar';
             return [row('Drehzahl', data.rpm === null ? unknown : Math.round(data.rpm) + ' U/min'),
@@ -129,10 +136,12 @@ class NativeMenu {
         }
         return [row('Bedienung', 'Zeile mit Touch oder Controller drücken. Zurück und Weitere Seiten unten.'),
             row('LUXO-Grafik', 'Benötigt mgu-render/1 mit Touch-Routing. BMW-Menüs funktionieren auch ohne Renderer.'),
+            row('Grafik-Navigation', 'Zurück und Hauptmenü stehen auf jeder Unterseite. BMW-Menü ist die Rückfallebene.'),
+            row('Diagnosebericht', 'Audio-Diagnose: in App-Daten speichern oder auf erkannten USB-Datenträger exportieren.'),
             row('Einstellungen', 'Jede Änderung wird automatisch in data/settings.json gespeichert.'),
-            row('Kein Ton', out.detail || 'Audio-Dienst und Mischpfad luxo_overlay prüfen.'),
+            row('Kein Ton', out.detail || 'Audio-Diagnose öffnen und vorhandene Ausgänge prüfen.'),
             row('Fahrzeugdaten', 'Ohne frische Drehzahl und laufenden Motor bleibt der Motorsound stumm.'),
-            row('MGU-Store-Update', 'Quelle aktualisieren und Version 0.2.2 aktualisieren. App-ID bleibt gleich.')];
+            row('MGU-Store-Update', 'Quelle aktualisieren und Version 0.3.0 aktualisieren. App-ID bleibt gleich.')];
     }
 
     async render() {

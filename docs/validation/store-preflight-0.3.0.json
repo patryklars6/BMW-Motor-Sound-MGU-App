@@ -1,0 +1,22 @@
+{
+  "upstream": "robertnisipeanu/mgu-store",
+  "revision": "d878bed5ce5848d0c1ce852be23fac539e434a0b",
+  "deployerVersion": "0.8.27",
+  "host": "win32",
+  "node": "v24.22.3",
+  "vehicleTest": false,
+  "checks": [
+    "real Store catalog agrees on app, tool and required version 0.3.0",
+    "real deployer check reproduces 0.2.1 bad enable entry with exit 2",
+    "real deployer check accepts the complete rebuilt 0.3.0 audio archive",
+    "real deployer installation preflight accepts 0.3.0 without installing it",
+    "packed enable, units, restart and file digest describe the actual audio payload",
+    "real preflight rejects a missing enable target",
+    "real preflight rejects a changed audio payload hash",
+    "real preflight rejects a missing service unit payload",
+    "real deployer validates the app archive with its unchanged ID and ID7 declaration",
+    "settings schema and app ID remain identical to installed 0.2.1"
+  ],
+  "limits": "Unmodified upstream check/preflight in an isolated fake root; no systemd service start, donor linking, or vehicle install.",
+  "audioSha256": "6840cba9379b78095379e1f283ecf5eda40cf29e4d44b893ecfe1c9a7d495b7b"
+}

@@ -209,7 +209,7 @@ test('Missing audio service and missing ALSA route are reported without claiming
     assert.equal(socket.packets[0], 'PROBE\n');
     socket.emit('data', Buffer.from('ERROR ALSA_ROUTE_MISSING\n'));
     assert.equal(out.channels, 0);
-    assert.match(out.detail, /luxo_overlay fehlt/);
+    assert.match(out.detail, /bestätigter ALSA-Mischpfad fehlt/);
     assert.equal(socket.destroyed, true);
 });
 
