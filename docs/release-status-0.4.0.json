@@ -1,0 +1,42 @@
+{
+  "localVersion": "0.4.0",
+  "lastPublishedVersion": "0.3.0",
+  "storePublicationHeld": false,
+  "reason": "User explicitly requested publication with new audio path and photos; vehicle output and sound quality remain unverified.",
+  "vehicleSpeakerOutputVerified": false,
+  "neededReport": "diagnostics/audio-report.json from installed 0.3.0, optionally exported to LUXO-Diagnose/audio-*.json",
+  "tests": {
+    "node": 76,
+    "python": 30,
+    "upstreamStoreDeployer": 14
+  },
+  "realtimeEndurance": {
+    "wallSeconds": 180,
+    "acceptedAudioSeconds": 179.98,
+    "maxBlockGapSeconds": 0.047,
+    "hardwareAudioVerified": false
+  },
+  "soundQuality": {
+    "productionReady": false,
+    "userAccepted": false,
+    "exactM5F90RecordingAvailable": false,
+    "profileSpecificTurboRecordingAvailable": false
+  },
+  "diagnosticExport": {
+    "localSaveIndependentOfAudioService": true,
+    "separateSocketServiceInExistingAudioTool": true,
+    "hostTransportTestWithAudioBackendUnavailablePassed": true,
+    "actualBmwUsbWriteVerified": false,
+    "limit": "Both services share the Store-installed Python runtime; if tool/runtime/peer authorization fails, use local report and detail photos."
+  },
+  "publicationState": "prepared-for-authorized-github-upload",
+  "managedMedia": {
+    "implemented": true,
+    "optIn": true,
+    "stereoOnly": true,
+    "replacesMusicSource": true,
+    "followsBmwVolume": true,
+    "allId7Guaranteed": false,
+    "vehicleSpeakerOutputVerified": false
+  }
+}

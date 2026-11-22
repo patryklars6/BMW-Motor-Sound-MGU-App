@@ -1,12 +1,12 @@
-# Fahrzeugtest für Update 0.3.0
+# Fahrzeugtest für Update 0.4.0
 
 ## Bisherige Fahrzeugbeobachtung
 
-Der Nutzer bestätigt für **0.2.2** auf BMW G31 530d xDrive, Baujahr 2018, nachgerüstete MGU ID7, MATCH UP 10: App läuft, echte Drehzahl und Geschwindigkeit sichtbar, kein Motorsound; Meldungen Audio-Dienst nicht erreichbar / Audiopfad fehlt / Audiokanäle nicht bestätigt. 0.3.0 ist noch nicht auf diesem Fahrzeug getestet. Es gibt keine pauschale Freigabe anderer MGU-/RAM-Kombinationen.
+Der Nutzer bestätigt für **0.2.2** auf BMW G31 530d xDrive, Baujahr 2018, nachgerüstete MGU ID7, MATCH UP 10: App läuft, echte Drehzahl und Geschwindigkeit sichtbar, kein Motorsound; Meldungen Audio-Dienst nicht erreichbar / Audiopfad fehlt / Audiokanäle nicht bestätigt. 0.4.0 ist noch nicht auf diesem Fahrzeug getestet. Es gibt keine pauschale Freigabe anderer MGU-/RAM-Kombinationen.
 
 ## Prüfablauf
 
-1. Bestehende Installation gemäß [README](../README.md#installation-und-update-über-den-mgu-store) aktualisieren. **App und Dienst 0.3.0** prüfen. Vorhandene Profile, Einzelpegel, Amp-Auswahl, Moduszuordnungen und Theme müssen erhalten bleiben; nach normalem Neustart erneut prüfen.
+1. Bestehende Installation gemäß [README](../README.md#installation-und-update-über-den-mgu-store) aktualisieren. **App und Dienst 0.4.0** prüfen. Vorhandene Profile, Einzelpegel, Amp-Auswahl, Moduszuordnungen und Theme müssen erhalten bleiben; nach normalem Neustart erneut prüfen.
 2. **Audio-Diagnose → Diagnose aktualisieren**. Versionsdaten, UID/GID, systemd, Socket, Ausgabehindernis und sichtbar gemeldete Geräte erfassen. Bericht lokal speichern und, falls angeboten, auf vorhandenen USB-Datenträger exportieren. Dienst nicht erreichbar: lokale Berichtsdaten und Fehlermeldung zurückgeben. USB-Schreiben auf MGU ist ungetestet.
 3. RAM-Typ, Verstärker, Kabelbaum und Fahrzeugsoftware vor Ort dokumentieren. Die App erkennt diese Modelle nicht aus der gewählten Soundsystem-Vorgabe. AudioManager-Listen sind Beobachtungen der vorhandenen Firmware, keine Freigabe von Quellen oder Verbindungen.
 4. Nur einen vor Ort bestätigten separaten ALSA-Mischpfad auswählen. Kein `luxo_overlay` wird vorausgesetzt oder eingerichtet. Ohne nutzbaren Ausgang endet die Audiofreigabe hier mit Diagnosebericht; OEM-/SmartX-Standardquellen nicht versuchsweise übernehmen.
@@ -21,6 +21,14 @@ Der Nutzer bestätigt für **0.2.2** auf BMW G31 530d xDrive, Baujahr 2018, nach
 
 ## Grenzen
 
-45 Node-, 19 Python- und zehn echte Store-/Deployer-Prüfungen plus App-Archivvalidierung bestehen auf dem Entwicklungsrechner. Sie ersetzen keinen Fahrzeugtest. Als Erfolg getrennt erfassen: **Engine erzeugt PCM → Socket nimmt Daten an → ALSA nimmt Frames an → richtige Lautsprecher hörbar → Musikparallelität → unabhängige akustische Lautstärke**.
+63 Node-, 19 Python- und zehn echte Store-/Deployer-Prüfungen plus App-Archivvalidierung bestehen auf dem Entwicklungsrechner. Sie ersetzen keinen Fahrzeugtest. Als Erfolg getrennt erfassen: **Engine erzeugt PCM → Socket nimmt Daten an → ALSA nimmt Frames an → richtige Lautsprecher hörbar → Musikparallelität → unabhängige akustische Lautstärke**.
 
-Die Fahrzeuganbindung verwendet vorhandene SOME/IP-Getter/Abonnements und sendet keine ECU-/Getriebe-/Codierbefehle. Im Diagnosewerkzeug werden ausschließlich die katalogdefinierten AudioManager-Listen gelesen. Es werden keine Medienquellen verbunden oder OEM-Routen verändert. [Technischer Bericht und Quellen](reparatur-0.3.0.md)
+Die Fahrzeuganbindung verwendet vorhandene SOME/IP-Getter/Abonnements und sendet keine ECU-/Getriebe-/Codierbefehle. Im Diagnosewerkzeug werden ausschließlich die katalogdefinierten AudioManager-Listen gelesen. Es werden keine Medienquellen verbunden oder OEM-Routen verändert. [Technischer Bericht und Quellen](reparatur-0.4.0.md)
+
+## Zusätzliche Klangprüfung in 0.4.0
+
+- Fünf Aufnahme-Grundprofile und Individual direkt vergleichen. Ein unterschiedliches PCM-Signal oder eine andere Quelldatei beweist noch keine subjektiv realistische Wiedergabe. M5/M sind Klangabstimmungen auf anderer Aufnahmebasis.
+- Gang in der App mit dem Fahrzeug vergleichen. Echte Hoch-/Rückschaltungen im Vorwärtsbetrieb prüfen; bei fehlendem Gang darf kein Drehzahlabfall als Ersatz-Schaltung dienen. Erster Gangwert, P/N/R und konstante/repetierte Werte dürfen keine Knallfolge auslösen. Die tatsächliche Verfügbarkeit des Gangs auf dem G31 ist bisher nicht bestätigt.
+- Pop-Volume auf null, Härte, Häufigkeit, Schaltknall-Aus und Turbo-Schalten-Aus getrennt prüfen. Gas langsam und schnell wegnehmen; es darf ohne neues Ereignis kein neuer Effekt entstehen.
+- Bei P, echter Geschwindigkeit 0 und laufendem Motor stoppen: maximal 0,85 s optionaler Nachklang nach gemeldetem Motor aus/RPM 0. Unbekannte Park-/RPM-Daten sperren ihn. App-Neustart bei bereits abgestelltem Motor darf ihn nicht nachspielen.
+- Menü verlassen und Hintergrundbetrieb mit kontinuierlich frischen RPM prüfen. Reguläres Einschlafen und Aufwachen der MGU testen. Ein Hosttest kann keinen Dauerbetrieb gegen die Lebenszyklusverwaltung der Head Unit garantieren.

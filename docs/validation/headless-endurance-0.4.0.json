@@ -1,0 +1,46 @@
+{
+  "version": "0.4.0",
+  "requestedSeconds": 180,
+  "wallSeconds": 180,
+  "acceptedAudioSeconds": 179.98,
+  "sink": {
+    "frames": 8639040,
+    "blocks": 8999,
+    "nonzeroBlocks": 8999,
+    "maxGapSeconds": 0.04700000000048021
+  },
+  "source": "actual packaged headless background + telemetry decoder + PcmOutput + Python production bridge + host sink",
+  "uiStarted": false,
+  "inventedTestVehicleInputs": true,
+  "hardwareAudioVerified": false,
+  "events": {
+    "lift": 7,
+    "upshift": 8,
+    "downshift": 7,
+    "shutdown": 0,
+    "last": {
+      "kind": "upshift",
+      "from": 1,
+      "to": 2,
+      "source": "statusGearboxDrive",
+      "rpmBefore": 3095.75,
+      "rpmAtShift": 3122.75,
+      "rpmAfter": 3203,
+      "pedal": 0.675,
+      "torque": 176.5
+    },
+    "lastShift": {
+      "kind": "upshift",
+      "from": 1,
+      "to": 2,
+      "source": "statusGearboxDrive",
+      "rpmBefore": 3095.75,
+      "rpmAtShift": 3122.75,
+      "rpmAfter": 3203,
+      "pedal": 0.675,
+      "torque": 176.5
+    }
+  },
+  "rssBefore": 50675712,
+  "rssAfter": 54210560
+}

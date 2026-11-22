@@ -1,0 +1,160 @@
+{
+  "version": "0.4.0",
+  "technicalChecksOnly": true,
+  "audibleLoopOrRealismVerified": false,
+  "note": "No digital overload or unintended silent steady window found. Measurements do not establish absence of audible repetition, clicks or subjective distortion. User listening and BMW test still required.",
+  "clips": [
+    {
+      "profile": "v6",
+      "seconds": 24,
+      "peakDbfs": -16.61388625702188,
+      "meanDc": [
+        0.0008073163562350803,
+        0.0007707615693410238
+      ],
+      "steadyRmsMin": 0.0230114272498931,
+      "steadyRmsMax": 0.05349696846353398,
+      "steadyLargestAdjacentStep": 0.0201416015625,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    },
+    {
+      "profile": "v8",
+      "seconds": 24,
+      "peakDbfs": -16.80626860983448,
+      "meanDc": [
+        0.00039711059464348685,
+        0.0003796559704674615
+      ],
+      "steadyRmsMin": 0.02165501708449164,
+      "steadyRmsMax": 0.05472166996857896,
+      "steadyLargestAdjacentStep": 0.02978515625,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    },
+    {
+      "profile": "f90",
+      "seconds": 24,
+      "peakDbfs": -16.651662785947867,
+      "meanDc": [
+        -0.00027102017402648925,
+        -0.0002596633434295654
+      ],
+      "steadyRmsMin": 0.041888095758145255,
+      "steadyRmsMax": 0.05846475618608237,
+      "steadyLargestAdjacentStep": 0.022491455078125,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    },
+    {
+      "profile": "m",
+      "seconds": 24,
+      "peakDbfs": -16.902225876645517,
+      "meanDc": [
+        0.00032645087771945527,
+        0.0003142748143937853
+      ],
+      "steadyRmsMin": 0.03632287947931346,
+      "steadyRmsMax": 0.050092260722449704,
+      "steadyLargestAdjacentStep": 0.020904541015625,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    },
+    {
+      "profile": "diesel",
+      "seconds": 24,
+      "peakDbfs": -16.722258088778478,
+      "meanDc": [
+        -0.0006509664323594835,
+        -0.0006298668384552002
+      ],
+      "steadyRmsMin": 0.03602337857430791,
+      "steadyRmsMax": 0.053976138697081524,
+      "steadyLargestAdjacentStep": 0.017242431640625,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    },
+    {
+      "profile": "individual",
+      "seconds": 24,
+      "peakDbfs": -16.633653470688124,
+      "meanDc": [
+        0.00100314638349745,
+        0.0009807181888156467
+      ],
+      "steadyRmsMin": 0.02481103484458964,
+      "steadyRmsMax": 0.0637003893538936,
+      "steadyLargestAdjacentStep": 0.0177001953125,
+      "unexpectedSilentSteadyWindows": 0,
+      "motorOffSilentAfter22_9": true
+    }
+  ],
+  "loopJoins": [
+    {
+      "sample": "v6-low",
+      "joinStep": 0.02838134765625,
+      "bodyStepP999": 0.1324013061523429,
+      "joinVsBodyP999": 0.21435851715536702
+    },
+    {
+      "sample": "v6-high",
+      "joinStep": 0.00091552734375,
+      "bodyStepP999": 0.15747607421874954,
+      "joinVsBodyP999": 0.005813755189745483
+    },
+    {
+      "sample": "v8-low",
+      "joinStep": 0.032470703125,
+      "bodyStepP999": 0.14601501464843714,
+      "joinVsBodyP999": 0.22237920670816128
+    },
+    {
+      "sample": "v8-high",
+      "joinStep": 0.011199951171875,
+      "bodyStepP999": 0.28228784179686883,
+      "joinVsBodyP999": 0.03967564136160834
+    },
+    {
+      "sample": "f90-low",
+      "joinStep": 0.00830078125,
+      "bodyStepP999": 0.034469177246093774,
+      "joinVsBodyP999": 0.2408175045994371
+    },
+    {
+      "sample": "f90-high",
+      "joinStep": 0.001739501953125,
+      "bodyStepP999": 0.12466925048828126,
+      "joinVsBodyP999": 0.0139529350366032
+    },
+    {
+      "sample": "m-low",
+      "joinStep": 0.136993408203125,
+      "bodyStepP999": 0.2768942871093767,
+      "joinVsBodyP999": 0.49474985429732216
+    },
+    {
+      "sample": "m-high",
+      "joinStep": 0.0064697265625,
+      "bodyStepP999": 0.17295043945312516,
+      "joinVsBodyP999": 0.037407979898504355
+    },
+    {
+      "sample": "diesel-low",
+      "joinStep": 0.001922607421875,
+      "bodyStepP999": 0.09441674804687494,
+      "joinVsBodyP999": 0.020362991329890816
+    },
+    {
+      "sample": "diesel-high",
+      "joinStep": 0.034942626953125,
+      "bodyStepP999": 0.11055505371093699,
+      "joinVsBodyP999": 0.31606539710511844
+    },
+    {
+      "sample": "spool",
+      "joinStep": 0.13006591796875,
+      "bodyStepP999": 0.47237585449218655,
+      "joinVsBodyP999": 0.27534412847704387
+    }
+  ]
+}
