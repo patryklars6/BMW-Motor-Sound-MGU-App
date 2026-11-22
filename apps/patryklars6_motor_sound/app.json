@@ -2,7 +2,7 @@
   "id": "patryklars6_motor_sound",
   "title": "LUXO Motor Sound",
   "description": "Fahrzeugdaten und separat geregelter Motorsound für iDrive 7. Audioausgabe benötigt einen freigegebenen Mischpfad.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "vendor": "patryklars6",
   "loggingId": "LUXO",
   "iconGlyph": "gauge",
@@ -3084,12 +3084,413 @@
       "type": "bool",
       "default": true,
       "group": "Oberfläche"
+    },
+    {
+      "key": "v6_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "v6_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v6_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "V6 Sound"
+    },
+    {
+      "key": "v6_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "V6 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "v8_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "v8_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "V8 Sound"
+    },
+    {
+      "key": "v8_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "V8 Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "f90_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "f90_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M5 F90"
+    },
+    {
+      "key": "f90_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "BMW M5 F90",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "m_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "m_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "BMW M Sound"
+    },
+    {
+      "key": "m_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "BMW M Sound",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "diesel_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "diesel_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "Sport Diesel"
+    },
+    {
+      "key": "diesel_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "Sport Diesel",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_bangVolume",
+      "label": "Lautstärke Pop & Bangs",
+      "type": "number",
+      "default": 100,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_bangHardness",
+      "label": "Pop & Bangs: Härte",
+      "type": "number",
+      "default": 85,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 70, 80, 85, 90, 100 ]
+    },
+    {
+      "key": "individual_shiftOn",
+      "label": "Effekte bei echten Gangwechseln",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_shiftBangOn",
+      "label": "Schaltknall (Pop & Bangs benötigt)",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_shiftTurboOn",
+      "label": "Turbo beim Schalten",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_shiftLevel",
+      "label": "Schalt-Effekt: Intensität",
+      "type": "number",
+      "default": 65,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "individual_shutdownTailOn",
+      "label": "Nachklang bei Motor aus und P",
+      "type": "bool",
+      "default": true,
+      "group": "Individual"
+    },
+    {
+      "key": "individual_shutdownLevel",
+      "label": "Nachklang: Lautstärke",
+      "type": "number",
+      "default": 45,
+      "group": "Individual",
+      "unit": "%",
+      "steps": [ 0, 10, 20, 30, 40, 45, 50, 60, 70, 80, 90, 100 ]
+    },
+    {
+      "key": "audioPack",
+      "label": "Aufnahme-Paket",
+      "type": "choice",
+      "default": "builtin",
+      "group": "Motorsound",
+      "options": [
+        [
+          "builtin",
+          "Mitgeliefert"
+        ],
+        [
+          "installed",
+          "Optional installiert (benötigt Soundpaket)"
+        ]
+      ]
     }
   ],
   "config": {
     "nativeSettings": true
   },
   "requires": {
-    "luxo-motor-audio": "0.3.0"
+    "luxo-motor-audio": "0.4.0"
   }
 }

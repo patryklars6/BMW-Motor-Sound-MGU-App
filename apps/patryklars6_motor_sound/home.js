@@ -195,11 +195,11 @@ function drawInfo(cv, nav, version, accentName) {
     cv.text('iDrive 7  ·  Version ' + version, x + 35, y + 107, 25, accent.dim);
     const help = [
         ['1. Klangprofil wählen', 'Im Hauptmenü oder unter Soundprofile auswählen. Änderungen werden gespeichert.'],
-        ['2. Sound einstellen', 'Tuning pro Profil öffnen, Pegelgrenze einstellen und das Soundsystem wählen.'],
+        ['2. Pop & Bangs und Turbo', 'Im Profil einschalten; Lautstärke, Härte, Häufigkeit und Schalt-Effekte anpassen.'],
         ['3. Zurück und Hauptmenü', 'Jede Grafikseite hat beide Tasten. BMW-Menü öffnet die native Bedienung.'],
-        ['4. Fahrzeugdaten', 'Live-Daten zeigt empfangene Werte. Fehlende Signale bleiben nicht verfügbar.'],
-        ['5. Wenn der Ton fehlt', 'Audio-Diagnose öffnen. Geräteanzeige allein bestätigt noch keinen Lautsprecherpfad.'],
-        ['6. Diagnosebericht', 'In Audio-Diagnose speichern oder auf einen dort erkannten USB-Datenträger exportieren.']
+        ['4. Hintergrund und Nachklang', 'Läuft bei aktiver MGU weiter. Motor-Aus-Nachklang nur bei gemeldetem Stillstand und P.'],
+        ['5. Wenn der Ton fehlt', 'Audio-Diagnose: Audiomodus einrichten. Medienquelle ersetzt Musik, bleibt fahrzeugabhängig.'],
+        ['6. Diagnosebericht', 'Lokal speichern; separater Diagnosezugang ermöglicht USB-Export auch bei PCM-Ausfall.']
     ];
     help.forEach(([title, description], i) => {
         const line = y + 145 + 44 * i;

@@ -11,6 +11,6 @@ Group=root
 UMask=0027
 NoNewPrivileges=yes
 LimitCORE=1
-TimeoutStopSec=2
+TimeoutStopSec=15
 Restart=on-failure
 RestartSec=3

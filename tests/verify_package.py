@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import hashlib
 import pathlib
 import sys
 import tarfile
@@ -29,7 +30,7 @@ with tarfile.open(archive, "r:gz") as tar:
     assert meta["mguAppStartType"] == "autostart"
     assert component["id"] == "patryklars6_motor_sound"
     audio = json.loads((ROOT / "tools/component.json").read_text(encoding="utf-8"))
-    assert spec["version"] == audio["version"] == "0.3.0"
+    assert spec["version"] == audio["version"] == "0.4.0"
     assert component["requires"]["luxo-motor-audio"] == spec["requires"]["luxo-motor-audio"] == audio["version"]
     assert data("config/base.json")["rhmiLoadingEnabled"]
     assert b"require('oap-sdk')" in read("javascript/kit/mgu.js")
@@ -53,4 +54,12 @@ with tarfile.open(archive, "r:gz") as tar:
         assert set(entry) == {"attributes", "instances"}
         assert all(flags == "rs" for flags in entry["attributes"].values())
     assert b"Sim" not in read("javascript/telemetry.js")
+    sound_manifest = data("javascript/audio/manifest.json")
+    assert sound_manifest["sampleRate"] == 24000 and len(sound_manifest["sounds"]) == 16
+    for sound in sound_manifest["sounds"].values():
+        payload = read("javascript/audio/" + sound["file"])
+        assert len(payload) == sound["frames"] * 2 and hashlib.sha256(payload).hexdigest() == sound["sha256"]
+    assert b"EvanBoyerman" in read("javascript/audio/ATTRIBUTION.md")
+    assert b"creativecommons.org/licenses/by/4.0" in read("javascript/audio/ATTRIBUTION.md")
+    assert "package/javascript/audio.pack" not in files
 print(f"OK: {archive.name} ({len(files)} files, manifest, ID7 layout, icon, and no BMW SDK)")

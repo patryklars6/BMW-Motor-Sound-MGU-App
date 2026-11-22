@@ -5,12 +5,12 @@ const { themeFor } = require('./themes');
 
 const EFFECTS = [
     { id: 'engine', name: 'Motor', route: 'Vorn · Center bei 5 Kanälen', settings: ['engine', 'engineOn', 'engineVolume', 'bass',
-        'bassOn', 'depth', 'character', 'enginePan', 'engineFader', 'engineCenter', 'engineRouteGain'] },
+        'bassOn', 'depth', 'character', 'shutdownTailOn', 'shutdownLevel', 'enginePan', 'engineFader', 'engineCenter', 'engineRouteGain'] },
     { id: 'turbo', name: 'Turbo', route: 'Vorn rechts', settings: ['turbo', 'turboOn', 'turboVolume', 'turboStyle',
-        'boostOn', 'boost', 'liftOn', 'lift', 'turboPan', 'turboFader', 'turboRouteGain'] },
+        'boostOn', 'boost', 'liftOn', 'lift', 'shiftOn', 'shiftTurboOn', 'shiftLevel', 'turboPan', 'turboFader', 'turboRouteGain'] },
     { id: 'exhaust', name: 'Auspuff', route: 'Hinten', settings: ['exhaust', 'exhaustOn', 'exhaustVolume',
         'exhaustPan', 'exhaustFader', 'exhaustRouteGain'] },
-    { id: 'bang', name: 'Pop & Bangs', route: 'Hinten', settings: ['bang', 'bangOn', 'bangRate',
+    { id: 'bang', name: 'Pop & Bangs', route: 'Hinten', settings: ['bang', 'bangOn', 'bangVolume', 'bangHardness', 'bangRate', 'shiftOn', 'shiftBangOn', 'shiftLevel',
         'bangPan', 'bangFader', 'bangRouteGain'] }
 ];
 

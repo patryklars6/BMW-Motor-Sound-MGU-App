@@ -1,0 +1,14 @@
+[Unit]
+Description=LUXO independent diagnostics socket
+
+[Socket]
+ListenStream=/run/luxo-motor-sound/diagnostics.sock
+SocketUser=root
+SocketGroup=root
+# The service authenticates the kernel peer against the existing OAP registry.
+SocketMode=0666
+DirectoryMode=0755
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

@@ -113,6 +113,23 @@ test('Native BMW menus expose profiles, values, pagination and theme without a G
     assert.equal(restored.get('theme'), 'ice_white');
 });
 
+test('Native recording-pack selector displays friendly labels and persists both choices', async t => {
+    const h = await harness(t, false);
+    const find = async label => {
+        for (let i = 0; i < 10; i++) {
+            if (Array.from(h.cells).some(([key, row]) => h.visible.get(key) && row.Text1stRow === label)) return h.click(label);
+            await h.click('Weitere Einträge');
+        }
+        assert.fail('Missing recording-pack menu: ' + label);
+    };
+    await find('Alle Einstellungen'); await find('Motorsound'); await find('Aufnahme-Paket');
+    await find('Optional installiert (benötigt Soundpaket)');
+    assert.equal(h.settings.get('audioPack'), 'installed');
+    assert.equal(h.settings.display('audioPack'), 'Optional installiert (benötigt Soundpaket)');
+    await find('Aufnahme-Paket'); await find('Mitgeliefert');
+    assert.equal(settingsAt(h.dir).get('audioPack'), 'builtin');
+});
+
 test('Every graphical submenu has working touch Back, Home and BMW fallback across repeated visits', async t => {
     const h = await harness(t, true);
     const draw = async () => { await h.tick(); return h.frames.get('MAIN_GFX'); };

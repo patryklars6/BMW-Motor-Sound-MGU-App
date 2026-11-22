@@ -1,0 +1,353 @@
+{
+  "schema": 1,
+  "quality": {
+    "status": "rejected-by-user",
+    "productionReady": false,
+    "reason": "Short rev crops and shared turbo effects were rejected as artificial; sustained measured-RPM/load recordings and profile-specific effects are required.",
+    "exactBmwM5F90Recording": false,
+    "profileSpecificTurboRecordings": false
+  },
+  "sampleRate": 24000,
+  "channels": 1,
+  "format": "S16LE",
+  "recordedRpmKnown": false,
+  "referenceRpmMeaning": "Playback calibration only; not a measured RPM of the recording",
+  "sounds": {
+    "v6-low": {
+      "file": "v6-low.pcm",
+      "source": "v6",
+      "sourceIntervalSeconds": [
+        2.55,
+        3.35
+      ],
+      "loop": true,
+      "referenceRpm": 1100,
+      "frames": 18240,
+      "sha256": "1e4cf5c9fde2562a7f7258e95ad729ad88ee2fda516b75966cc7bd2cccffdf44",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "v6-high": {
+      "file": "v6-high.pcm",
+      "source": "v6",
+      "sourceIntervalSeconds": [
+        0.6,
+        1.18
+      ],
+      "loop": true,
+      "referenceRpm": 3400,
+      "frames": 12960,
+      "sha256": "57d60fccf57c52e5a9129bbab0a4249d5745197b7a04b66a865314b903ece7a9",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 8000,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "v8-low": {
+      "file": "v8-low.pcm",
+      "source": "v8",
+      "sourceIntervalSeconds": [
+        2.05,
+        2.85
+      ],
+      "loop": true,
+      "referenceRpm": 1100,
+      "frames": 18240,
+      "sha256": "018e99f78394df9248dea471123195d296dc95287d5770c1553c91eb612ed83c",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "v8-high": {
+      "file": "v8-high.pcm",
+      "source": "v8",
+      "sourceIntervalSeconds": [
+        0.72,
+        1.2
+      ],
+      "loop": true,
+      "referenceRpm": 3200,
+      "frames": 10560,
+      "sha256": "b4eea99333f47bfb79b019dfc04916ca678d38a67e3648ed694f1ffca3ed1626",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 8000,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "f90-low": {
+      "file": "f90-low.pcm",
+      "source": "f90",
+      "sourceIntervalSeconds": [
+        6.4,
+        7.35
+      ],
+      "loop": true,
+      "referenceRpm": 1100,
+      "frames": 21840,
+      "sha256": "a3f938cd6feaddfe53237ae8bd12fe50d8ec4b6470bea6397ca8c88ab71448b7",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "f90-high": {
+      "file": "f90-high.pcm",
+      "source": "f90",
+      "sourceIntervalSeconds": [
+        3.25,
+        3.95
+      ],
+      "loop": true,
+      "referenceRpm": 3400,
+      "frames": 15840,
+      "sha256": "058f3635f88a1a6eec48321f7f18a6bf42cee50339021baa4dbb3de156b11ad1",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 8000,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "m-low": {
+      "file": "m-low.pcm",
+      "source": "m",
+      "sourceIntervalSeconds": [
+        30.05,
+        30.95
+      ],
+      "loop": true,
+      "referenceRpm": 1300,
+      "frames": 20640,
+      "sha256": "ecb8b128151b6fda63274e1fe64af9fd0e330b519d6b1d993d1194c6e49bf163",
+      "processing": {
+        "highpassHz": 45,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "m-high": {
+      "file": "m-high.pcm",
+      "source": "m",
+      "sourceIntervalSeconds": [
+        15.15,
+        15.85
+      ],
+      "loop": true,
+      "referenceRpm": 3600,
+      "frames": 15840,
+      "sha256": "dd8803966ca7a82e1833f045589f15fd1c13d7483f748960d21710eb5907e1e8",
+      "processing": {
+        "highpassHz": 45,
+        "lowpassHz": 8000,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "diesel-low": {
+      "file": "diesel-low.pcm",
+      "source": "diesel",
+      "sourceIntervalSeconds": [
+        0.2,
+        0.95
+      ],
+      "loop": true,
+      "referenceRpm": 1400,
+      "frames": 17040,
+      "sha256": "5a01f6be1690c2d19002bf4db1e6796432ae36bd242eab0d2274f9b02aac45e9",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 4500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "diesel-high": {
+      "file": "diesel-high.pcm",
+      "source": "diesel",
+      "sourceIntervalSeconds": [
+        1.05,
+        1.85
+      ],
+      "loop": true,
+      "referenceRpm": 3200,
+      "frames": 18240,
+      "sha256": "bc8c6b45be851188d16a72dbe6a5ac016a01220261053bd6fffe34cc3519d2e5",
+      "processing": {
+        "highpassHz": 35,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "spool": {
+      "file": "spool.pcm",
+      "source": "m",
+      "sourceIntervalSeconds": [
+        15.1,
+        15.9
+      ],
+      "loop": true,
+      "referenceRpm": null,
+      "frames": 18240,
+      "sha256": "26dbad74832f954d3b409c57f1ccd7c7716123606d0afc2a1daea39324de9947",
+      "processing": {
+        "highpassHz": 1600,
+        "lowpassHz": 9500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 40
+      }
+    },
+    "release": {
+      "file": "release.pcm",
+      "source": "turbo",
+      "sourceIntervalSeconds": [
+        1.0,
+        2.0
+      ],
+      "loop": false,
+      "referenceRpm": null,
+      "frames": 24000,
+      "sha256": "134d2fdd37d974fbeaf56be74e0d23da6d04b06d4ec48c8d0a19e74105321940",
+      "processing": {
+        "highpassHz": 850,
+        "lowpassHz": 9500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 0
+      }
+    },
+    "crack-1": {
+      "file": "crack-1.pcm",
+      "source": "pop",
+      "sourceIntervalSeconds": [
+        1.575,
+        1.81
+      ],
+      "loop": false,
+      "referenceRpm": null,
+      "frames": 5640,
+      "sha256": "49e65e0bc7f95122d5f6983e914439537568a5f7494dd0af53ca327eb7f6f079",
+      "processing": {
+        "highpassHz": 55,
+        "lowpassHz": 9500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 0
+      }
+    },
+    "crack-2": {
+      "file": "crack-2.pcm",
+      "source": "pop",
+      "sourceIntervalSeconds": [
+        5.28,
+        5.5
+      ],
+      "loop": false,
+      "referenceRpm": null,
+      "frames": 5280,
+      "sha256": "712f1463b8fedb4ad236bc0448c2743215a508097e1b5d5e0a620bafe1aaf6b1",
+      "processing": {
+        "highpassHz": 55,
+        "lowpassHz": 9500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 0
+      }
+    },
+    "crack-3": {
+      "file": "crack-3.pcm",
+      "source": "pop",
+      "sourceIntervalSeconds": [
+        0.325,
+        0.56
+      ],
+      "loop": false,
+      "referenceRpm": null,
+      "frames": 5640,
+      "sha256": "16424241fbcb949c965b259dd8b40088d1f5d2bf899cc5c068a5cc0bc0277500",
+      "processing": {
+        "highpassHz": 55,
+        "lowpassHz": 9500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 0
+      }
+    },
+    "stop": {
+      "file": "stop.pcm",
+      "source": "stop",
+      "sourceIntervalSeconds": [
+        0.8,
+        1.7
+      ],
+      "loop": false,
+      "referenceRpm": null,
+      "frames": 21600,
+      "sha256": "36d46160e90832d9a15155e07e1e28af827cb218ebf18405765887d1424d4ef1",
+      "processing": {
+        "highpassHz": 40,
+        "lowpassHz": 6500,
+        "mono": true,
+        "sampleRate": 24000,
+        "rmsTarget": 0.23,
+        "peakLimit": 0.92,
+        "loopCrossfadeMs": 0
+      }
+    }
+  }
+}

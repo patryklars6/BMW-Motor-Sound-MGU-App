@@ -131,17 +131,24 @@ class NativeMenu {
                 row('Motor', ({ off: 'Aus', starting: 'Startet', running: 'An' })[data.engine] || unknown),
                 row('Fahrmodus', data.mode === null ? unknown : MODES[data.mode].label),
                 row('Gang', data.gear === null ? data.stage || unknown : [data.stage, data.gear].filter(x => x !== null).join(' ')),
-                row('Leerlauf', data.idle === null ? unknown : data.idle ? 'Ja' : 'Nein'),
+                row('Motorleerlauf', data.idle === null ? unknown : data.idle ? 'Ja · auch in D bei Stillstand möglich' : 'Nein'),
+                row('Fahrzeug steht', data.stationary === null || data.stationary === undefined ? unknown : data.stationary ? 'Ja' : 'Nein'),
+                row('Pedalverlauf', ({ rising: 'Gas geben', falling: 'Gaswegnahme', steady: 'Unverändert' })[data.pedalPhase] || unknown),
                 row('Beschleunigung', data.acceleration === null ? unknown : data.acceleration.toFixed(1) + ' m/s²')];
         }
         return [row('Bedienung', 'Zeile mit Touch oder Controller drücken. Zurück und Weitere Seiten unten.'),
             row('LUXO-Grafik', 'Benötigt mgu-render/1 mit Touch-Routing. BMW-Menüs funktionieren auch ohne Renderer.'),
             row('Grafik-Navigation', 'Zurück und Hauptmenü stehen auf jeder Unterseite. BMW-Menü ist die Rückfallebene.'),
-            row('Diagnosebericht', 'Audio-Diagnose: in App-Daten speichern oder auf erkannten USB-Datenträger exportieren.'),
+            row('Diagnosebericht', 'Audio-Diagnose: lokal speichern; separater Diagnosezugang exportiert auch bei PCM-Ausfall auf USB.'),
             row('Einstellungen', 'Jede Änderung wird automatisch in data/settings.json gespeichert.'),
             row('Kein Ton', out.detail || 'Audio-Diagnose öffnen und vorhandene Ausgänge prüfen.'),
-            row('Fahrzeugdaten', 'Ohne frische Drehzahl und laufenden Motor bleibt der Motorsound stumm.'),
-            row('MGU-Store-Update', 'Quelle aktualisieren und Version 0.3.0 aktualisieren. App-ID bleibt gleich.')];
+            row('Fahrzeugdaten', 'Nur echte Daten. Optionaler kurzer Nachklang nach gemeldetem Motorstopp in P.'),
+            row('Aufnahmebasis', 'Unfertige Arbeitsbank; Klang vom Nutzer abgelehnt. Keine originalen M5-F90-/BMW-M-Aufnahmen.'),
+            row('Pop & Bangs', 'Pro Profil einschalten. Intensität, Lautstärke, Härte und Häufigkeit getrennt einstellen.'),
+            row('Schalt-Effekte', 'Turbo/Knall brauchen gemeldete Gänge. Keine Gangschätzung aus Drehzahl oder Geschwindigkeit.'),
+            row('Hintergrund', 'Sound läuft ohne geöffnetes Menü, solange MGU aktiv ist und frische Fahrzeugdaten vorliegen.'),
+            row('Audiomodus', 'Audio-Diagnose: BMW-Medienquelle ist Stereo, ersetzt Musik und folgt BMW-Lautstärke.'),
+            row('MGU-Store-Update', '0.4.0 zum Fahrzeugtest: bestehende GitHub-Quelle und Entwicklungsbranch aktualisieren.')];
     }
 
     async render() {

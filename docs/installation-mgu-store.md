@@ -1,9 +1,18 @@
-# Installation und Update im MGU Store
+# Installation über GitHub und MGU Store
 
-Die vollständige deutsche Anleitung mit allen Menübildern steht direkt in der [README](../README.md#installation-und-update-über-den-mgu-store).
+0.4.0 aktualisiert die vorhandene App patryklars6_motor_sound. Einstellungen, Profile und Menüs bleiben erhalten. Keine allgemeine ID7-Freigabe; tatsächliche Lautsprecherausgabe im BMW und Klangqualität noch unbestätigt.
 
-Für **0.3.0** die vorhandene Quelle `patryklars6/BMW-Motor-Sound-MGU-App` auf Branch `codex/luxo-sound-tuning-020` aktualisieren. **LUXO Motor Sound → Aktualisieren** wählen. Die bestehende App-ID und `data/settings.json` bleiben erhalten. Nur eine bisher fehlgeschlagene Erstinstallation über **Installieren** erneut anstoßen. Der Audio-Dienst `luxo-motor-audio >= 0.3.0` wird als Abhängigkeit benötigt; er benötigt weiterhin `mgu-python >= 1.0.2`.
+1. Im bereits installierten Community-MGU-Store die Quelle **patryklars6/BMW-Motor-Sound-MGU-App** aktualisieren.
+2. Den Branch **codex/luxo-sound-tuning-020** wählen.
+3. Bei LUXO Motor Sound Version **0.4.0** prüfen und **Aktualisieren** wählen. Keine Deinstallation.
+4. Der Store plant die Abhängigkeiten: **mgu-python >= 1.0.2 → luxo-motor-audio >= 0.4.0 → vorhandene App**. Ausreichende installierte Versionen werden übersprungen. Fehlt eine nötige Laufzeit in Installation und Quellen, verweigert der Store den Plan.
+5. Das Audio-Tool richtet PCM-Ausgabe und unabhängige Diagnose/USB-Export automatisch ein. Keine manuelle Dienstinstallation. Reguläre Store-Hinweise zum nächsten Head-Unit-Start beachten.
+6. **BMW-Menü → Audio-Diagnose → Diagnose aktualisieren** öffnen und Dienstversion/Fehler prüfen.
+7. **Audiomodus einrichten → BMW-Medienquelle einrichten** öffnen. Der Modus ist **Stereo, ersetzt die Musikquelle und folgt der BMW-Lautstärke**. Mit **Diesen Medienmodus verwenden** bewusst aktivieren.
+8. Für den leisen Kanaltest: Motor aus, gemessene Geschwindigkeit 0 und P. Für Motorsound sind frische reale RPM/Motorwerte und ein gewähltes Profil erforderlich. Fehlende Voraussetzungen bleiben als Fehler sichtbar.
 
-Ausstehende Dienste gemäß Store-Anzeige beim nächsten regulären MGU-Start aktivieren lassen. Danach **Audio-Diagnose → Diagnose aktualisieren → Diagnosebericht speichern**. Ein fehlender Mischpfad wird nicht automatisch eingerichtet und ein sichtbares PCM-Gerät ist keine bestätigte Lautsprecherroute. Bitte zuerst einen Bericht erfassen. Hörbarer Ton und vollständiger Updateablauf mit 0.3.0 sind noch nicht am Fahrzeug bestätigt.
+**Ausschließlich Installation über die bestehende GitHub-Quelle im MGU Store. Keine ZIP-/USB-Installation und keine manuelle Diensteinrichtung.** USB ist nur für Diagnoseberichte vorgesehen.
 
-[Reparaturbericht 0.3.0](reparatur-0.3.0.md) · [Fahrzeugtest](fahrzeugtest.md)
+[README mit allen Bildern](../README.md) · [Audiopfad und Grenzen](audiopfad-0.4.0.md) · [Fahrzeugdiagnose](diagnosebericht-bmw.md)
+
+Die abgelehnte Klangbank bleibt unfertig. Das Update ist keine bestätigte Realsound-Freigabe. Die echte Store-Planung und Paketvorprüfung bestehen im Host-Test; der vollständige Vorgang auf deiner Head Unit bleibt offen.

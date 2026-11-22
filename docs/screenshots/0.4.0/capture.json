@@ -1,0 +1,198 @@
+{
+  "version": "0.4.0",
+  "theme": "luxo",
+  "capture": "packaged software renderer",
+  "vehicleConnected": false,
+  "vehicleSignals": "unavailable",
+  "note": "No vehicle photo; native BMW menu appearance depends on head unit. Audio rows below are runtime text only.",
+  "nativeAudioRows": [
+    {
+      "Text1stRow": "Audio-Diagnose",
+      "Text2ndRow": "Geräte und Fehlerursache prüfen"
+    },
+    {
+      "Text1stRow": "Audioausgabe",
+      "Text2ndRow": "Audio-Dienst nicht erreichbar · luxo-motor-audio im Store prüfen"
+    },
+    {
+      "Text1stRow": "Kanäle",
+      "Text2ndRow": "PCM: noch nicht geöffnet"
+    },
+    {
+      "Text1stRow": "App-Pegel",
+      "Text2ndRow": "30 %"
+    },
+    {
+      "Text1stRow": "Pegelgrenze",
+      "Text2ndRow": "55 %"
+    },
+    {
+      "Text1stRow": "Audio erneut prüfen",
+      "Text2ndRow": "Verbindung zum Audio-Dienst testen"
+    },
+    {
+      "Text1stRow": "Parallele Musik",
+      "Text2ndRow": "Benötigt einen separat bestätigten Mischpfad"
+    },
+    {
+      "Text1stRow": "BMW-Lautstärke",
+      "Text2ndRow": "Unabhängigkeit hängt vom RAM- und Verstärkerpfad ab"
+    },
+    {
+      "Text1stRow": "Zurück / Hauptmenü",
+      "Text2ndRow": ""
+    }
+  ],
+  "images": [
+    {
+      "file": "hauptmenue.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "706d3be84ca011cc01c9ff0009c512ccb71bb5c55338240bc2af57928d7bca14"
+    },
+    {
+      "file": "live-daten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "1aceda19b187b9713b15284a3f1f98fc5466f6d315cef637b80fd3c4065a6e95"
+    },
+    {
+      "file": "soundprofile.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "de0982d6bf8a64198b46bda563ac3569b7d08782e3d491d3f3aeea968b1580fb"
+    },
+    {
+      "file": "sound-tuning.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "a5f479857fc06c81ee66038d60d355aa4e0f0c0e4606f6301a23221565889087"
+    },
+    {
+      "file": "turbo-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "9a2eb0cd654328605d52934775b185437ab453a6bc12f15f9b178287cf6092c4"
+    },
+    {
+      "file": "turbo-varianten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "b318e22af3610cba927923741af846951c591b221b11e56c7564a856c40b4e1c"
+    },
+    {
+      "file": "turbo-schalten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "318f8a2414cdcea18f9413e986264dd239fc4d6f087984998f61d7c8e6b190bd"
+    },
+    {
+      "file": "motor-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "fc04cdb385cb79dedee91d0509b72c865d20d25877c783d87b1303b1419dd4f4"
+    },
+    {
+      "file": "motor-nachklang.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "613a2ffbbe76e59a8ec377f9dbce33bb8f5851fc9cfb1b92d1317020aee42970"
+    },
+    {
+      "file": "auspuff-einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "2b03826b90dff8cb79825a8da121688a2cb8d71e54b4263759d6ef6d1e349ac3"
+    },
+    {
+      "file": "pop-bangs.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "c78676f4df66faf0b3312036f886f50dc482f235eea6583ab62b86d5a5ab30de"
+    },
+    {
+      "file": "pop-bangs-schalten.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "d9e9041bf642833cf132ce44e758ecd8e0856d4401d8edc472976524b2f0e2af"
+    },
+    {
+      "file": "lautsprecher.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "abdc75dffecd8b322893d7cc2e610f8e8c7d1b34b6393451c97dfaaba37d441d"
+    },
+    {
+      "file": "fahrmodi.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "0b629be79a281bdb43b66cf28d0a1fcf9dfe3750a421194e5d3e6b293d095fc7"
+    },
+    {
+      "file": "einstellungen.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "2464aff5150cc15c3a0de2aabf90cb6e695fef13c73e1f9b732344e0aba63e21"
+    },
+    {
+      "file": "design.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "e59b0a62b5e1040dc21fa477ab7fd68f7a0f57b1a4a7008fb4f903f8731e925b"
+    },
+    {
+      "file": "info.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "ff0d4b214b024d2ba2f2a99ae963203e8a062bea52be2abc65e268774f9ae9b0"
+    },
+    {
+      "file": "audio-diagnose.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "3a13d07519cc6749b3d5acb1b7b2cd3d9fddc23903a83ba4d74c8bb2753a2f79"
+    },
+    {
+      "file": "audio-geraete.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "4f5ccd7cd6822d19f5a70a03775df48dba426bfd546ab8dd4a1c4c650e3ed63b"
+    },
+    {
+      "file": "audio-tests.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "1ae6059cbb336503dc099987917cedc39c1ab02caa90a0e3376def05b0b33c88"
+    },
+    {
+      "file": "audio-export.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "01ed63c4bd186bc05691255818b89681b51090c87efab47f4e473c533467af3d"
+    },
+    {
+      "file": "audio-fehler.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "19fa85194435316c8b40698f9372800288fb315cfcc50e2d20e6ade3e10fae87"
+    },
+    {
+      "file": "audio-usb.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "3fc81815a06d2a22c0885be04c0ff49e155672b06b8078ac82a420f820bc03b8"
+    },
+    {
+      "file": "audio-modi.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "24a50457024e3ebf148d6f1886fff506b5195f77787fcc171ce9220cc4cd31f4"
+    },
+    {
+      "file": "audio-medienquelle.png",
+      "width": 1600,
+      "height": 520,
+      "sha256": "8ef82bdf9906d646c6973607d37964b50f21acfd02cba10df851c98c9e73e690"
+    }
+  ]
+}

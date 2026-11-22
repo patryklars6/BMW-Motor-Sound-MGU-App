@@ -14,6 +14,82 @@ const { interfaceSchema, probe, READS } = require('../tools/audio_probe');
 const spec = require('../apps/patryklars6_motor_sound/app.json');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+test('Switching media mode pauses PCM reconnects while the previous stream releases its lock', async () => {
+    let closed = 0, retried = 0, attempts = 0;
+    const d = new AudioDiagnostics({ spec, output: { close() { closed++; }, retry() { retried++; } },
+        settings: { get() {} }, vehicle: { snapshot: () => ({}) },
+        rpc: async value => {
+            assert.equal(d.changingMode, true);
+            assert.equal(value.acceptSharedMedia, true);
+            if (++attempts === 1) throw Object.assign(Error('still closing'), { code: 'AUDIO_BUSY' });
+            return { backend: 'bmw-media-source' };
+        } });
+    d.refresh = async () => {};
+    await d.selectMedia();
+    assert.equal(attempts, 2); assert.equal(closed, 1); assert.equal(retried, 1);
+    assert.equal(d.changingMode, false); assert.equal(d.page, 'root');
+});
+
+test('Save waits for an extended report even when a lightweight refresh is already running', async t => {
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'luxo-report-wait-'));
+    t.after(() => fs.rmSync(dataDir, { recursive: true, force: true }));
+    const calls = [];
+    const d = new AudioDiagnostics({ dataDir, spec, output: {}, settings: { get() {} }, vehicle: { snapshot: () => ({}) },
+        rpc: async () => { await delay(10); return { serviceStarted: true }; },
+        supportRpc: async value => {
+            calls.push(value.extended); await delay(10);
+            return value.extended ? { audioJournal: { stdout: 'full failure evidence' } } : {};
+        } });
+    await d.refresh(true);
+    const pending = d.refresh(false);
+    const file = await d.save(); await pending;
+    assert.deepEqual(calls, [true, false, true]);
+    assert.equal(JSON.parse(fs.readFileSync(file)).independentDiagnostics.audioJournal.stdout, 'full failure evidence');
+});
+
+test('Independent production diagnostic endpoint exports while the PCM backend cannot even import', { timeout: 6000 }, async t => {
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'luxo-independent-'));
+    t.after(() => fs.rmSync(dataDir, { recursive: true, force: true }));
+    const child = cp.spawn(process.env.LUXO_TEST_PYTHON, ['-B', path.join(__dirname, 'diagnostics-host-fixture.py'), dataDir],
+        { stdio: ['ignore', 'pipe', 'pipe'] });
+    t.after(() => child.kill());
+    let errors = ''; child.stderr.on('data', data => { errors += data; });
+    const first = await Promise.race([once(child.stdout, 'data'), delay(2000).then(() => { throw Error(errors || 'Fixture startup timeout'); })]);
+    const port = JSON.parse(first[0].toString()).port;
+    const d = new AudioDiagnostics({ dataDir, spec, output: { state: 'waiting', channels: 0 },
+        settings: { get() { return 'up10'; } }, vehicle: { snapshot: () => ({ rpm: null, speed: null }) },
+        rpc: async () => { throw Object.assign(Error('PCM process unavailable'), { code: 'ECONNREFUSED' }); },
+        supportRpc: value => request(value, () => net.createConnection(port, '127.0.0.1'), true) });
+    await d.refresh();
+    assert.equal(d.service, null); assert.equal(d.error.code, 'ECONNREFUSED');
+    assert.equal(d.support.independentOfPcmProcess, true);
+    assert.match(d.rows().find(row => row.id === 'devices').value, /1 sichtbare/);
+    d.page = 'devices'; assert.equal(d.rows()[0].action, null);
+    d.page = 'usb';
+    await d.rows().find(row => row.id === 'usb-0').action();
+    assert.ok(d.exported);
+    const report = JSON.parse(fs.readFileSync(d.exported, 'utf8'));
+    assert.equal(report.error.code, 'ECONNREFUSED'); assert.equal(report.service, null);
+    assert.equal(report.independentDiagnostics.audioSystemd.service.ActiveState, 'failed');
+    assert.equal(report.diagnosticsAtExport.physicalSoundAutomaticallyVerified, false);
+    assert.equal(JSON.parse(fs.readFileSync(d.saved)).audibleOutputAutomaticallyVerified, false);
+    assert.equal(errors, '');
+});
+
+test('Both failed diagnostic endpoints still allow local save and show the USB limitation', async t => {
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'luxo-no-service-'));
+    t.after(() => fs.rmSync(dataDir, { recursive: true, force: true }));
+    const fail = async () => { throw Object.assign(Error('not installed'), { code: 'ENOENT' }); };
+    const d = new AudioDiagnostics({ dataDir, spec, output: {}, settings: { get() {} },
+        vehicle: { snapshot: () => ({}) }, rpc: fail, supportRpc: fail });
+    const file = await d.save();
+    const report = JSON.parse(fs.readFileSync(file));
+    assert.equal(report.error.code, 'ENOENT'); assert.equal(report.independentDiagnosticsError.code, 'ENOENT');
+    assert.ok(report.local); assert.equal(report.service, null);
+    d.page = 'usb'; assert.match(d.rows().find(row => row.id === 'usb-note').value, /Diagnosezugang fehlt/);
+});
+
+
 test('Audiotest requires measured zero speed, P and engine off; missing values never pass', () => {
     const good = { speed: 0, stage: 'P', engine: 'off' };
     assert.equal(parked(good), true);

@@ -7,6 +7,9 @@ const WIDTH = 1600;
 const HEIGHT = 520;
 const UNKNOWN = 'Nicht verfügbar';
 const ENGINE = { off: 'Aus', starting: 'Startet', running: 'An' };
+const OPERATION = { off: 'Motor aus', starting: 'Motor startet', moving: 'Fahrzeug fährt',
+    'stationary-P': 'Standlauf · P', 'stationary-N': 'Standlauf · N', 'stationary-D': 'Standlauf · D',
+    'stationary-R': 'Standlauf · R', 'stationary-unknown-gear': 'Motor läuft · Fahrzeug steht' };
 const PROFILE_CARDS = [
     { id: 'v6', name: 'V6 Sound', description: 'Klarer Sechszylinder-Klang' },
     { id: 'v8', name: 'V8 Sound', description: 'Tiefer Motor- und Auspuffklang' },
@@ -108,7 +111,7 @@ function drawLive(cv, data, prefs, output, needle, actions, theme, showAccelerat
     const acceleration = data.acceleration === null ? null
         : (Math.abs(data.acceleration) < 0.05 ? '0,0' : data.acceleration.toFixed(1).replace('.', ',')) + ' m/s²';
     const live = data.rpm !== null || data.speed !== null || data.engine !== null || mode !== null;
-    const h = header(cv, 'Live-Ansicht', live ? 'Fahrzeugdaten aktiv' : null, C);
+    const h = header(cv, 'Live-Ansicht', OPERATION[data.operation] || (live ? 'Fahrzeugdaten aktiv' : null), C);
     const top = 92;
     const footer = h - 89;
     const rowSpace = footer - top - 15;

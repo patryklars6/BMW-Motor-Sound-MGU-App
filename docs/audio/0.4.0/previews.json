@@ -1,0 +1,200 @@
+{
+  "version": "0.4.0",
+  "origin": "actual packaged recording-based engine",
+  "vehicleConnected": false,
+  "input": "preview-only invented RPM/pedal/gear/stop trajectory, never a vehicle trace",
+  "normalization": false,
+  "timelineSeconds": {
+    "idle": [
+      0,
+      2
+    ],
+    "steadyRpm": [
+      8,
+      11
+    ],
+    "upshift": [
+      5.5,
+      17
+    ],
+    "lift": [
+      11,
+      19
+    ],
+    "downshift": 12,
+    "engineOffParked": 22
+  },
+  "encoding": "MP3 derivative of unnormalized PCM WAV",
+  "licenseForMixedPreview": "https://creativecommons.org/licenses/by/4.0/",
+  "attributionFile": "ATTRIBUTION.md",
+  "clips": [
+    {
+      "profile": "v6",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-V6.mp3",
+      "sha256": "f13a6df163621d83e81a0dde0375e6c83a959d0e627e4130a02fe4406d019038",
+      "waveSourceSha256": "3cf30588e0023084d23ce2b738c6ff13eb27b9f77f70ee72f986b465208ee31d"
+    },
+    {
+      "profile": "v8",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-V8.mp3",
+      "sha256": "7cd998d1580c1675534e670bf6f802007be36c632a45ddd543859bc103c20f3b",
+      "waveSourceSha256": "2c1d7c171b7d6dced83810a430d2f5e542bca12cdc878f75e90ea047804207c2"
+    },
+    {
+      "profile": "f90",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-M5-F90-Klangabstimmung.mp3",
+      "sha256": "31c5c5ea9745ebaae885d0c9150c5c680ef6ce62854804cf3e5c9c9cc76ee1e2",
+      "waveSourceSha256": "5b3c7625c3806b632f720b1cc622ef18973cf853c77f43ff1378387391ae003d"
+    },
+    {
+      "profile": "m",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-M-Sound-Klangabstimmung.mp3",
+      "sha256": "1274884e9cb1a9686140b0519a8cd673942fd69bf02ee5dfc39cd26b58a7ed4a",
+      "waveSourceSha256": "8f52ca830b443659888cffca16bf02d08e97792d0a156ca6c2bd199cbd50af28"
+    },
+    {
+      "profile": "diesel",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-Sport-Diesel.mp3",
+      "sha256": "5e5df48d81a24e43db9cd902d85a2347b62a2964e991c4077eef85c34d6b2c1f",
+      "waveSourceSha256": "d4d85fd89fbcf7c400330380ac8c9e659a092ab6c3585a81333ae94115bc6c41"
+    },
+    {
+      "profile": "individual",
+      "seconds": 24,
+      "events": {
+        "lift": 2,
+        "upshift": 2,
+        "downshift": 1,
+        "shutdown": 1,
+        "last": {
+          "kind": "shutdown",
+          "source": "measured motor off, RPM 0, speed 0, P"
+        },
+        "lastShift": {
+          "kind": "upshift",
+          "from": 1,
+          "to": 2,
+          "source": "preview-only-fixture",
+          "rpmBefore": 4486.666666666667,
+          "rpmAtShift": 3000,
+          "rpmAfter": 3099.9999999999995,
+          "pedal": 0.8,
+          "torque": 176
+        }
+      },
+      "file": "LUXO-0.4.0-Individual.mp3",
+      "sha256": "42288eaf36f49e16f3828e26bbac9095a17a2b73ae0cb7f4553520db9cde7863",
+      "waveSourceSha256": "e632813ff1fff77424df6cd6015a8c52b6b64af7054981a096a5459311384e02"
+    }
+  ]
+}

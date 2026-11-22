@@ -1,0 +1,16 @@
+[Unit]
+Description=LUXO independent read-only diagnostics and USB report export
+Requires=luxo-motor-diagnostics.socket
+After=luxo-motor-diagnostics.socket
+
+[Service]
+Type=simple
+ExecStart=/var/opt/mgu-python/current/bin/python3 /var/opt/luxo-motor-audio/current/diagnostics_bridge.py
+User=root
+Group=root
+UMask=0027
+NoNewPrivileges=yes
+LimitCORE=1
+TimeoutStopSec=2
+Restart=on-failure
+RestartSec=3

@@ -5,6 +5,7 @@
     "deploy/unit/mgu-deploy.js": "c4a21d32cca730f4ee5ef45ad6058ca176f3c434",
     "native/mgu-updater/js/sources.js": "b7f9da0fa92c5747e363c52b6ac889f7021d6f8d",
     "native/mgu-updater/js/catalog.js": "a90050d67c26566762c9a01814edc309d8d7fc98",
-    "native/mgu-updater/js/tar.js": "d52c293270a0ea0c151d3ed962efd4ef2316bd1d"
+    "native/mgu-updater/js/tar.js": "d52c293270a0ea0c151d3ed962efd4ef2316bd1d",
+    "native/mgu-updater/js/updater.js": "97cac1b7600b8abed60845c01b1bc84529b26a70"
   }
 }

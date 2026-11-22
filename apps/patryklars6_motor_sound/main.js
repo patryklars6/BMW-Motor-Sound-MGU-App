@@ -9,6 +9,7 @@ const { resolveSettings, Synth, profileSetting } = require('./sound');
 const { PcmOutput } = require('./output');
 const { NativeMenu } = require('./native-menu');
 const { AudioDiagnostics } = require('./audio-diagnostics');
+const { AudioClock } = require('./audio-clock');
 const { navigation, drawDiagnostics } = require('./navigation');
 const { WIDTH, HEIGHT, PROFILE_CARDS, smoothGauge, audioStatus, drawLive, drawProfiles } = require('./view');
 
@@ -27,7 +28,10 @@ mgu.run({
         const vehicle = new Telemetry(clock);
         const output = new PcmOutput(clock);
         const synth = new Synth();
-        const engine = { blocks: 0, frames: 0, active: false, lastPeak: 0 };
+        const pacing = new AudioClock();
+        const engine = { blocks: 0, frames: 0, active: false, lastPeak: 0, source: 'vehicle recording development bank',
+            soundQuality: synth.audio.bank.quality,
+            error: synth.error, events: synth.events, background: true };
         const diagnostics = new AudioDiagnostics({ vehicle, output, settings, spec, dataDir, engine, effective: mode => effective(mode) });
         const get = key => settings.get(key);
         let stopVehicle = () => {};
@@ -47,28 +51,39 @@ mgu.run({
             return prefs;
         }
         const timer = setInterval(() => {
-            if (diagnostics.testing) { engine.active = false; return; }
+            if (diagnostics.testing || diagnostics.changingMode) { engine.active = false; pacing.reset(); return; }
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
-            const active = cfg.enabled && cfg.profileId && cfg.gain > 0 && data.engine === 'running' && data.rpm !== null && data.rpm >= 400;
+            const active = synth.wantsAudio(data, cfg);
+            engine.error = synth.error; engine.pack = synth.currentPack;
+            engine.soundQuality = synth.audio.bank.quality;
             if (!active) {
                 engine.active = false;
+                engine.tailActive = false;
                 if (output.channels) output.close();
                 output.tick(false);
                 synth.reset();
+                pacing.reset();
                 return;
             }
             output.tick();
             if (output.channels) {
-                const pcm = synth.render(data, cfg, output.channels);
+                const due = pacing.due(clock());
+                engine.clockSkippedBlocks = pacing.skippedBlocks;
+                for (let block = 0; block < due; block++) {
+                const currentData = block ? vehicle.snapshot() : data;
+                if (!synth.wantsAudio(currentData, cfg)) { pacing.reset(); break; }
+                const pcm = synth.render(currentData, cfg, output.channels);
                 let peak = 0;
                 for (let at = 0; at < pcm.length; at += 2) peak = Math.max(peak, Math.abs(pcm.readInt16LE(at)));
                 engine.lastPeak = peak;
                 output.write(pcm);
                 engine.blocks++; engine.frames += 960; engine.active = true;
+                engine.tailActive = synth.tailFrames > 0;
+                }
             }
-            else { engine.active = false; synth.reset(); }
-        }, 20);
+            else { engine.active = false; synth.reset(); pacing.reset(); }
+        }, 8);
         app.once('shutdown', () => {
             clearInterval(timer);
             output.close();

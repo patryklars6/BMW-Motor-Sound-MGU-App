@@ -100,6 +100,10 @@ def stage_app(work, app_id, app_dir):
     builder.build(app_id)
 
     package = work / "dist" / app_id / "source"
+    # The kit packs data folders; our PCM reader needs individual local files.
+    if (target / "audio").is_dir():
+        shutil.copytree(target / "audio", package / "javascript" / "audio")
+        (package / "javascript" / "audio.pack").unlink(missing_ok=True)
     shutil.rmtree(package / "node_modules")
     metadata_path = package / "package.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))

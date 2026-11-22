@@ -24,6 +24,9 @@ class AlsaOutput:
     def __init__(self, channels, device=None):
         if not device:
             raise OSError(errno.ENODEV, "No approved PCM route")
+        if device.startswith(('smartx:', 'plug:smartx:')):
+            from managed_media import prepare_smartx_lock
+            prepare_smartx_lock(device)
         self.lib = c.CDLL("libasound.so.2")
         self.handle = c.c_void_p()
         p, i, u = c.c_void_p, c.c_int, c.c_uint
@@ -44,6 +47,8 @@ class AlsaOutput:
         self.supported_channels = None
         self._check(self.lib.snd_pcm_open(c.byref(self.handle), device.encode("utf-8"), SND_PCM_PLAYBACK, SND_PCM_NONBLOCK))
         try:
+            if device.startswith(('smartx:', 'plug:smartx:')):
+                prepare_smartx_lock(device)
             self.supported_channels = self._channels()
             self._check(self.lib.snd_pcm_set_params(
                 self.handle, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED,
@@ -179,6 +184,8 @@ def serve_connection(conn, manager):
                 result["usbMounts"] = usb_mounts()
             elif operation == "select":
                 result = manager.select(request)
+            elif operation == "select-media":
+                result = manager.select_media(request)
             elif operation == "confirm":
                 result = manager.confirm(request)
             elif operation == "export":

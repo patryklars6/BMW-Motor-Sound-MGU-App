@@ -8,7 +8,7 @@ const { FRAMES } = require('./sound');
 const SOCKET = '/run/luxo-motor-sound/pcm.sock';
 const HELLO = 'LUXO/1 S16LE 48000\n';
 const RETRY_MS = 3500;
-const HANDSHAKE_MS = 6000;
+const HANDSHAKE_MS = 18000;
 const HEADER_LIMIT = 160;
 const ERRORS = {
     ALSA_UNAVAILABLE: 'ALSA-Bibliothek des Audio-Dienstes ist nicht verfügbar',
@@ -19,6 +19,13 @@ const ERRORS = {
     AUDIO_WRITE_FAILED: 'Schreibfehler am Audio-Mischpfad · Dienstprotokoll prüfen'
 };
 Object.assign(ERRORS, {
+    MEDIA_UNSUPPORTED: 'BMW-Medienquelle auf dieser MGU nicht vollständig verfügbar · Diagnosebericht prüfen',
+    MEDIA_SOURCE_BUSY: 'BMW-Medienquelle wird bereits von einer anderen Sitzung verwendet',
+    MEDIA_CONNECT_FAILED: 'BMW-Audiomanager hat die Medienverbindung nicht bestätigt',
+    MEDIA_CONNECT_TIMEOUT: 'BMW-Quelle erreicht keinen bestätigten Verbindungszustand',
+    MEDIA_MANAGER_UNAVAILABLE: 'BMW-Audiodienste sind nicht erreichbar',
+    MEDIA_SOURCE_LOST: 'Andere BMW-Audioquelle gewählt · Medienmodus zum Fortsetzen erneut auswählen',
+    MEDIA_LOCK_UNSAFE: 'SmartX-Laufzeitrechte unerwartet · Ausgang wird nicht geöffnet',
     ENOENT: 'Audio-Socket fehlt · Dienstinstallation und Start prüfen',
     EACCES: 'Zugriff auf Audio-Dienst verweigert · UID und Socketrechte prüfen',
     ECONNREFUSED: 'Audio-Socket vorhanden, aber Dienst nimmt keine Verbindung an',

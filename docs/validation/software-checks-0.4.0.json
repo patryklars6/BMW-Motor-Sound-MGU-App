@@ -1,0 +1,40 @@
+{
+  "version": "0.4.0",
+  "status": "prepared-for-authorized-github-upload",
+  "appId": "patryklars6_motor_sound",
+  "branch": "codex/luxo-sound-tuning-020",
+  "tests": {
+    "node": 76,
+    "python": 30,
+    "realUpstreamStoreDeployer": 14,
+    "total": 120,
+    "failed": 0
+  },
+  "independentDiagnosticProtocolAndHostExportPassed": true,
+  "pcmBackendUnavailableDuringDiagnosticHostTest": true,
+  "actualBmwUsbExportVerified": false,
+  "vehicleSpeakerOutputVerified": false,
+  "soundQualityAccepted": false,
+  "limits": [
+    "Host tests and fake-root deployer preflight; no BMW/systemd install.",
+    "Host USB writer injected; production Linux mount and dirfd protections are not a BMW USB proof.",
+    "Current short-loop recording bank rejected by user; not a finished realistic soundbank.",
+    "No concrete vehicle audio service/socket/error report supplied yet."
+  ],
+  "artifacts": {
+    "patryklars6_motor_sound@0.4.0.tgz": {
+      "sha256": "a8ca4f89d5875ef0d5f211bd9cc02c19f77eed80285fdb6aaf7ee23b5fb31a8b",
+      "bytes": 945797
+    },
+    "luxo-motor-audio@0.4.0.tgz": {
+      "sha256": "8ecee4cb0e373a14a32399d600ff15f9a14e00a6358f8809544ef09bffdd77ad",
+      "bytes": 16769
+    }
+  },
+  "managedMedia": {
+    "implemented": true,
+    "actualPythonToNodeLeaseTestPassed": true,
+    "vehicleSpeakerOutputVerified": false,
+    "allId7Guaranteed": false
+  }
+}

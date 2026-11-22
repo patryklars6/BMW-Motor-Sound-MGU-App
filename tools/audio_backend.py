@@ -1,136 +1,16 @@
 """Measured audio inventory, approved ALSA routes and bounded PCM workers."""
-import ctypes as c
-import hashlib
 import json
 import multiprocessing as mp
 import os
 import queue
-import re
-import socket
-import stat
-import struct
-import subprocess
-import sys
 import threading
 import time
 from pathlib import Path
 
-APP_ID = "patryklars6_motor_sound"
+from diagnostic_support import (APP_ID, AudioError, text_file, pcm_devices, eligible_name,
+    inventory, systemd_status, manager_inventory, allowed_peer, usb_mounts, export_usb)
 CONFIG = "/var/opt/luxo-motor-audio/config.json"
 CHANNELS = (2, 4, 5)
-
-
-class AudioError(Exception):
-    def __init__(self, code, detail=""):
-        super().__init__(detail or code)
-        self.code = code
-
-
-def text_file(name, limit=8192):
-    try:
-        with open(name, encoding="utf-8", errors="replace") as file:
-            return file.read(limit)
-    except OSError:
-        return None
-
-
-def pcm_devices():
-    """ALSA hints are observations, never evidence of a connected speaker."""
-    lib = c.CDLL("libasound.so.2")
-    hints = c.c_void_p()
-    lib.snd_device_name_hint.argtypes = [c.c_int, c.c_char_p, c.POINTER(c.c_void_p)]
-    lib.snd_device_name_get_hint.argtypes = [c.c_void_p, c.c_char_p]
-    lib.snd_device_name_get_hint.restype = c.c_void_p
-    lib.snd_device_name_free_hint.argtypes = [c.c_void_p]
-    libc = c.CDLL(None)
-    libc.free.argtypes = [c.c_void_p]
-    if lib.snd_device_name_hint(-1, b"pcm", c.byref(hints)) < 0:
-        raise AudioError("ALSA_ENUM_FAILED")
-    devices = []
-    try:
-        entries = c.cast(hints, c.POINTER(c.c_void_p))
-        for index in range(64):
-            if not entries[index]:
-                break
-            item = {}
-            for key in ("NAME", "DESC", "IOID"):
-                value = lib.snd_device_name_get_hint(entries[index], key.encode())
-                if value:
-                    try:
-                        item[key] = c.string_at(value).decode("utf-8", errors="replace")[:160]
-                    finally:
-                        libc.free(value)
-            if item.get("NAME") and item.get("IOID") != "Input":
-                name = item["NAME"]
-                devices.append({"name": name, "description": item.get("DESC", ""),
-                    "backend": "bmw-smartx" if name.lower().startswith("smartx:") else "alsa",
-                    "selectable": eligible_name(name), "speakerMappingVerified": False})
-    finally:
-        lib.snd_device_name_free_hint(hints)
-    return devices
-
-
-def eligible_name(name):
-    # OEM sources require source ownership/routing; opening one blindly can
-    # block CarPlay. A named PCM alone does not establish an overlay.
-    return isinstance(name, str) and bool(re.fullmatch(r"[A-Za-z0-9_.-]{1,96}", name)) and name.lower() not in {
-        "default", "null", "pulse", "sysdefault", "hw", "plughw", "dmix", "dsnoop"}
-
-
-def inventory():
-    out = {"devices": [], "alsaError": None, "cards": text_file("/proc/asound/cards"),
-        "pcms": text_file("/proc/asound/pcm"), "firmware": text_file("/etc/os-release-id-dlt", 256),
-        "ram": {"model": None, "verified": False}, "amplifier": {"model": None, "verified": False}}
-    try:
-        out["devices"] = pcm_devices()
-    except (OSError, AttributeError, AudioError) as error:
-        out["alsaError"] = {"code": getattr(error, "code", "ALSA_UNAVAILABLE"), "message": str(error)[:256]}
-    raw = json.dumps([out["devices"], out["cards"], out["pcms"], out["firmware"]], sort_keys=True).encode()
-    out["fingerprint"] = hashlib.sha256(raw).hexdigest()
-    return out
-
-
-def systemd_status():
-    result = {}
-    for kind in ("socket", "service"):
-        try:
-            proc = subprocess.run(["systemctl", "show", "luxo-motor-audio." + kind,
-                "--property=LoadState,ActiveState,SubState,Result,MainPID", "--no-pager"],
-                capture_output=True, text=True, timeout=1.5, check=False)
-            result[kind] = dict(line.split("=", 1) for line in proc.stdout.splitlines() if "=" in line) if proc.returncode == 0 else {"error": proc.stderr[:256]}
-        except (OSError, subprocess.TimeoutExpired) as error:
-            result[kind] = {"error": str(error)[:256]}
-    return result
-
-
-def manager_inventory():
-    try:
-        proc = subprocess.run(["/usr/bin/node", str(Path(__file__).with_name("audio_probe.js"))],
-            capture_output=True, text=True, timeout=4, check=False)
-        if proc.returncode == 0 and len(proc.stdout) <= 32768:
-            return json.loads(proc.stdout)
-        return {"available": False, "error": proc.stderr[:256] or "AudioManager probe failed"}
-    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
-        return {"available": False, "error": str(error)[:256]}
-
-
-def allowed_peer(conn, registry="/var/opt/public/oap/oap_12201/data/apps/patryklars6_motor_sound.json"):
-    """Kernel peer UID instead of assuming every OAP app has tm_oap_app."""
-    try:
-        _, uid, _ = struct.unpack("3i", conn.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
-        if uid == 0:
-            return True
-        data = json.loads(Path(registry).read_text(encoding="utf-8"))
-        expected = data.get("userId")
-        if isinstance(expected, str) and expected.isdecimal():
-            expected = int(expected)
-        if type(expected) is not int or expected <= 0 or uid != expected:
-            return False
-        source = Path(registry).parents[3] / ("oap_" + str(uid)) / "source/package.json"
-        # Registry is <oap>/oap_12201/data/apps/id.json.
-        return json.loads(source.read_text(encoding="utf-8")).get("name") == APP_ID
-    except (OSError, ValueError, AttributeError):
-        return False
 
 
 def _pcm_worker(device, channels, frames, feedback, stop):
@@ -259,6 +139,14 @@ class AudioManager:
         data = self.discover()
         self.last_inventory = data
         route = cfg.get("route")
+        if route and route.get("backend") == "bmw-media-source":
+            if route.get("acceptedSharedMedia") is not True or route.get("channels") != 2:
+                raise AudioError("CONFIG_INVALID", "Shared media consent missing")
+            if route.get("fingerprint") != data["fingerprint"]:
+                raise AudioError("ROUTE_CHANGED")
+            if not any(item["name"] in ("smartx:CarLifeMedia_CF_48_STEREO", "plug:smartx:CarLifeMedia_CF_48_STEREO") for item in data["devices"]):
+                raise AudioError("MEDIA_UNSUPPORTED", "No observed CarLife stereo PCM")
+            return route
         if not route or route.get("approvedOverlay") is not True:
             raise AudioError("NO_APPROVED_ROUTE", "No separately approved overlay route selected")
         if not eligible_name(route.get("device")) or route["device"] not in [item["name"] for item in data["devices"]]:
@@ -290,6 +178,28 @@ class AudioManager:
         self.last_test = None
         return cfg["route"]
 
+    def select_media(self, value):
+        if self.stream_lock.locked():
+            raise AudioError("AUDIO_BUSY")
+        if value.get("acceptSharedMedia") is not True:
+            raise AudioError("APPROVAL_REQUIRED", "Media source replaces music and follows BMW volume")
+        data = self.discover()
+        candidates = [item["name"] for item in data["devices"] if item["name"] in
+            ("plug:smartx:CarLifeMedia_CF_48_STEREO", "smartx:CarLifeMedia_CF_48_STEREO")]
+        if not candidates:
+            raise AudioError("MEDIA_UNSUPPORTED", "No observed CarLife stereo PCM")
+        cfg = self.load()
+        if cfg.get("route", {}).get("backend") != "bmw-media-source":
+            cfg["previousOverlayRoute"] = cfg.get("route")
+        cfg["route"] = {"backend": "bmw-media-source", "device": candidates[0], "channels": 2,
+            "acceptedSharedMedia": True, "approvedOverlay": False, "fingerprint": data["fingerprint"],
+            "speakerMappingVerified": False, "parallelMusicVerified": False, "independentVolumeVerified": False}
+        self.save(cfg)
+        self.negotiated = None
+        self.last_test = None
+        self.last_error = None
+        return cfg["route"]
+
     def open(self, test=False, guard=None):
         if test and not (guard and all(guard.get(key) is True for key in ("stationary", "park", "engineOff"))):
             raise AudioError("PARK_REQUIRED")
@@ -300,7 +210,15 @@ class AudioManager:
             channels = guard.get("channels", route["channels"]) if test else route["channels"]
             if type(channels) is not int or channels not in CHANNELS:
                 raise AudioError("CONFIG_INVALID")
-            output = self.output_factory(route["device"], channels)
+            if route.get("backend") == "bmw-media-source":
+                if channels != 2:
+                    raise AudioError("CONFIG_INVALID", "Media source is stereo only")
+                if self.last_error and self.last_error.get("code") == "MEDIA_SOURCE_LOST":
+                    raise AudioError("MEDIA_SOURCE_LOST", "Reselect media mode explicitly after another source took over")
+                from managed_media import ManagedMediaOutput
+                output = ManagedMediaOutput(self.discover()["devices"], self.output_factory)
+            else:
+                output = self.output_factory(route["device"], channels)
             self.active = output
             self.negotiated = {"channels": output.channels, "supportedChannels": output.supported_channels,
                 "device": route["device"], "speakerMappingVerified": False}
@@ -355,53 +273,9 @@ class AudioManager:
                 stream = self.active.status()
             except AudioError as error:
                 self.last_error = {"code": error.code, "message": str(error)}
-        return {"protocol": 2, "serviceVersion": "0.3.0", "serviceStarted": True, "pid": os.getpid(), "collectedAt": time.time(),
+        return {"protocol": 2, "serviceVersion": "0.4.0", "serviceStarted": True, "pid": os.getpid(), "collectedAt": time.time(),
             "inventory": data, "route": route, "routeError": route_error, "negotiated": self.negotiated,
             "stream": stream, "lastStream": self.last_stream, "lastError": self.last_error,
             "systemd": systemd_status() if extended else None,
             "audioManager": manager_inventory() if extended else None,
             "physicalSoundAutomaticallyVerified": False}
-
-
-def usb_mounts():
-    mounts = text_file("/proc/mounts", 32768) or ""
-    found = []
-    for line in mounts.splitlines():
-        fields = line.split()
-        if len(fields) < 4 or "rw" not in fields[3].split(",") or not re.fullmatch(r"/dev/sd[a-z]+[0-9]*", fields[0]):
-            continue
-        device, target = fields[0], fields[1].replace("\\040", " ").replace("\\134", "\\")
-        try:
-            origin = os.path.realpath("/sys/class/block/" + os.path.basename(device))
-            if target != "/" and "/usb" in origin and os.stat(target).st_dev == os.stat(device).st_rdev:
-                found.append(target)
-        except OSError:
-            pass
-    return found
-
-
-def export_usb(report, target, mounts=None):
-    if target not in (usb_mounts() if mounts is None else mounts):
-        raise AudioError("NO_USB", "No matching writable mounted USB device")
-    # The caller chooses an observed USB mount. Never overwrite or follow a link.
-    parent = os.open(target, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
-    directory = None
-    try:
-        try:
-            os.mkdir("LUXO-Diagnose", 0o755, dir_fd=parent)
-        except FileExistsError:
-            pass
-        directory = os.open("LUXO-Diagnose", os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent)
-        if not stat.S_ISDIR(os.fstat(directory).st_mode) or os.fstat(directory).st_dev != os.fstat(parent).st_dev:
-            raise AudioError("NO_USB")
-        name = "audio-" + time.strftime("%Y%m%d-%H%M%S", time.gmtime()) + "-" + os.urandom(3).hex() + ".json"
-        fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o644, dir_fd=directory)
-        with os.fdopen(fd, "w", encoding="utf-8") as file:
-            json.dump(report, file, ensure_ascii=False, indent=2)
-            file.flush()
-            os.fsync(file.fileno())
-        return str(Path(target) / "LUXO-Diagnose" / name)
-    finally:
-        if directory is not None:
-            os.close(directory)
-        os.close(parent)

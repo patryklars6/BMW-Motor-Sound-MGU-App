@@ -4,7 +4,7 @@
 // head unit's catalog. No connect, register, availability or volume methods.
 const fs = require('fs');
 const READS = ['getListMainSources', 'getListMainSinks', 'getListMainConnections'];
-function interfaceSchema(catalog, name) {
+function interfaceSchema(catalog, name, methods) {
     const types = catalog.datatypes || {};
     function shape(reference, depth) {
         if (depth > 20) throw Error('Catalog type recursion');
@@ -38,7 +38,7 @@ function interfaceSchema(catalog, name) {
     const original = catalog.interfaces[name];
     const schema = { name: original.name, serviceId: original.serviceId, version: original.version,
         instances: catalog.instanceIDs[name] || {}, methods: {} };
-    READS.forEach(method => {
+    (methods || READS).forEach(method => {
         const value = original.methods && original.methods[method];
         if (!value) return;
         const result = { id: value.methodId, schema: args(value.inputs) };

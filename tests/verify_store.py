@@ -2,8 +2,10 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
+import sys
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,7 +33,8 @@ def main():
         if not target.is_file():
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
-    subprocess.run([args.node, str(ROOT / "tests/store_preflight.cjs"), str(upstream)], check=True)
+    subprocess.run([args.node, str(ROOT / "tests/store_preflight.cjs"), str(upstream)],
+        env=dict(os.environ, LUXO_TEST_PYTHON=sys.executable), check=True)
 
 
 if __name__ == "__main__":

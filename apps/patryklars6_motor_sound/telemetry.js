@@ -58,15 +58,30 @@ class Telemetry {
         this.clock = clock;
         this.samples = Object.create(null);
         this.nextSequence = 0;
+        this.receptions = Object.create(null);
+        this.interfaceStatus = Object.create(null);
+        this.pedalTrend = null;
     }
 
     put(key, value, retainWhileAvailable) {
+        if (key === 'pedal') {
+            const previous = this.samples.pedal;
+            const age = previous ? this.clock() - previous.at : Infinity;
+            this.pedalTrend = value === null || !previous || age < 0 || age > MOVING_MAX_AGE ? null
+                : { kind: value - previous.value > .02 ? 'rising' : previous.value - value > .02 ? 'falling' : 'steady', at: this.clock() };
+        }
         if (value === null) delete this.samples[key];
         else this.samples[key] = { value, at: this.clock(), retained: !!retainWhileAvailable && NOTIFY_ONLY_STATES.has(key), sequence: this.nextSequence++ };
     }
 
     watchGroups() {
-        const put = (key, decode) => ({ key, decode: (v, retain) => this.put(key, v ? decode(v) : null, retain) });
+        const put = (key, decode) => ({ key, decode: (v, retain) => {
+            const value = v ? decode(v) : null;
+            let raw;
+            try { raw = JSON.stringify(v).slice(0, 1600); } catch (error) { raw = 'Payload not serializable'; }
+            this.receptions[key] = { at: this.clock(), valid: value !== null, raw };
+            this.put(key, value, retain);
+        } });
         return {
             [CDS]: {
                 statusEngineSpeed2: put('rpm', v => scaled(v.actualValueRPMEngineCrankshaft, 48000, 0.25)),
@@ -92,6 +107,13 @@ class Telemetry {
         return sample && elapsed >= 0 && (sample.retained || elapsed <= age) ? sample : null;
     }
 
+    diagnostics() {
+        const signals = {};
+        Object.keys(this.receptions).forEach(key => { signals[key] = Object.assign({}, this.receptions[key],
+            { ageMs: this.clock() - this.receptions[key].at, retained: !!(this.samples[key] && this.samples[key].retained) }); });
+        return { interfaces: this.interfaceStatus, signals };
+    }
+
     snapshot() {
         const val = (key, age) => {
             const sample = this.latest(key, age);
@@ -112,10 +134,20 @@ class Telemetry {
         const acceleration = val('acceleration', MOVING_MAX_AGE);
         const pedal = this.latest('pedal', MOVING_MAX_AGE);
         const neutral = stage === null ? null : stage === 'N';
-        const idle = engine === 'running' && rpm !== null && speed !== null && stage !== null && pedal
-            ? (stage === 'N' || stage === 'P') && speed < 1 && pedal.value <= 0.03 && rpm >= 400 && rpm <= 1200
+        const stationary = speed === null ? null : speed === 0;
+        const moving = speed === null ? null : speed > 0;
+        const idle = engine === 'off' ? false : engine === 'running' && rpm !== null && speed !== null
+            ? speed > 0 || rpm > 1200 || (pedal && pedal.value > .03) ? false : pedal ? rpm >= 400 : null
             : null;
-        return { rpm, engine, speed, acceleration, stage, gear, neutral, idle, pedal, mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
+        const operation = engine === 'off' ? 'off' : engine === 'starting' ? 'starting' : engine !== 'running' ? null
+            : moving ? 'moving' : stationary ? stage ? 'stationary-' + stage : 'stationary-unknown-gear' : null;
+        const pedalPhase = this.pedalTrend && this.clock() - this.pedalTrend.at <= MOVING_MAX_AGE ? this.pedalTrend.kind : null;
+        const gearSignal = current && gear !== null ? { gear, stage, sequence: current.sequence, at: current.at,
+            source: current === first ? 'statusGearboxDrive' : 'DataPowerTrain2' } : null;
+        return { rpm, engine, speed, stationary, moving, operation, pedalPhase, acceleration, stage, gear, gearSignal, neutral, idle, pedal,
+            engineEvidence: engineSignal ? 'statusEngineStatus' : rpm === null ? null : 'measured crankshaft speed',
+            engineSignalConflict: engineSignal === null || rpm === null ? null : (engineSignal === 'off' && rpm >= 400) || (engineSignal === 'running' && rpm === 0),
+            mode: val('mode', STATE_MAX_AGE), torque: val('torque', MOVING_MAX_AGE) };
     }
 }
 
