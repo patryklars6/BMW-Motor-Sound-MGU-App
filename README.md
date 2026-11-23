@@ -1,8 +1,8 @@
 # BMW Motor Sound MGU App
 
-## Update 0.4.0 zum Fahrzeugtest · 22. November 2026
+## Reparatur 0.4.1 · 23. November 2026
 
-**Update der bestehenden App: Quelle `patryklars6/BMW-Motor-Sound-MGU-App`, Branch `codex/luxo-sound-tuning-020`.** App und Audio-Dienst tragen Version **0.4.0**. [Pull Request #1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/pull/1) · [Technischer Reparaturbericht](docs/reparatur-0.4.0.md)
+**Update der bestehenden App: Quelle `patryklars6/BMW-Motor-Sound-MGU-App`, Branch `codex/luxo-sound-tuning-020`.** App und Audio-Dienst tragen Version **0.4.1**. [Pull Request #1](https://github.com/patryklars6/BMW-Motor-Sound-MGU-App/pull/1) · [Technischer Reparaturbericht](docs/reparatur-0.4.1.md)
 
 **Die Klangqualität der bisherigen 0.4.0-Arbeitsproben wurde vom Nutzer abgelehnt. Sie ist nicht freigegeben.** Die kurzen Rev-Schleifen, gemeinsame Turboaufnahme und fehlenden gemessenen RPM-/Laststufen erfüllen das gewünschte Realsound-Ziel noch nicht. Für M5 F90 und BMW M fehlen geeignete bestätigte Originalaufnahmen. 0.4.0 wird auf den erneuten ausdrücklichen Auftrag als Update mit neuem Audiomodus bereitgestellt, **nicht als bestätigter realistischer Motorsound für alle ID7-Systeme**. [Klanganalyse und noch benötigte Aufnahmen](docs/sound-quality-0.4.0.md)
 
@@ -10,7 +10,23 @@ Ergänzt sind eine vom PCM-Prozess getrennte Diagnose mit USB-Bericht, tatsächl
 
 **Fahrzeugstand:** Der Nutzer bestätigt echte Drehzahl und Geschwindigkeit in 0.2.2 auf einem BMW G31 530d xDrive (2018), nachgerüstete MGU ID7, MATCH UP 10. Dort blieb die Audioausgabe stumm. **Hörbarer Motorsound mit 0.4.0, physische Lautsprecherkanäle sowie parallele Musik und unabhängige BMW-Lautstärke sind noch nicht am Fahrzeug bestätigt.** PCM-Erzeugung und erfolgreiche ALSA-Schreibvorgänge gelten ausdrücklich nicht als Lautsprechernachweis.
 
-**Getestet auf dem Entwicklungsrechner:** 76 Node-Tests, 30 Python-Tests, App-Paketvalidierung und 14 Prüfungen mit unverändertem Code des tatsächlichen MGU Stores und Deployers. [Prüfergebnisse](docs/validation/store-preflight-0.4.0.json)
+**Getestet auf dem Entwicklungsrechner:** 78 Node-Tests, 39 Python-Tests, App-Paketvalidierung und 15 Prüfungen mit unverändertem Code des tatsächlichen MGU Stores und Deployers. [Prüfergebnisse](docs/validation/store-preflight-0.4.1.json)
+
+## Neuer Befund aus deinem BMW
+
+**Audio-Dienst 0.4.0 läuft und ist erreichbar; Audio-Socket funktioniert.** Die Meldung „kein separat freigegebener Mischpfad“ war in 0.4.0 mehrdeutig. 0.4.1 trennt fehlende Auswahl, fehlende Freigabe, nicht beobachtetes Gerät und nicht lesbares Inventar. Eine neue Prüfung zeigt Voraussetzungen **ohne Aktivierung eines Ausgangs**.
+
+Für ENOENT wird nun der genaue Dateizugriff am erwarteten Diagnose-Socket **/run/luxo-motor-sound/diagnostics.sock** protokolliert. Zusätzlich ist die im bisherigen Paket fehlende Recovery-Manager-Registrierung unserer beiden Dienste ergänzt; der echte Deployer prüft diese Registrierung vor dem sofortigen Socket-Start. Kein Schutzmechanismus wird deaktiviert. Die exakte Ursache auf deinem BMW muss der Bericht noch bestätigen.
+
+[Reparaturbericht 0.4.1 und benötigte Fahrzeugdaten](docs/reparatur-0.4.1.md)
+
+**Schon in der installierten 0.4.0:** Da der Audio-Dienst läuft, den Diagnosebericht über ihn auf einen erkannten beschreibbaren USB-Datenträger exportieren. Bitte **LUXO-Diagnose/audio-…json** senden. Alternativ die tatsächlichen Gerätenamen, BMW-Audiomanager und Ausgabehindernis fotografieren. Der unabhängige Diagnosefehler beweist nicht, dass kein Ausgang existiert.
+
+![Rein lesende Routenprüfung · LUXO](docs/screenshots/0.4.1/audio-routenpruefung.png)
+
+![Genauer Diagnosepfad · LUXO](docs/screenshots/0.4.1/audio-diagnosepfad.png)
+
+Diese Softwareaufnahme läuft auf Windows ohne Fahrzeugverbindung. Der dort sichtbare C:-Pfad ist der tatsächliche fehlgeschlagene Hostzugriff; auf der MGU wird deren tatsächlich gemeldeter Pfad angezeigt.
 
 ## Neue Klangfunktionen bedienen
 
@@ -42,14 +58,14 @@ Für die untenstehenden Hörproben: App-Pegel/Pegelgrenze **60 %**, Pop-Intensit
 
 ## Installation und Update über den MGU Store
 
-**Bestehende GitHub-Quelle im MGU Store verwenden: Branch codex/luxo-sound-tuning-020, Update 0.4.0.** Der neue **BMW-Medienmodus** ist ausdrücklich auswählbar. Er verwendet eine verwaltete Stereo-Unterhaltungsquelle, ersetzt die Musikquelle und folgt der BMW-Lautstärke. Der bisherige separate Mischpfadmodus bleibt erhalten. **Keine universelle ID7-Freigabe; Lautsprecherausgabe und vollständiges Update im BMW noch nicht bestätigt.** [Audiopfad und Einrichtung](docs/audiopfad-0.4.0.md)
+**Bestehende GitHub-Quelle im MGU Store verwenden: Branch codex/luxo-sound-tuning-020, Update 0.4.1.** Der neue **BMW-Medienmodus** ist ausdrücklich auswählbar. Er verwendet eine verwaltete Stereo-Unterhaltungsquelle, ersetzt die Musikquelle und folgt der BMW-Lautstärke. Der bisherige separate Mischpfadmodus bleibt erhalten. **Keine universelle ID7-Freigabe; Lautsprecherausgabe und vollständiges Update im BMW noch nicht bestätigt.** [Audiopfad und Einrichtung](docs/audiopfad-0.4.0.md)
 
 Voraussetzung ist der Community-Store [robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store), nicht der offizielle BMW ConnectedDrive Store. Die App ist für **iDrive 7** deklariert. Eine allgemeine Freigabe sämtlicher MGU-Firmwarestände besteht nicht. Der Store muss Repository-Quellen, Python-App-Builds und Tool-Abhängigkeiten unterstützen; der Dienst benötigt `mgu-python >= 1.0.2`. [Tatsächliche Store-Paketspezifikation](https://github.com/robertnisipeanu/mgu-store/blob/d878bed5ce5848d0c1ce852be23fac539e434a0b/docs/PUBLISHING.md)
 
 1. Im BMW den **MGU Store** öffnen und die vorhandene Quelle `patryklars6/BMW-Motor-Sound-MGU-App` aktualisieren. Falls die Quelle noch fehlt: **Einstellungen → Quelle hinzufügen / Settings → Add source**, Repository-Namen eintragen.
 2. Den Branch **`codex/luxo-sound-tuning-020`** auswählen. Auf `main` liegt die aktuelle Anleitung; der beauftragte App-Code liegt im Entwicklungsbranch.
-3. Bei **LUXO Motor Sound** die angebotene Version **0.4.0** prüfen und **Aktualisieren** wählen. Nur bei bisher fehlgeschlagener Erstinstallation **Installieren** wählen. Eine Deinstallation ist nicht vorgesehen.
-4. Der echte Store plant `mgu-python >= 1.0.2`, danach **`luxo-motor-audio >= 0.4.0`**, danach die vorhandene App. Bereits ausreichend neue Komponenten werden übersprungen. Das Audio-Paket enthält **zwei getrennte socket-aktivierte Dienste**: PCM-Ausgabe und Diagnose/USB-Export. Beide werden über das Tool-Manifest eingerichtet; keine manuelle Dienstinstallation ist vorgesehen. Die Python-Laufzeit muss bereits vorhanden oder aus einer Store-Quelle verfügbar sein, sonst verweigert der Store den Plan. Falls ausstehende Dienste gemeldet werden, den Store-Hinweis zum nächsten regulären Head-Unit-Start beachten. Keine erzwungenen Neustarts während der Fahrt.
+3. Bei **LUXO Motor Sound** die angebotene Version **0.4.1** prüfen und **Aktualisieren** wählen. Nur bei bisher fehlgeschlagener Erstinstallation **Installieren** wählen. Eine Deinstallation ist nicht vorgesehen.
+4. Der echte Store plant `mgu-python >= 1.0.2`, danach **`luxo-motor-audio >= 0.4.1`**, danach die vorhandene App. Bereits ausreichend neue Komponenten werden übersprungen. Das Audio-Paket enthält **zwei getrennte socket-aktivierte Dienste**: PCM-Ausgabe und Diagnose/USB-Export. Beide werden über das Tool-Manifest eingerichtet; keine manuelle Dienstinstallation ist vorgesehen. Die Python-Laufzeit muss bereits vorhanden oder aus einer Store-Quelle verfügbar sein, sonst verweigert der Store den Plan. Falls ausstehende Dienste gemeldet werden, den Store-Hinweis zum nächsten regulären Head-Unit-Start beachten. Keine erzwungenen Neustarts während der Fahrt.
 5. Die App öffnen. Sie startet im **nativen BMW-Menü**. Unter **Audio-Diagnose** Dienstversion, Erreichbarkeit, Socket und Fehler prüfen. Die Diagnose läuft auch nach dem App-Start automatisch.
 6. Bei verfügbarem kompatiblem `mgu-render/1` mit Touch-Routing **LUXO-Oberfläche** öffnen. Jede grafische Unterseite besitzt **Zurück**, **Hauptmenü** und **BMW-Menü**. Bei Renderer-Ausfall steht das native Menü als Rückfallebene bereit.
 
@@ -63,9 +79,9 @@ Die bisherigen Einstellungen bleiben in `data/settings.json` der App. Das Update
 
 Der Modus ist **Stereo mit gemeinsamer BMW-Lautstärke**. Radio/CarPlay parallel und unabhängiger akustischer Motorsound-Pegel sind damit nicht umgesetzt. Der separate Mischpfad bleibt für tatsächlich unterstützte Hardware verfügbar. Fehlen Dienste, passende Quelle, beobachteter PCM oder geeignete Rechte, zeigt die Diagnose den Fehler. [Technik, Grenzen und Recherche](docs/audiopfad-0.4.0.md)
 
-![Audiomodi · LUXO](docs/screenshots/0.4.0/audio-modi.png)
+![Audiomodi · LUXO](docs/screenshots/0.4.1/audio-modi.png)
 
-![BMW-Medienquelle mit Einschränkungen · LUXO](docs/screenshots/0.4.0/audio-medienquelle.png)
+![BMW-Medienquelle mit Einschränkungen · LUXO](docs/screenshots/0.4.1/audio-medienquelle.png)
 
 ## Audio-Diagnose und erster Fahrzeugtest
 
@@ -79,121 +95,121 @@ Der Modus ist **Stereo mit gemeinsamer BMW-Lautstärke**. Radio/CarPlay parallel
 
 Ohne freigegebenen Ausgang bleiben die Soundregler mit der PCM-Engine verbunden, die Fahrzeugausgabe bleibt gesperrt. App-Pegel und Einzelpegel verändern die eigenen Audiodaten. Eine von Radio/CarPlay unabhängige Lautstärke hinter dem BMW-Mixer wird damit **nicht** nachgewiesen. Öffentliche MGU-Tests zeigen einen Medienpfad, der Radio ersetzt und dem BMW-Pegel folgt; eine universelle parallele Overlay-Route ist nicht belegt. [Quellen, Architektur und Grenzen](docs/reparatur-0.3.0.md#audio-recherche-und-tatsächliche-grenzen)
 
-## Menübilder · Version 0.4.0 · LUXO
+## Menübilder · Version 0.4.1 · LUXO
 
-Alle 25 Aufnahmen stammen aus dem gebauten **Paket 0.4.0**, durchlaufen dessen wirkliche Zeichenfunktionen und verwenden dasselbe **LUXO**-Theme: Dunkelgrau, Weiß und Violett. Sie sind Softwareaufnahmen ohne Fahrzeugverbindung; echte Live-Werte bleiben deshalb **Nicht verfügbar**. MATCH UP 10 ist als Benutzereinstellung ausgewählt. Die Diagnose zeigt den tatsächlich fehlenden Dienst auf dem Entwicklungsrechner, keine erfundene Fahrzeugverbindung. [Aufnahmeprotokoll und Bildprüfsummen](docs/screenshots/0.4.0/capture.json)
+Alle 27 Aufnahmen stammen aus dem gebauten **Paket 0.4.1**, durchlaufen dessen wirkliche Zeichenfunktionen und verwenden dasselbe **LUXO**-Theme: Dunkelgrau, Weiß und Violett. Sie sind Softwareaufnahmen ohne Fahrzeugverbindung; echte Live-Werte bleiben deshalb **Nicht verfügbar**. MATCH UP 10 ist als Benutzereinstellung ausgewählt. Die Diagnose zeigt den tatsächlich fehlenden Dienst auf dem Entwicklungsrechner, keine erfundene Fahrzeugverbindung. [Aufnahmeprotokoll und Bildprüfsummen](docs/screenshots/0.4.1/capture.json)
 
 Die optionale Grafik benötigt einen kompatiblen Renderer. Die native BMW-Menüdarstellung hängt von der Head Unit ab; ein Foto davon im Fahrzeug steht aus.
 
 ### Diagnose bei fehlendem Audio-Dienst
 
-![USB-Diagnose · LUXO · beide Dienste auf dem Host nicht vorhanden](docs/screenshots/0.4.0/audio-usb.png)
+![USB-Diagnose · LUXO · beide Dienste auf dem Host nicht vorhanden](docs/screenshots/0.4.1/audio-usb.png)
 
 ### Hauptmenü
 
-![Hauptmenü · 0.4.0 · LUXO](docs/screenshots/0.4.0/hauptmenue.png)
+![Hauptmenü · 0.4.1 · LUXO](docs/screenshots/0.4.1/hauptmenue.png)
 
 
 ### Live-Daten
 
-![Live-Daten · 0.4.0 · LUXO](docs/screenshots/0.4.0/live-daten.png)
+![Live-Daten · 0.4.1 · LUXO](docs/screenshots/0.4.1/live-daten.png)
 
 
 ### Soundprofile
 
-![Soundprofile · 0.4.0 · LUXO](docs/screenshots/0.4.0/soundprofile.png)
+![Soundprofile · 0.4.1 · LUXO](docs/screenshots/0.4.1/soundprofile.png)
 
 
 ### Sound-Tuning
 
-![Sound-Tuning · 0.4.0 · LUXO](docs/screenshots/0.4.0/sound-tuning.png)
+![Sound-Tuning · 0.4.1 · LUXO](docs/screenshots/0.4.1/sound-tuning.png)
 
 
 ### Motor-Einstellungen
 
-![Motor-Einstellungen · 0.4.0 · LUXO](docs/screenshots/0.4.0/motor-einstellungen.png)
+![Motor-Einstellungen · 0.4.1 · LUXO](docs/screenshots/0.4.1/motor-einstellungen.png)
 
 
 ### Turbo-Einstellungen
 
-![Turbo-Einstellungen · 0.4.0 · LUXO](docs/screenshots/0.4.0/turbo-einstellungen.png)
+![Turbo-Einstellungen · 0.4.1 · LUXO](docs/screenshots/0.4.1/turbo-einstellungen.png)
 
 
 ### Turbo-Varianten
 
-![Turbo-Varianten · 0.4.0 · LUXO](docs/screenshots/0.4.0/turbo-varianten.png)
+![Turbo-Varianten · 0.4.1 · LUXO](docs/screenshots/0.4.1/turbo-varianten.png)
 
 
 ### Auspuff-Einstellungen
 
-![Auspuff-Einstellungen · 0.4.0 · LUXO](docs/screenshots/0.4.0/auspuff-einstellungen.png)
+![Auspuff-Einstellungen · 0.4.1 · LUXO](docs/screenshots/0.4.1/auspuff-einstellungen.png)
 
 
 ### Künstliche Pop & Bangs
 
-![Künstliche Pop & Bangs · 0.4.0 · LUXO](docs/screenshots/0.4.0/pop-bangs.png)
+![Künstliche Pop & Bangs · 0.4.1 · LUXO](docs/screenshots/0.4.1/pop-bangs.png)
 
 
 ### Lautsprecher
 
-![Lautsprecher · 0.4.0 · LUXO](docs/screenshots/0.4.0/lautsprecher.png)
+![Lautsprecher · 0.4.1 · LUXO](docs/screenshots/0.4.1/lautsprecher.png)
 
 
 ### Fahrmodi
 
-![Fahrmodi · 0.4.0 · LUXO](docs/screenshots/0.4.0/fahrmodi.png)
+![Fahrmodi · 0.4.1 · LUXO](docs/screenshots/0.4.1/fahrmodi.png)
 
 
 ### Allgemeine Einstellungen
 
-![Allgemeine Einstellungen · 0.4.0 · LUXO](docs/screenshots/0.4.0/einstellungen.png)
+![Allgemeine Einstellungen · 0.4.1 · LUXO](docs/screenshots/0.4.1/einstellungen.png)
 
 
 ### Design
 
-![Design · 0.4.0 · LUXO](docs/screenshots/0.4.0/design.png)
+![Design · 0.4.1 · LUXO](docs/screenshots/0.4.1/design.png)
 
 
 ### Info und Hilfe
 
-![Info und Hilfe · 0.4.0 · LUXO](docs/screenshots/0.4.0/info.png)
+![Info und Hilfe · 0.4.1 · LUXO](docs/screenshots/0.4.1/info.png)
 
 
 ### Audio-Diagnose: Dienst und Socket
 
-![Audio-Diagnose: Dienst und Socket · 0.4.0 · LUXO](docs/screenshots/0.4.0/audio-diagnose.png)
+![Audio-Diagnose: Dienst und Socket · 0.4.1 · LUXO](docs/screenshots/0.4.1/audio-diagnose.png)
 
 
 ### Audio-Diagnose: Pfad und Geräte
 
-![Audio-Diagnose: Pfad und Geräte · 0.4.0 · LUXO](docs/screenshots/0.4.0/audio-geraete.png)
+![Audio-Diagnose: Pfad und Geräte · 0.4.1 · LUXO](docs/screenshots/0.4.1/audio-geraete.png)
 
 
 ### Audio-Diagnose: Kanalformat und Grenzen
 
-![Audio-Diagnose: Kanalformat und Grenzen · 0.4.0 · LUXO](docs/screenshots/0.4.0/audio-tests.png)
+![Audio-Diagnose: Kanalformat und Grenzen · 0.4.1 · LUXO](docs/screenshots/0.4.1/audio-tests.png)
 
 
 ### Audio-Diagnose: gesperrte Tests und Bestätigung
 
-![Audio-Diagnose: gesperrte Tests und Bestätigung · 0.4.0 · LUXO](docs/screenshots/0.4.0/audio-export.png)
+![Audio-Diagnose: gesperrte Tests und Bestätigung · 0.4.1 · LUXO](docs/screenshots/0.4.1/audio-export.png)
 
 
 ### Audio-Diagnose: Bericht und Fehler
 
-![Audio-Diagnose: Bericht und Fehler · 0.4.0 · LUXO](docs/screenshots/0.4.0/audio-fehler.png)
+![Audio-Diagnose: Bericht und Fehler · 0.4.1 · LUXO](docs/screenshots/0.4.1/audio-fehler.png)
 
 ### Pop & Bangs und Schaltknall
 
-![Neue Pop-&-Bangs-Regler und Schaltknall](docs/screenshots/0.4.0/pop-bangs-schalten.png)
+![Neue Pop-&-Bangs-Regler und Schaltknall](docs/screenshots/0.4.1/pop-bangs-schalten.png)
 
 ### Turbo beim Schalten
 
-![Turbo-Schaltregler](docs/screenshots/0.4.0/turbo-schalten.png)
+![Turbo-Schaltregler](docs/screenshots/0.4.1/turbo-schalten.png)
 
 ### Nachklang beim Motorabstellen
 
-![Motor-Aus-Nachklang](docs/screenshots/0.4.0/motor-nachklang.png)
+![Motor-Aus-Nachklang](docs/screenshots/0.4.1/motor-nachklang.png)
 
 ## Soundprofile und Regler
 

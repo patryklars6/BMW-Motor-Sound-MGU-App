@@ -1,0 +1,79 @@
+CHECK luxo-motor-audio@0.2.1.tgz
+running as root (fake root)
+node: v24.22.3
+head unit: iDrive 7 (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp), firmware unknown
+systemd: unknown
+NOT systemd 237 (found: unknown)
+/ mount: unknown
+C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt writable
+free space: df unavailable, skipped
+group mgu_wayland present
+group tm_oap_app present
+NOT winston.service unit file present
+oapcontroller: unknown; app manager pid: not found
+NOT base.json readable at C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp\config\base.json
+app-privacy: not installed (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\no-privacy-tool)
+display-bridge socket unit: unknown; service: unknown; socket file: absent
+fallback: inactive
+NOT artifact C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\packages\luxo-motor-audio@0.2.1.tgz valid: C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\packages\luxo-motor-audio@0.2.1.tgz: bad enable entry
+exit=2
+
+CHECK luxo-motor-audio@0.4.1.tgz
+running as root (fake root)
+node: v24.22.3
+head unit: iDrive 7 (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp), firmware unknown
+systemd: unknown
+NOT systemd 237 (found: unknown)
+/ mount: unknown
+C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt writable
+free space: df unavailable, skipped
+group mgu_wayland present
+group tm_oap_app present
+NOT winston.service unit file present
+oapcontroller: unknown; app manager pid: not found
+NOT base.json readable at C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp\config\base.json
+app-privacy: not installed (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\no-privacy-tool)
+display-bridge socket unit: unknown; service: unknown; socket file: absent
+fallback: inactive
+artifact C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\luxo-motor-audio@0.4.1.tgz: tool luxo-motor-audio 0.4.1 ok (for iDrive 7)
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\luxo-motor-audio\current
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\recmgr-restartlist.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-audio.socket
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-audio.service
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-diagnostics.socket
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-diagnostics.service
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\sockets.target.wants\luxo-motor-audio.socket
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\sockets.target.wants\luxo-motor-diagnostics.socket
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-audio.socket.d\zz-mgu-deploy-limits.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-audio.service.d\zz-mgu-deploy-limits.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-diagnostics.socket.d\zz-mgu-deploy-limits.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\systemd\system\luxo-motor-diagnostics.service.d\zz-mgu-deploy-limits.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\luxo-motor-audio\versions\0.4.1
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\mgu-uplink\uids.d\luxo-motor-audio
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\mgu-uplink\apps.d\luxo-motor-audio
+exit=0
+
+CHECK optional-soundpack.tgz
+running as root (fake root)
+node: v24.22.3
+head unit: iDrive 7 (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp), firmware unknown
+systemd: unknown
+NOT systemd 237 (found: unknown)
+/ mount: unknown
+C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt writable
+free space: df unavailable, skipped
+group mgu_wayland present
+group tm_oap_app present
+NOT winston.service unit file present
+oapcontroller: unknown; app manager pid: not found
+NOT base.json readable at C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\usr\lib\oap-mainapp\config\base.json
+app-privacy: not installed (C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\no-privacy-tool)
+display-bridge socket unit: unknown; service: unknown; socket file: absent
+fallback: inactive
+artifact C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\optional-soundpack.tgz: tool luxo-soundpack 0.4.0 ok (for iDrive 7)
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\luxo-soundpack\current
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\etc\recmgr-restartlist.conf
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\luxo-soundpack\versions\0.4.0
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\mgu-uplink\uids.d\luxo-soundpack
+  would touch C:\Users\Patryk\Documents\Codex\2026-11-15\vizualyse-idrive-apps\work\BMW-Motor-Sound-MGU-App\dist\store-preflight-tLYblP\head-unit\var\opt\mgu-uplink\apps.d\luxo-soundpack
+exit=0

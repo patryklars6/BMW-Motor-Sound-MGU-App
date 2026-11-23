@@ -1,0 +1,25 @@
+{
+  "localVersion": "0.4.1",
+  "lastVerifiedPublishedVersion": "0.4.0",
+  "publicationState": "prepared",
+  "purpose": "targeted package/diagnostic correction; not a confirmed functional BMW sound release",
+  "vehicleSpeakerOutputVerified": false,
+  "requiresVehicleReportForActualRouteRepair": true,
+  "tests": {
+    "node": 78,
+    "python": 39,
+    "upstreamStoreDeployer": 15,
+    "total": 132,
+    "failed": 0
+  },
+  "artifacts": {
+    "patryklars6_motor_sound@0.4.1.tgz": {
+      "sha256": "7eebb46b29233e50d8f8588139f4e1e6875a456b00c21ec70148203351f05c60",
+      "bytes": 947131
+    },
+    "luxo-motor-audio@0.4.1.tgz": {
+      "sha256": "e9f12453a833cc560e11867d0ece35fe091ece28b4872e956245607554702321",
+      "bytes": 19848
+    }
+  }
+}

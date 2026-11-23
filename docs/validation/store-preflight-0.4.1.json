@@ -1,0 +1,27 @@
+{
+  "upstream": "robertnisipeanu/mgu-store",
+  "revision": "d878bed5ce5848d0c1ce852be23fac539e434a0b",
+  "deployerVersion": "0.8.27",
+  "host": "win32",
+  "node": "v24.22.3",
+  "vehicleTest": false,
+  "checks": [
+    "real Store catalog agrees on app, tool and required version 0.4.1",
+    "real Store install plan queues Python and the complete audio tool before the existing app",
+    "real Store update plan upgrades an old audio service while retaining a sufficient Python runtime",
+    "real Store refuses the app when no installed or available Python satisfies the audio tool",
+    "real deployer check reproduces 0.2.1 bad enable entry with exit 2",
+    "real deployer check accepts the complete rebuilt 0.4.1 audio archive",
+    "real deployer installation preflight accepts 0.4.1 without installing it",
+    "real deployer sees an unregistered diagnostic service and accepts only our additive recmgr registration",
+    "packed enable, units, restart and file digest describe the actual audio payload",
+    "real preflight rejects a missing enable target",
+    "real preflight rejects a changed audio payload hash",
+    "real preflight rejects a missing service unit payload",
+    "real deployer validates the app archive with its unchanged ID and ID7 declaration",
+    "existing settings and app ID are preserved; new controls are additive",
+    "optional recording pack built by the real Store passes actual deployer preflight"
+  ],
+  "limits": "Unmodified upstream check/preflight in an isolated fake root; no systemd service start, donor linking, or vehicle install.",
+  "audioSha256": "e9f12453a833cc560e11867d0ece35fe091ece28b4872e956245607554702321"
+}

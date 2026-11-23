@@ -1,0 +1,48 @@
+{
+  "version": "0.4.1",
+  "status": "prepared-for-authorized-publication",
+  "appId": "patryklars6_motor_sound",
+  "tests": {
+    "node": 78,
+    "python": 39,
+    "upstreamStoreDeployer": 15,
+    "total": 132,
+    "failed": 0
+  },
+  "vehicleSpeakerOutputVerified": false,
+  "exactIndependentSocketRootCauseOnVehicleConfirmed": false,
+  "softwareFixes": [
+    "route state distinctions",
+    "read-only media prerequisites",
+    "exact filesystem error path",
+    "independent socket health via reachable PCM service",
+    "own recmgr registrations",
+    "legacy null route selection"
+  ],
+  "vehicleObservation": {
+    "source": "user report, 2026-11-23",
+    "installedVersion": "0.4.0",
+    "audioServiceReachable": true,
+    "audioServicePid": 11338,
+    "pcmSocket": "successful",
+    "routeStatus": "Kein separat freigegebener Mischpfad ausgewählt",
+    "independentDiagnosticError": "ENOENT",
+    "speakerAudio": "no sound reported"
+  },
+  "limits": [
+    "Host and fake-root tests only; no vehicle install or actual systemd/recmgr restart.",
+    "No OEM audio route selected automatically; observations do not prove speaker output.",
+    "Current sound recording bank remains unfinished and rejected by user.",
+    "Actual device names, AudioManager observations and route configuration still needed."
+  ],
+  "artifacts": {
+    "patryklars6_motor_sound@0.4.1.tgz": {
+      "sha256": "7eebb46b29233e50d8f8588139f4e1e6875a456b00c21ec70148203351f05c60",
+      "bytes": 947131
+    },
+    "luxo-motor-audio@0.4.1.tgz": {
+      "sha256": "e9f12453a833cc560e11867d0ece35fe091ece28b4872e956245607554702321",
+      "bytes": 19848
+    }
+  }
+}
