@@ -2,6 +2,7 @@
 No PCM stream, source connection or vehicle control is opened by this module.
 """
 import ctypes as c
+import errno
 import hashlib
 import json
 import os
@@ -15,6 +16,60 @@ import time
 from pathlib import Path
 
 APP_ID = "patryklars6_motor_sound"
+
+DIAGNOSTIC_SOCKET = "/run/luxo-motor-sound/diagnostics.sock"
+
+def diagnostic_registration():
+    name = "/etc/recmgr-restartlist.conf"
+    raw = text_file(name, 32768)
+    if raw is None:
+        return {"path": name, "readable": False, "loadedAtBootVerified": False}
+    registered = {unit: [] for unit in ("luxo-motor-audio", "luxo-motor-diagnostics")}
+    section = None
+    for line in raw.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line.startswith("[") and line.endswith("]"):
+            section = line[1:-1]
+        elif line in registered and section in ("Whitelist", "WhitelistExitSuccess"):
+            registered[line].append(section)
+    return {"path": name, "readable": True, "truncated": len(raw) >= 32768,
+        "ownEntries": registered, "loadedAtBootVerified": False}
+
+
+def observe_path(name):
+    """Report the exact failed filesystem lookup, without following symlinks."""
+    try:
+        value = os.lstat(name)
+        return {"path": name, "exists": True, "uid": value.st_uid, "gid": value.st_gid,
+            "mode": oct(stat.S_IMODE(value.st_mode)), "socket": stat.S_ISSOCK(value.st_mode),
+            "symlink": stat.S_ISLNK(value.st_mode)}
+    except OSError as error:
+        return {"path": name, "errorPath": error.filename or name, "exists": False if error.errno == 2 else None,
+            "errno": error.errno, "error": errno.errorcode.get(error.errno, "STAT_FAILED")}
+
+
+def diagnostic_endpoint_health():
+    prefix = "/var/opt/luxo-motor-audio/current/"
+    units = systemd_status("luxo-motor-diagnostics")
+    observations = {name: observe_path(name) for name in [
+        DIAGNOSTIC_SOCKET, prefix + "diagnostics_bridge.py", prefix + "diagnostic_support.py",
+        "/etc/systemd/system/luxo-motor-diagnostics.socket",
+        "/etc/systemd/system/luxo-motor-diagnostics.service"]}
+    endpoint = observations[DIAGNOSTIC_SOCKET]
+    socket_unit = units.get("socket", {})
+    if socket_unit.get("LoadState") == "not-found":
+        state = "socket-unit-not-installed"
+    elif socket_unit.get("ActiveState") in ("inactive", "failed"):
+        state = "socket-unit-not-active"
+    elif endpoint.get("exists") is False:
+        state = "socket-node-not-visible"
+    elif endpoint.get("socket") is True:
+        state = "socket-node-observed"
+    else:
+        state = "unresolved"
+    return {"expectedSocketPath": DIAGNOSTIC_SOCKET, "state": state, "observedFiles": observations,
+        "systemd": units, "recmgrRegistration": diagnostic_registration(),
+        "readOnly": True, "serviceReachabilityProven": False}
 
 class AudioError(Exception):
     def __init__(self, code, detail=""):
@@ -96,7 +151,7 @@ def systemd_status(prefix="luxo-motor-audio"):
     for kind in ("socket", "service"):
         try:
             proc = subprocess.run(["systemctl", "show", prefix + "." + kind,
-                "--property=LoadState,ActiveState,SubState,Result,MainPID", "--no-pager"],
+                "--property=Id,LoadState,ActiveState,SubState,Result,MainPID,FragmentPath,UnitFileState,Listen,NeedDaemonReload,ExecMainCode,ExecMainStatus", "--no-pager"],
                 capture_output=True, text=True, timeout=1.5, check=False)
             result[kind] = dict(line.split("=", 1) for line in proc.stdout.splitlines() if "=" in line) if proc.returncode == 0 else {"error": proc.stderr[:256]}
         except (OSError, subprocess.TimeoutExpired) as error:

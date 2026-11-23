@@ -14,6 +14,54 @@ const { interfaceSchema, probe, READS } = require('../tools/audio_probe');
 const spec = require('../apps/patryklars6_motor_sound/app.json');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+test('Socket inspection distinguishes a missing socket filename from a missing parent directory', () => {
+    const { inspectSocket } = require('../apps/patryklars6_motor_sound/output');
+    const target = '/run/luxo-motor-sound/diagnostics.sock';
+    const parent = path.dirname(target);
+    const missing = file => Object.assign(Error('missing'), { code: 'ENOENT', path: file, syscall: 'lstat' });
+    const result = inspectSocket(target, { lstatSync(file) {
+        if (file === parent) return { isDirectory: () => true, uid: 0, mode: 0o755 };
+        throw missing(file);
+    } });
+    assert.equal(result.errorPath, target); assert.equal(result.checkedPath, target);
+    const noParent = inspectSocket(target, { lstatSync(file) { throw missing(file); } });
+    assert.equal(noParent.errorPath, parent); assert.equal(noParent.path, target);
+});
+
+test('Running audio service with no selection and a missing diagnostic socket stays distinguishable and exportable', async t => {
+    const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'luxo-vehicle-report-'));
+    t.after(() => fs.rmSync(dataDir, { recursive: true, force: true }));
+    const endpoint = '/run/luxo-motor-sound/diagnostics.sock', operations = [];
+    const service = { serviceStarted: true, pid: 11338, route: null, routeError: { code: 'ROUTE_NOT_SELECTED' },
+        routeAssessment: { state: 'not-selected' }, usbMounts: ['/fixture-usb'],
+        diagnosticEndpointHealth: { expectedSocketPath: endpoint, state: 'socket-unit-not-active' } };
+    const d = new AudioDiagnostics({ dataDir, spec, output: {}, settings: { get() {} },
+        vehicle: { snapshot: () => ({ rpm: null, speed: null }) },
+        rpc: async value => {
+            operations.push(value.op);
+            if (value.op === 'diagnose') return service;
+            assert.equal(value.op, 'export');
+            assert.equal(value.report.independentDiagnosticsError.path, endpoint);
+            return { path: '/fixture-usb/LUXO-Diagnose/fixture.json' };
+        },
+        supportRpc: async () => { throw Object.assign(Error('missing diagnostic socket'), { code: 'ENOENT', path: endpoint }); } });
+    await d.refresh();
+    assert.equal(d.service.pid, 11338);
+    assert.match(d.message, /Kein Audioweg ausgewählt/);
+    d.page = 'modes'; assert.match(d.rows()[0].value, /Noch kein Audioweg/);
+    d.page = 'diagnostic-path';
+    assert.equal(d.rows().find(row => row.id === 'diag-failed-path').value, endpoint);
+    assert.match(d.rows().find(row => row.id === 'diag-unit-state').value, /nicht aktiv/);
+    d.page = 'usb'; await d.rows().find(row => row.id === 'usb-0').action();
+    assert.equal(d.exported, '/fixture-usb/LUXO-Diagnose/fixture.json');
+    assert.equal(operations.some(op => op === 'select' || op === 'select-media'), false);
+    const saved = JSON.parse(fs.readFileSync(d.saved));
+    assert.equal(saved.service.route, null);
+    assert.equal(saved.service.diagnosticEndpointHealth.expectedSocketPath, endpoint);
+    assert.equal(saved.independentDiagnosticsError.path, endpoint);
+    assert.equal(saved.audibleOutputAutomaticallyVerified, false);
+});
+
 test('Switching media mode pauses PCM reconnects while the previous stream releases its lock', async () => {
     let closed = 0, retried = 0, attempts = 0;
     const d = new AudioDiagnostics({ spec, output: { close() { closed++; }, retry() { retried++; } },
@@ -212,7 +260,9 @@ test('Real Python bridge protocol receives synthesized engine PCM at a host sink
     const connect = () => net.createConnection(port, '127.0.0.1');
     const rpc = data => request(data, connect);
     const initial = await rpc({ op: 'diagnose' });
-    assert.equal(initial.negotiated, null); assert.equal(initial.routeError.code, 'NO_APPROVED_ROUTE');
+    assert.equal(initial.negotiated, null); assert.equal(initial.routeError.code, 'ROUTE_NOT_SELECTED');
+    assert.equal(initial.routeAssessment.state, 'not-selected');
+    assert.equal(initial.diagnosticEndpointHealth.expectedSocketPath, '/run/luxo-motor-sound/diagnostics.sock');
     await rpc({ op: 'select', device: 'host_test_sink', channels: 2, approvedOverlay: true });
     let now = 0;
     const output = new PcmOutput(() => now, { trusted: () => true, open: connect });

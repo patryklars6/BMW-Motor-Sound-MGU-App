@@ -1,7 +1,7 @@
 {
   "id": "luxo-motor-audio",
   "kind": "tool",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "title": "LUXO Audio-Dienst",
   "description": "Audio-Diagnose, bestätigte separate Mischpfade und optional verwaltete BMW-Medienquelle (Stereo, BMW-Lautstärke).",
   "mguHmi": [
@@ -10,6 +10,7 @@
   "requires": {
     "mgu-python": "1.0.2"
   },
+  "recmgr": ["luxo-motor-audio", "luxo-motor-diagnostics"],
   "files": [
     {
       "path": "overlay_bridge.py",
@@ -44,6 +45,11 @@
     {
       "path": "managed_media.py",
       "from": "managed_media.py",
+      "mode": "0644"
+    },
+    {
+      "path": "route_diagnostics.py",
+      "from": "route_diagnostics.py",
       "mode": "0644"
     }
   ],

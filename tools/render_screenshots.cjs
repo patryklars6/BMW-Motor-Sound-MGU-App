@@ -184,6 +184,12 @@ async function main() {
     await draw('audio-export.png');
     await target('diag-page-1');
     await draw('audio-fehler.png');
+    background.diagnostics.rows().find(row => row.id === 'route-check').action();
+    await draw('audio-routenpruefung.png');
+    background.diagnostics.backSub();
+    background.diagnostics.rows().find(row => row.id === 'independent').action();
+    await draw('audio-diagnosepfad.png');
+    background.diagnostics.backSub();
     const usbRow = background.diagnostics.rows().find(row => row.id === 'usb');
     assert.ok(usbRow && usbRow.action); usbRow.action();
     await draw('audio-usb.png');

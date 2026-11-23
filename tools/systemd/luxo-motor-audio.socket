@@ -1,5 +1,6 @@
 [Unit]
 Description=LUXO PCM socket
+Wants=luxo-motor-diagnostics.socket
 
 [Socket]
 ListenStream=/run/luxo-motor-sound/pcm.sock

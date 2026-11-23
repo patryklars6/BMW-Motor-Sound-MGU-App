@@ -10,7 +10,7 @@ import threading
 import time
 from pathlib import Path
 from diagnostic_support import (APP_ID, AudioError, allowed_peer, text_file,
-    inventory, systemd_status, manager_inventory, usb_mounts, export_usb)
+    inventory, systemd_status, manager_inventory, usb_mounts, export_usb, diagnostic_endpoint_health)
 
 PREFIX = b"LUXODIAG/1 "
 LIMIT = 393216
@@ -36,7 +36,8 @@ def observed_file(name):
 
 def collect(extended=True):
     root = "/var/opt/luxo-motor-audio/current/"
-    result = {"serviceVersion": "0.4.0", "independentOfPcmProcess": True,
+    endpoint_health = diagnostic_endpoint_health()
+    result = {"serviceVersion": "0.4.1", "independentOfPcmProcess": True,
         "collectedAt": time.time(), "pid": os.getpid(), "python": sys.version.split()[0],
         "uid": os.getuid() if hasattr(os, "getuid") else None,
         "inventory": inventory(), "usbMounts": usb_mounts(),
@@ -44,7 +45,8 @@ def collect(extended=True):
             root + "component.json", root + "overlay_bridge.py", root + "audio_backend.py",
             "/var/opt/mgu-python/current/bin/python3", "/run/luxo-motor-sound/pcm.sock",
             "/var/opt/public/oap/oap_12201/data/apps/" + APP_ID + ".json"]},
-        "audioSystemd": systemd_status(), "diagnosticsSystemd": systemd_status("luxo-motor-diagnostics"),
+        "audioSystemd": systemd_status(), "diagnosticsSystemd": endpoint_health["systemd"],
+        "diagnosticEndpointHealth": endpoint_health,
         "physicalSoundAutomaticallyVerified": False}
     # Read existing route metadata without approving, opening or changing it.
     route = text_file("/var/opt/luxo-motor-audio/config.json", 16384)

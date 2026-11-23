@@ -21,7 +21,9 @@ function request(value, connect, diagnostic) {
     return new Promise((resolve, reject) => {
         if (!connect) {
             const endpoint = inspectSocket(endpointPath);
-            if (!endpoint.trusted) return reject(Object.assign(Error('Audio-Socket nicht zugänglich oder nicht vertrauenswürdig'), { code: endpoint.error || 'UNTRUSTED_ENDPOINT' }));
+            if (!endpoint.trusted) return reject(Object.assign(Error('Audio-Socket nicht zugänglich oder nicht vertrauenswürdig'),
+                { code: endpoint.error || 'UNTRUSTED_ENDPOINT', path: endpoint.errorPath || endpointPath,
+                    endpointPath, syscall: endpoint.syscall }));
         }
         const socket = connect ? connect() : net.createConnection(endpointPath);
         let data = '', finished = false;
@@ -29,13 +31,13 @@ function request(value, connect, diagnostic) {
             if (finished) return; finished = true; clearTimeout(timer); socket.destroy();
             if (error) reject(error); else resolve(result);
         }
-        const timer = setTimeout(() => finish(Object.assign(Error('Audio-Diagnose: Zeitüberschreitung'), { code: 'DIAG_TIMEOUT' })), diagnostic ? 20000 : 12000);
+        const timer = setTimeout(() => finish(Object.assign(Error('Audio-Diagnose: Zeitüberschreitung'), { code: 'DIAG_TIMEOUT', path: endpointPath })), 20000);
         socket.on('connect', () => socket.write((diagnostic ? 'LUXODIAG/1 ' : 'LUXO/2 ') + JSON.stringify(value) + '\n'));
         socket.on('error', error => finish(error));
         socket.on('end', () => { if (!finished) finish(Object.assign(Error('Keine Diagnoseantwort'), { code: 'NO_RESPONSE' })); });
         socket.on('data', chunk => {
             data += chunk.toString('utf8');
-            if (data.length > (diagnostic ? 393216 : 131072)) return finish(Object.assign(Error('Diagnoseantwort zu groß'), { code: 'REPORT_LIMIT' }));
+            if (data.length > 393216) return finish(Object.assign(Error('Diagnoseantwort zu groß'), { code: 'REPORT_LIMIT' }));
             if (data.indexOf('\n') < 0) return;
             try {
                 if (data.indexOf('ERROR ') === 0) throw Object.assign(Error(audioErrorText(data.trim().slice(6))), { code: data.trim().slice(6) });
@@ -48,7 +50,8 @@ function request(value, connect, diagnostic) {
 }
 function unitStatus() {
     return new Promise(resolve => cp.execFile('systemctl', ['show', 'luxo-motor-audio.socket', 'luxo-motor-audio.service',
-        '--property=Id,LoadState,ActiveState,SubState,Result,MainPID', '--no-pager'], { timeout: 2000, maxBuffer: 16384, encoding: 'utf8' },
+        'luxo-motor-diagnostics.socket', 'luxo-motor-diagnostics.service',
+        '--property=Id,LoadState,ActiveState,SubState,Result,MainPID,FragmentPath,UnitFileState,Listen,NeedDaemonReload,ExecMainStatus', '--no-pager'], { timeout: 2000, maxBuffer: 16384, encoding: 'utf8' },
         (error, stdout) => resolve(error ? { error: error.code || String(error.message).slice(0, 160) } : { observations: stdout.slice(0, 16384) })));
 }
 
@@ -90,7 +93,9 @@ class AudioDiagnostics {
             const audio = answers[0], support = answers[1];
             if (support.error) {
                 this.support = null;
-                this.supportError = { code: support.error.code || 'DIAG_FAILED', message: support.error.message };
+                this.supportError = { code: support.error.code || 'DIAG_FAILED', message: support.error.message,
+                    path: support.error.path || DIAGNOSTIC_SOCKET, endpointPath: support.error.endpointPath || DIAGNOSTIC_SOCKET,
+                    syscall: support.error.syscall, detail: support.error.detail };
             } else {
                 const previous = this.support;
                 this.support = support.data; this.supportError = null;
@@ -103,6 +108,8 @@ class AudioDiagnostics {
             const next = audio.data;
             if (extended === false && this.service) {
                 next.systemd = this.service.systemd; next.audioManager = this.service.audioManager;
+                next.mediaPrerequisites = this.service.mediaPrerequisites;
+                next.diagnosticEndpointHealth = this.service.diagnosticEndpointHealth;
             }
             this.service = next;
             this.error = null;
@@ -200,8 +207,51 @@ class AudioDiagnostics {
         const usable = (route.approvedOverlay || (media && route.acceptedSharedMedia)) && !service.routeError;
         const usbMounts = support.usbMounts || service.usbMounts || [];
         const open = page => { this.page = page; this.offset = 0; this.version++; };
+
+        const assessment = service.routeAssessment || {}, prerequisites = service.mediaPrerequisites || {};
+        const endpointHealth = service.diagnosticEndpointHealth || support.diagnosticEndpointHealth || {};
+        const socketState = (this.local || {}).diagnosticsSocket || {};
+        const stateText = state => ({
+            'not-selected': 'Noch kein Audioweg gewählt',
+            'approval-required': 'Gespeichert · erforderliche Freigabe fehlt',
+            'device-not-observed': 'Ausgewähltes Gerät nicht im Inventar beobachtet',
+            'device-observed': 'Gerät beobachtet · Lautsprecherausgabe ungeprüft',
+            'unsupported-device': 'Dieses Gerät ist kein freigebbarer separater Mischpfad',
+            'unsupported-backend': 'Gespeicherter Audiomodus nicht unterstützt',
+            'inventory-unavailable': 'Inventar nicht ermittelbar · Geräteverfügbarkeit unbekannt',
+            'inventory-changed': 'Inventar geändert · gespeicherten Pfad erneut prüfen',
+            'invalid': 'Ungültige Dienstkonfiguration',
+            'observed': 'Beobachtet · noch kein Ausgabenachweis',
+            'not-observed': 'Nicht im aktuellen Inventar beobachtet',
+            'not-assessed': 'Nicht geprüft', 'ambiguous': 'Mehrdeutig',
+            'unavailable': 'Liste nicht abrufbar · keine Aussage über fehlende Hardware',
+            'unknown': 'Nicht ermittelbar'
+        })[state] || 'Noch nicht ermittelt';
+        if (this.page === 'route-check') return [
+            row('route-state', 'Auswahl / Freigabe', stateText(assessment.state)),
+            row('media-pcm', 'Medienausgang im Inventar', stateText(prerequisites.pcmState)),
+            row('media-manager', 'BMW-Audiomanager', prerequisites.audioManager === 'reachable' ? 'Lesend erreichbar' : 'Nicht erreichbar oder noch nicht geprüft'),
+            row('media-source', 'Passende Medienquelle', stateText(prerequisites.sourceState)),
+            row('media-sink', 'Passende Audiosenke', stateText(prerequisites.sinkState)),
+            row('media-observer', 'Routing-Schnittstelle', prerequisites.routingObserver ?
+                prerequisites.routingObserver.requiredMethodDeclared && prerequisites.routingObserver.unambiguousInstance ? 'Katalogeintrag eindeutig · Erreichbarkeit noch ungeprüft' : 'Erforderlicher Katalogeintrag fehlt oder ist mehrdeutig' : 'Nicht geprüft'),
+            row('check-readonly', 'Diese Prüfung', 'Nur lesend · keine Freigabe, Quellenumschaltung oder PCM-Öffnung'),
+            row('check-next', 'Audiomodus einrichten', 'Unterstützten Modus bewusst auswählen', () => open('modes'))
+        ];
+        if (this.page === 'diagnostic-path') return [
+            row('diag-expected', 'Erwarteter Diagnose-Socket', DIAGNOSTIC_SOCKET),
+            row('diag-failed-path', 'Fehlgeschlagener Dateizugriff', this.supportError && this.supportError.path || socketState.errorPath || 'Kein Dateifehler gemeldet'),
+            row('diag-unit-state', 'Diagnose-Socketzustand', ({
+                'socket-unit-not-installed': 'Socket-Unit nicht installiert',
+                'socket-unit-not-active': 'Socket-Unit nicht aktiv',
+                'socket-node-not-visible': 'Socket-Datei nicht sichtbar · Units und Namensraum im Bericht prüfen',
+                'socket-node-observed': 'Socket-Datei beobachtet · Verbindung separat prüfen'
+            })[endpointHealth.state] || 'Noch nicht ermittelt'),
+            row('diag-units', 'Unit-Details und Fehler', 'Im JSON-Bericht · auch über den erreichbaren Audio-Dienst'),
+            row('diag-export-path', 'USB-Export bei Diagnoseausfall', this.service ? 'Über Audio-Dienst möglich, falls USB eingebunden/beschreibbar' : 'Lokal speichern; Verfügbarkeit beider Zugänge im Bericht')
+        ];
         if (this.page === 'modes') return [
-            row('mode-current', 'Gewählter Audiomodus', media ? 'BMW-Medienquelle · Stereo' : 'Separater Mischpfad'),
+            row('mode-current', 'Gewählter Audiomodus', media ? 'BMW-Medienquelle · Stereo' : route.device ? 'Separater Mischpfad' : 'Noch kein Audioweg ausgewählt'),
             row('mode-media', 'BMW-Medienquelle einrichten', 'Stereo · ersetzt Musikquelle · folgt BMW-Lautstärke', () => open('media-consent')),
             row('mode-overlay', 'Separaten Mischpfad wählen', 'Bestehender Modus für nachgewiesene Overlay-Ausgänge', () => open('devices')),
             row('mode-limit', 'ID7-Unterstützung', 'Prüfung tatsächlicher Kataloge, Quellen und PCMs; keine pauschale Freigabe')
@@ -234,14 +284,15 @@ class AudioDiagnostics {
         const mapping = route.speakerMappingVerified ? 'Vom Benutzer nach Kanaltest bestätigt' : 'Nicht am Lautsprecher überprüft';
         const local = this.local || {}, component = local.component || {}, socketInfo = local.socket || {};
         return [row('refresh', 'Diagnose aktualisieren', this.busy ? 'Läuft' : this.message, () => this.refresh()),
-            row('independent', 'Unabhängiger Diagnosezugang', this.support ? 'Erreichbar · ohne PCM-Prozess' : this.supportError ? this.supportError.code : 'Noch nicht geprüft'),
+            row('independent', 'Unabhängiger Diagnosezugang', this.support ? 'Erreichbar · ohne PCM-Prozess' : this.supportError ? this.supportError.code + ' · Dateipfad anzeigen' : 'Noch nicht geprüft', () => open('diagnostic-path')),
             row('installed', 'Audio-Dienst installiert', component.installed === true ? component.version : component.installed === false ? 'Nicht gefunden' : 'Unbekannt · ' + (component.error || 'noch nicht geprüft')),
             row('started', 'Audio-Dienst gestartet / erreichbar', service.serviceStarted ? 'Ja · PID ' + service.pid : 'Nicht bestätigt · ' + (this.error ? this.error.code : 'noch nicht geprüft')),
             row('socket', 'Socket-Verbindung', service.serviceStarted ? 'Erfolgreich' : socketInfo.error || 'Noch nicht geprüft'),
             row('engine', 'PCM-Engine', this.engine ? this.engine.blocks + ' erzeugte Blöcke · Motorstatus ' + (this.vehicle.snapshot().engine || 'unbekannt') : 'Nicht geprüft'),
             row('sound-quality', 'Klangstand', this.engine && this.engine.soundQuality && this.engine.soundQuality.status === 'rejected-by-user' ? 'Arbeitsbank klanglich abgelehnt · nicht freigegeben' : 'Aufnahmen und Klangqualität nicht abschließend bestätigt'),
             row('gate', 'Motor- und Profilfreigabe', this.gate()),
-            row('route', 'Audiopfad', !this.service ? 'Nicht geprüft · Dienst nicht erreichbar' : route.device ? (service.stream ? 'Aktiv: ' : 'Ausgewählt, kein Stream: ') + route.device : 'Kein freigegebener Mischpfad'),
+            row('route', 'Audiopfad', !this.service ? 'Nicht geprüft · Dienst nicht erreichbar' : route.device ? (service.stream ? 'Aktiv: ' : 'Ausgewählt, kein Stream: ') + route.device : stateText(assessment.state)),
+            row('route-check', 'Audioweg prüfen · ohne Aktivierung', stateText(assessment.state), () => open('route-check')),
             row('audio-mode', 'Audiomodus einrichten', media ? 'BMW-Medienquelle · Stereo · gemeinsame BMW-Lautstärke' : 'Mischpfad oder verwaltete BMW-Medienquelle wählen', () => open('modes')),
             row('devices', 'Audiogeräte anzeigen / auswählen', !this.service && !this.support ? 'Nicht ermittelt · beide Diagnosezugänge fehlen' : inventory.alsaError ? 'ALSA-Inventarfehler: ' + inventory.alsaError.code : (inventory.devices || []).length + ' sichtbare ALSA-PCMs', () => open('devices')),
             row('pcm-channels', 'ALSA-PCM-Kanäle', negotiated.channels ? negotiated.channels + ' angenommen · Angebote ' + (negotiated.supportedChannels || []).join(', ') : 'Erst nach erfolgreichem Öffnen bekannt'),

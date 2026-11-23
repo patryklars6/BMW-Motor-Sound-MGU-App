@@ -8,7 +8,8 @@ import time
 from pathlib import Path
 
 from diagnostic_support import (APP_ID, AudioError, text_file, pcm_devices, eligible_name,
-    inventory, systemd_status, manager_inventory, allowed_peer, usb_mounts, export_usb)
+    inventory, systemd_status, manager_inventory, allowed_peer, usb_mounts, export_usb, diagnostic_endpoint_health)
+from route_diagnostics import route_assessment, media_prerequisites
 CONFIG = "/var/opt/luxo-motor-audio/config.json"
 CHANNELS = (2, 4, 5)
 
@@ -111,7 +112,9 @@ class AudioManager:
     def load(self):
         try:
             value = json.loads(self.config.read_text(encoding="utf-8"))
-            return value if isinstance(value, dict) else {}
+            if not isinstance(value, dict):
+                raise AudioError("CONFIG_INVALID", "Configuration must be a JSON object")
+            return value
         except FileNotFoundError:
             return {}
         except (OSError, ValueError) as error:
@@ -139,6 +142,9 @@ class AudioManager:
         data = self.discover()
         self.last_inventory = data
         route = cfg.get("route")
+        assessment = route_assessment(cfg, data)
+        if assessment.get("code"):
+            raise AudioError(assessment["code"], "Route assessment: " + assessment["state"])
         if route and route.get("backend") == "bmw-media-source":
             if route.get("acceptedSharedMedia") is not True or route.get("channels") != 2:
                 raise AudioError("CONFIG_INVALID", "Shared media consent missing")
@@ -189,7 +195,7 @@ class AudioManager:
         if not candidates:
             raise AudioError("MEDIA_UNSUPPORTED", "No observed CarLife stereo PCM")
         cfg = self.load()
-        if cfg.get("route", {}).get("backend") != "bmw-media-source":
+        if not isinstance(cfg.get("route"), dict) or cfg["route"].get("backend") != "bmw-media-source":
             cfg["previousOverlayRoute"] = cfg.get("route")
         cfg["route"] = {"backend": "bmw-media-source", "device": candidates[0], "channels": 2,
             "acceptedSharedMedia": True, "approvedOverlay": False, "fingerprint": data["fingerprint"],
@@ -273,9 +279,13 @@ class AudioManager:
                 stream = self.active.status()
             except AudioError as error:
                 self.last_error = {"code": error.code, "message": str(error)}
-        return {"protocol": 2, "serviceVersion": "0.4.0", "serviceStarted": True, "pid": os.getpid(), "collectedAt": time.time(),
+        manager = manager_inventory() if extended else None
+        return {"protocol": 2, "serviceVersion": "0.4.1", "serviceStarted": True, "pid": os.getpid(), "collectedAt": time.time(),
             "inventory": data, "route": route, "routeError": route_error, "negotiated": self.negotiated,
             "stream": stream, "lastStream": self.last_stream, "lastError": self.last_error,
             "systemd": systemd_status() if extended else None,
-            "audioManager": manager_inventory() if extended else None,
+            "audioManager": manager,
+            "routeAssessment": {"state": "invalid", "code": "CONFIG_INVALID"} if route_error and route_error["code"] == "CONFIG_INVALID" else route_assessment(cfg, data),
+            "mediaPrerequisites": media_prerequisites(data, manager) if extended else None,
+            "diagnosticEndpointHealth": diagnostic_endpoint_health() if extended else None,
             "physicalSoundAutomaticallyVerified": False}

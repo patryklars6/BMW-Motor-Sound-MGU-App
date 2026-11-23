@@ -51,11 +51,17 @@ function interfaceSchema(catalog, name, methods) {
 
 async function probe(catalog, someip) {
     const name = 'org.genivi.am.commandinterface.CommandControl';
+    const observer = 'org.genivi.am.routinginterface.RoutingControlObserver';
+    const definition = (catalog.interfaces || {})[observer];
+    const instances = Object.keys((catalog.instanceIDs || {})[observer] || {});
+    const routingObserver = { declared: !!definition, instances,
+        requiredMethodDeclared: !!(definition && definition.methods && definition.methods.hookSourceAvailablityStatusChange),
+        unambiguousInstance: instances.indexOf('1') >= 0 || instances.length === 1, availability: 'not-probed' };
     const declared = Object.keys(catalog.interfaces || {}).filter(key => /(?:audio|amplifier|\.ram\.|commandinterface)/i.test(key)).slice(0, 64);
-    if (!catalog.interfaces || !catalog.interfaces[name]) return { available: false, declaredInterfaces: declared, error: 'CommandControl absent from catalog' };
+    if (!catalog.interfaces || !catalog.interfaces[name]) return { available: false, declaredInterfaces: declared, routingObserver, error: 'CommandControl absent from catalog' };
     const schema = interfaceSchema(catalog, name);
     const instance = Object.keys(schema.instances)[0];
-    if (!instance) return { available: false, declaredInterfaces: declared, error: 'No catalog instance' };
+    if (!instance) return { available: false, declaredInterfaces: declared, routingObserver, error: 'No catalog instance' };
     await new Promise(resolve => setImmediate(resolve));
     const proxy = await someip.buildProxy(schema, instance);
     await proxy.init();
@@ -66,7 +72,7 @@ async function probe(catalog, someip) {
             .then(() => { if (proxy.waitUntilAvailable) return proxy.waitUntilAvailable(1500).then(done); })
             .catch(error => { clearTimeout(timeout); reject(error); });
     });
-    const out = { available: true, instance, declaredInterfaces: declared, observations: {} };
+    const out = { available: true, instance, declaredInterfaces: declared, routingObserver, observations: {} };
     await Promise.all(READS.map(async method => {
         if (schema.methods[method]) {
             try { out.observations[method] = await proxy.callMethod(method, {}, 1200); }

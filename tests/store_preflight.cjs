@@ -83,10 +83,10 @@ async function main() {
     }), null, null);
     const appEntry = catalog.components.find(entry => entry.id === spec.id);
     const toolEntry = catalog.components.find(entry => entry.id === audio.id);
-    check('real Store catalog agrees on app, tool and required version 0.4.0', () => {
+    check('real Store catalog agrees on app, tool and required version 0.4.1', () => {
         assert.deepEqual(catalog.skipped, []);
-        assert.equal(appEntry.version, '0.4.0'); assert.equal(toolEntry.version, '0.4.0');
-        assert.equal(appEntry.requires[audio.id], '0.4.0'); assert.equal(spec.requires[audio.id], '0.4.0');
+        assert.equal(appEntry.version, '0.4.1'); assert.equal(toolEntry.version, '0.4.1');
+        assert.equal(appEntry.requires[audio.id], '0.4.1'); assert.equal(spec.requires[audio.id], '0.4.1');
         assert.equal(toolEntry.requires['mgu-python'], '1.0.2');
     });
 
@@ -139,14 +139,30 @@ async function main() {
         refusal(() => old.context.preflightApp(oldFile), /bad enable entry/);
     });
     const good = deploy(audioFile);
-    check('real deployer check accepts the complete rebuilt 0.4.0 audio archive', () => {
+    check('real deployer check accepts the complete rebuilt 0.4.1 audio archive', () => {
         assert.equal(good.exit, 0, good.stdout + good.stderr);
         assert.ok(good.stdout.includes('luxo-motor-audio ' + spec.version + ' ok'));
         assert.match(good.stdout, /sockets\.target\.wants/);
     });
-    check('real deployer installation preflight accepts 0.4.0 without installing it', () => {
+    check('real deployer installation preflight accepts 0.4.1 without installing it', () => {
         good.context.preflightApp(audioFile);
         assert.equal(fs.existsSync(path.join(work, 'head-unit/var/opt/luxo-motor-audio/current')), false);
+    });
+    check('real deployer sees an unregistered diagnostic service and accepts only our additive recmgr registration', () => {
+        const listPath = path.join(work, 'head-unit/etc/recmgr-restartlist.conf');
+        const previous = '[Whitelist]\nexisting_bmw_service\nluxo-motor-audio\n[WhitelistExitSuccess]\nexisting_success_service\nluxo-motor-audio\n';
+        fs.writeFileSync(listPath, previous);
+        assert.equal(good.context.recmgrLoaded('luxo-motor-audio'), true);
+        assert.equal(good.context.recmgrLoaded('luxo-motor-diagnostics'), false);
+        assert.deepEqual(audio.recmgr, ['luxo-motor-audio', 'luxo-motor-diagnostics']);
+        const next = good.context.recmgrWith(previous, audio.recmgr, []);
+        good.context.checkListEdit(listPath, good.context.RECMGR_LIST, previous, next, audio.recmgr, []);
+        assert.ok(next.includes('existing_bmw_service'));
+        assert.ok(next.includes('existing_success_service'));
+        fs.writeFileSync(listPath, next);
+        assert.equal(good.context.recmgrLoaded('luxo-motor-diagnostics'), true);
+        // Fake-root fixture models a list already loaded at boot. No BMW
+        // Recovery Manager is restarted or bypassed on the host.
     });
     const members = await tar.untgz(packed, 20 << 20);
     const manifest = JSON.parse(members.find(item => item.name === 'component.json').data);
@@ -166,6 +182,9 @@ async function main() {
         assert.ok(members.find(item => item.name === 'files/diagnostic_support.py'));
         assert.ok(members.find(item => item.name === 'files/media_source.js'));
         assert.ok(members.find(item => item.name === 'files/managed_media.py'));
+        assert.ok(members.find(item => item.name === 'files/route_diagnostics.py'));
+        for (const name of ['luxo-motor-audio.socket', 'luxo-motor-audio.service'])
+            assert.match(members.find(item => item.name === 'units/' + name).data.toString(), /Wants=luxo-motor-diagnostics\.socket/);
     });
     function damaged(name, change) {
         const entries = members.map(item => ({ name: item.name, mode: item.mode, data: Buffer.from(item.data) }));
@@ -185,7 +204,7 @@ async function main() {
     check('real deployer validates the app archive with its unchanged ID and ID7 declaration', () => {
         const stage = path.join(work, 'app-stage'); fs.mkdirSync(stage);
         const descriptor = good.context.validateArtifact(appFile, stage);
-        assert.equal(descriptor.id, 'patryklars6_motor_sound'); assert.equal(descriptor.version, '0.4.0');
+        assert.equal(descriptor.id, 'patryklars6_motor_sound'); assert.equal(descriptor.version, '0.4.1');
         assert.equal(JSON.stringify(descriptor.hmi), '["ID7"]');
     });
     const previousApp = await tar.untgz(fs.readFileSync(path.join(root, 'packages', 'patryklars6_motor_sound@0.2.1.tgz')), 20 << 20);
@@ -208,13 +227,13 @@ async function main() {
         const result = deploy(optionalPath); assert.equal(result.exit, 0, result.stdout + result.stderr);
         result.context.preflightApp(optionalPath);
     });
-    fs.writeFileSync(path.join(root, 'dist', 'store-preflight-0.4.0.json'), JSON.stringify({
+    fs.writeFileSync(path.join(root, 'dist', 'store-preflight-0.4.1.json'), JSON.stringify({
         upstream: pin.repository, revision: pin.revision, deployerVersion: good.context.VERSION,
         host: process.platform, node: process.version, vehicleTest: false, checks: passed,
         limits: 'Unmodified upstream check/preflight in an isolated fake root; no systemd service start, donor linking, or vehicle install.',
         audioSha256: crypto.createHash('sha256').update(packed).digest('hex')
     }, null, 2) + '\n');
-    fs.writeFileSync(path.join(root, 'dist', 'mgu-deploy-0.4.0-check.log'), logs.join('\n'));
+    fs.writeFileSync(path.join(root, 'dist', 'mgu-deploy-0.4.1-check.log'), logs.join('\n'));
     console.log('Passed ' + passed.length + ' upstream Store/deployer checks; source ' + pin.revision);
 }
 main().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => {

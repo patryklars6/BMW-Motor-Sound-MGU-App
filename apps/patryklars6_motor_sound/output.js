@@ -19,6 +19,10 @@ const ERRORS = {
     AUDIO_WRITE_FAILED: 'Schreibfehler am Audio-Mischpfad · Dienstprotokoll prüfen'
 };
 Object.assign(ERRORS, {
+    ROUTE_NOT_SELECTED: 'Kein Audioweg ausgewählt · Audiomodus einrichten öffnen',
+    ROUTE_APPROVAL_REQUIRED: 'Audioweg gespeichert, aber erforderliche Freigabe fehlt',
+    ROUTE_BACKEND_UNSUPPORTED: 'Gespeicherter Audiomodus wird von diesem Dienst nicht unterstützt',
+    ROUTE_INVENTORY_UNAVAILABLE: 'Audiogeräte konnten nicht ermittelt werden · kein Beleg für fehlende Hardware',
     MEDIA_UNSUPPORTED: 'BMW-Medienquelle auf dieser MGU nicht vollständig verfügbar · Diagnosebericht prüfen',
     MEDIA_SOURCE_BUSY: 'BMW-Medienquelle wird bereits von einer anderen Sitzung verwendet',
     MEDIA_CONNECT_FAILED: 'BMW-Audiomanager hat die Medienverbindung nicht bestätigt',
@@ -42,13 +46,19 @@ Object.assign(ERRORS, {
     APPROVAL_REQUIRED: 'Separate Mischroute muss ausdrücklich freigegeben sein', NO_USB: 'Kein beschreibbarer USB-Datenträger erkannt'
 });
 
-function inspectSocket(socketPath) {
+function inspectSocket(socketPath, fileSystem) {
+    fileSystem = fileSystem || fs;
+    let checkedPath = path.dirname(socketPath);
     try {
-        const dir = fs.lstatSync(path.dirname(socketPath)), socket = fs.lstatSync(socketPath);
+        const dir = fileSystem.lstatSync(checkedPath);
+        checkedPath = socketPath;
+        const socket = fileSystem.lstatSync(checkedPath);
         const trusted = dir.isDirectory() && dir.uid === 0 && (dir.mode & 0o022) === 0 && socket.isSocket() && socket.uid === 0;
-        return { exists: true, trusted, uid: socket.uid, gid: socket.gid, mode: (socket.mode & 0o777).toString(8),
+        return { path: socketPath, exists: true, trusted, uid: socket.uid, gid: socket.gid, mode: (socket.mode & 0o777).toString(8),
             error: trusted ? null : 'UNTRUSTED_ENDPOINT' };
-    } catch (error) { return { exists: error.code === 'ENOENT' ? false : null, trusted: false, error: error.code || 'STAT_FAILED' }; }
+    } catch (error) { return { path: socketPath, checkedPath, errorPath: error.path || checkedPath,
+        syscall: error.syscall || 'lstat', exists: error.code === 'ENOENT' ? false : null,
+        trusted: false, error: error.code || 'STAT_FAILED' }; }
 }
 
 function trustedSocket(socketPath) {

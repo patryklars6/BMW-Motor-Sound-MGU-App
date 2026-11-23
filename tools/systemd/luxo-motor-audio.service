@@ -1,6 +1,7 @@
 [Unit]
 Description=LUXO PCM to configured ALSA overlay
 Requires=luxo-motor-audio.socket
+Wants=luxo-motor-diagnostics.socket
 After=luxo-motor-audio.socket
 
 [Service]

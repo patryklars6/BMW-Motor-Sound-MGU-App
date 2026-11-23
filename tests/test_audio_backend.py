@@ -79,7 +79,7 @@ class TestAudioBackend(unittest.TestCase):
         self.observed['devices'].append({'name': 'luxo_overlay'})
         with self.assertRaises(backend.AudioError) as caught:
             self.manager.route()
-        self.assertEqual(caught.exception.code, 'NO_APPROVED_ROUTE')
+        self.assertEqual(caught.exception.code, 'ROUTE_NOT_SELECTED')
         report = self.manager.diagnostics(extended=False)
         self.assertIsNone(report['negotiated'])
         self.assertFalse(report['physicalSoundAutomaticallyVerified'])

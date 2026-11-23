@@ -165,12 +165,12 @@ def serve_client(conn, channels, open_pcm=AlsaOutput, inspect_route=None):
 def serve_connection(conn, manager):
     conn.settimeout(2)
     message = bytearray()
-    while len(message) <= 131072 and not message.endswith(b"\n"):
+    while len(message) <= 393216 and not message.endswith(b"\n"):
         part = conn.recv(1)
         if not part:
             return
         message.extend(part)
-    if len(message) > 131072:
+    if len(message) > 393216:
         return
     try:
         request = None
