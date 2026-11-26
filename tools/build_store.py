@@ -16,10 +16,13 @@ import tarfile
 import tempfile
 import zipfile
 import zlib
+from patch_runtime import patch_runtime
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ID = "patryklars6_motor_sound"
 KIT = ROOT / "vendor" / "idrive7-kit.zip"
+FONT_ATLAS = ROOT / "vendor" / "luxo-fonts.zip"
+FONT_ATLAS_SHA256 = "39ccb95d9bec9509f7f9554623fdcb818dcdf394fa1fc3bdfe0eab6549449907"
 KIT_SHA256 = "bd9c0bdf4034ea9b21cbfb5caf867c97a366359e8338d247148ad5748b923ab6"
 
 def write_json(file, value):
@@ -54,6 +57,7 @@ def patch_builder(path):
         "    shutil.copy(os.path.join(SDK, 'index.js'), os.path.join(src, 'node_modules', 'oap-sdk', 'index.js'))\n": "",
         "    shutil.copy(os.path.join(SDK, 'package.json'), os.path.join(src, 'node_modules', 'oap-sdk', 'package.json'))\n": "",
         "    shutil.copytree(os.path.join(KIT, 'tools', 'oapgen'), os.path.join(stage, 'oapgen'))\n": "",
+        "                elif kindi in ('graphic',):": "                elif kindi == 'tworow':\n                    rows = [{'Text1stRow': {'value': label, 'type': 'Text'}, 'Text2ndRow': {'value': '', 'type': 'Text'}}]\n                elif kindi in ('graphic',):",
     }
     for old, new in edits.items():
         if source.count(old) != 1:
@@ -68,8 +72,14 @@ def stage_app(work, app_id, app_dir):
     with zipfile.ZipFile(io.BytesIO(archive)) as kit:
         kit.extractall(work)
     runtime = work / "kit" / "runtime"
+    fonts = FONT_ATLAS.read_bytes()
+    if hashlib.sha256(fonts).hexdigest() != FONT_ATLAS_SHA256:
+        raise ValueError("LUXO glyph atlas checksum mismatch")
+    with zipfile.ZipFile(io.BytesIO(fonts)) as atlas:
+        atlas.extractall(runtime / "fonts")
     # Required by the kit's general-purpose context; LUXO uses its own read-only adapter.
     (runtime / "signals.js").write_text("'use strict';\nmodule.exports = {};\n", encoding="utf-8")
+    patch_runtime(runtime)
     upstream = work / "kit" / "tools" / "build.py"
     patch_builder(upstream)
     target = work / "apps" / app_id
@@ -90,6 +100,10 @@ def stage_app(work, app_id, app_dir):
     builder.build(app_id)
 
     package = work / "dist" / app_id / "source"
+    # The kit packs data folders; our PCM reader needs individual local files.
+    if (target / "audio").is_dir():
+        shutil.copytree(target / "audio", package / "javascript" / "audio")
+        (package / "javascript" / "audio.pack").unlink(missing_ok=True)
     shutil.rmtree(package / "node_modules")
     metadata_path = package / "package.json"
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))

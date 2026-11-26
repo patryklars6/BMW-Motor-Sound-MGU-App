@@ -27,6 +27,8 @@ function connectVehicle(telemetry, log, binding, configDir) {
         let availabilityObserved = false;
         let availabilitySubscribed = false;
         let generation = 0;
+        const status = telemetry.interfaceStatus[iface] = { available: false, configured: false, instance: null, fields: {}, errors: [] };
+        const recordError = message => { status.errors.push(String(message).slice(0, 200)); if (status.errors.length > 8) status.errors.shift(); };
         const versions = Object.create(null);
         const pending = new Set();
         const configPath = path.join(configDir, iface.replace(/\./g, '_') + '.json');
@@ -37,6 +39,7 @@ function connectVehicle(telemetry, log, binding, configDir) {
             availabilityObserved = true;
             if (active === provider) return;
             provider = active;
+            status.available = active;
             generation++;
             if (provider) setImmediate(poll);
             else clear();
@@ -51,12 +54,12 @@ function connectVehicle(telemetry, log, binding, configDir) {
                 pending.add(field);
                 let result;
                 try { result = proxy.getValue(field, 450); }
-                catch (error) { pending.delete(field); continue; }
+                catch (error) { recordError(field + ': ' + error.message); pending.delete(field); continue; }
                 Promise.resolve(result).then(value => {
                     if (!closed && provider && generation === token && (versions[field] || 0) === version) {
                         fields[field].decode(value);
                     }
-                }).catch(() => {}).then(() => pending.delete(field));
+                }).catch(error => recordError(field + ': ' + error.message)).then(() => pending.delete(field));
             }
         }
 
@@ -64,8 +67,19 @@ function connectVehicle(telemetry, log, binding, configDir) {
         try {
             config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
             if (!config.fields || closed) return;
+            status.configured = true;
+            Object.keys(fields).forEach(field => { const value = config.fields[field];
+                status.fields[field] = value ? { getter: !!value.getter, notifier: !!value.notifier } : { missing: true };
+                if (value && /VehicleInformation/.test(iface)) status.fields[field].catalogDescriptor = JSON.stringify(value).slice(0, 1800);
+            });
+            const instances = Object.keys(config.instances || {});
+            status.instances = instances;
+            const instanceName = instances.indexOf('1') >= 0 ? '1' : instances.length === 1 ? instances[0] : instances.length === 0 ? '1' : null;
+            if (instanceName === null) throw Error('Multiple catalog instances; no unambiguous vehicle instance');
+            status.instance = instanceName;
+            status.instanceSource = instances.length ? 'catalog' : 'legacy default (catalog omitted instances)';
             proxy = await nativeTick(async () => {
-                const instance = await binding.buildProxy(config, '1');
+                const instance = await binding.buildProxy(config, instanceName);
                 await instance.init();
                 return instance;
             });
@@ -91,12 +105,13 @@ function connectVehicle(telemetry, log, binding, configDir) {
                         const notificationOnly = availabilitySubscribed && provider && !config.fields[field].getter;
                         fields[field].decode(value, notificationOnly);
                     }
-                })).catch(e => log.warn('SOME/IP ' + field + ': ' + e.message));
+                })).catch(e => { recordError(field + ': ' + e.message); log.warn('SOME/IP ' + field + ': ' + e.message); });
             }
             if (closed) return;
             if (proxy.isAvailable && proxy.isAvailable()) availability(true);
             timer = setInterval(poll, iface === CDS ? 250 : 750);
         } catch (e) {
+            recordError(e.message);
             log.warn('SOME/IP ' + iface + ': ' + e.message);
         }
     }

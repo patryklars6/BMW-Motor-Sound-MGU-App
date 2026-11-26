@@ -1,0 +1,15 @@
+[Unit]
+Description=LUXO PCM socket
+Wants=luxo-motor-diagnostics.socket
+
+[Socket]
+ListenStream=/run/luxo-motor-sound/pcm.sock
+SocketUser=root
+SocketGroup=root
+# Access is authenticated by the daemon with SO_PEERCRED and the OAP registry.
+SocketMode=0666
+DirectoryMode=0755
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target

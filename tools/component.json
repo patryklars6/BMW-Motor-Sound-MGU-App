@@ -1,0 +1,90 @@
+{
+  "id": "luxo-motor-audio",
+  "kind": "tool",
+  "version": "0.4.1",
+  "title": "LUXO Audio-Dienst",
+  "description": "Audio-Diagnose, bestätigte separate Mischpfade und optional verwaltete BMW-Medienquelle (Stereo, BMW-Lautstärke).",
+  "mguHmi": [
+    "ID7"
+  ],
+  "requires": {
+    "mgu-python": "1.0.2"
+  },
+  "recmgr": ["luxo-motor-audio", "luxo-motor-diagnostics"],
+  "files": [
+    {
+      "path": "overlay_bridge.py",
+      "from": "overlay_bridge.py",
+      "mode": "0644"
+    },
+    {
+      "path": "audio_backend.py",
+      "from": "audio_backend.py",
+      "mode": "0644"
+    },
+    {
+      "path": "audio_probe.js",
+      "from": "audio_probe.js",
+      "mode": "0644"
+    },
+    {
+      "path": "diagnostic_support.py",
+      "from": "diagnostic_support.py",
+      "mode": "0644"
+    },
+    {
+      "path": "diagnostics_bridge.py",
+      "from": "diagnostics_bridge.py",
+      "mode": "0644"
+    },
+    {
+      "path": "media_source.js",
+      "from": "media_source.js",
+      "mode": "0644"
+    },
+    {
+      "path": "managed_media.py",
+      "from": "managed_media.py",
+      "mode": "0644"
+    },
+    {
+      "path": "route_diagnostics.py",
+      "from": "route_diagnostics.py",
+      "mode": "0644"
+    }
+  ],
+  "units": [
+    {
+      "name": "luxo-motor-audio.socket",
+      "from": "systemd/luxo-motor-audio.socket"
+    },
+    {
+      "name": "luxo-motor-audio.service",
+      "from": "systemd/luxo-motor-audio.service"
+    },
+    {
+      "name": "luxo-motor-diagnostics.socket",
+      "from": "systemd/luxo-motor-diagnostics.socket"
+    },
+    {
+      "name": "luxo-motor-diagnostics.service",
+      "from": "systemd/luxo-motor-diagnostics.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "luxo-motor-audio.socket",
+      "target": "sockets.target"
+    },
+    {
+      "unit": "luxo-motor-diagnostics.socket",
+      "target": "sockets.target"
+    }
+  ],
+  "restart": [
+    "luxo-motor-audio.socket",
+    "luxo-motor-audio.service",
+    "luxo-motor-diagnostics.socket",
+    "luxo-motor-diagnostics.service"
+  ]
+}

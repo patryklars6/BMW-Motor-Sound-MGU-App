@@ -1,0 +1,17 @@
+[Unit]
+Description=LUXO PCM to configured ALSA overlay
+Requires=luxo-motor-audio.socket
+Wants=luxo-motor-diagnostics.socket
+After=luxo-motor-audio.socket
+
+[Service]
+Type=simple
+ExecStart=/var/opt/mgu-python/current/bin/python3 /var/opt/luxo-motor-audio/current/overlay_bridge.py
+User=root
+Group=root
+UMask=0027
+NoNewPrivileges=yes
+LimitCORE=1
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=3

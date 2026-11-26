@@ -2,72 +2,37 @@
 
 const path = require('path');
 const mgu = require('./kit/mgu');
+const themes = require('./kit/themes');
 const { Telemetry } = require('./telemetry');
 const { connectVehicle } = require('./vehicle');
-const { MODES, resolveSettings, Synth } = require('./sound');
+const { resolveSettings, Synth, profileSetting } = require('./sound');
 const { PcmOutput } = require('./output');
+const { NativeMenu } = require('./native-menu');
+const { AudioDiagnostics } = require('./audio-diagnostics');
+const { AudioClock } = require('./audio-clock');
+const { navigation, drawDiagnostics } = require('./navigation');
+const { WIDTH, HEIGHT, PROFILE_CARDS, smoothGauge, audioStatus, drawLive, drawProfiles } = require('./view');
 
-const WIDTH = 1600;
-const HEIGHT = 520;
-const PALETTE = { bg: '#1b1a20', panel: '#27262e', text: '#f7f6fa', sub: '#bcb7c7', violet: '#ba9dec', line: '#36333f' };
-const ENGINE_LABEL = { off: 'Aus', starting: 'Startet', running: 'Läuft' };
+const { drawHome, drawInfo } = require('./home');
+const { drawSettings } = require('./settings-view');
+const { EFFECTS, channelStatus, drawTuning } = require('./tuning-view');
+const { THEMES, kitTheme } = require('./themes');
+
 const clock = () => process.uptime() * 1000;
-
-function audioLabel(prefs, data, output) {
-    if (!prefs.enabled) return 'Motorsound aus';
-    if (!prefs.profileId) return 'Wartet auf Fahrmodus';
-    if (data.engine === null || data.rpm === null) return 'Wartet auf Fahrzeugdaten';
-    if (data.engine !== 'running' || data.rpm < 400) return 'Motor steht';
-    if (prefs.gain === 0) return 'Motorsound stumm';
-    if (output.state === 'connecting') return 'Verbindet Audiopfad';
-    if (output.channels === 2) return 'Audio verbunden · Stereo';
-    if (output.channels === 4) return 'Audio verbunden · 4 Kanäle';
-    return 'Kein freigegebener Audiopfad';
-}
-
-function draw(cv, data, prefs, output) {
-    const c = PALETTE;
-    const unknown = '–';
-    const rpm = data.rpm === null ? unknown : String(Math.round(data.rpm));
-    const mode = data.mode === null ? unknown : MODES[data.mode].label;
-    const gear = data.gear !== null ? [data.stage, data.gear].filter(v => v !== null).join(' ') : data.stage || unknown;
-    const state = ENGINE_LABEL[data.engine] || unknown;
-    const speed = data.speed === null ? unknown : Math.round(data.speed) + ' km/h';
-    const idle = data.idle === null ? unknown : data.idle ? 'Ja' : 'Nein';
-
-    cv.fillRect(0, 0, WIDTH, HEIGHT + (cv.extra || 0), c.bg);
-    cv.fillRect(44, 39, 6, 56, c.violet);
-    cv.text('LUXO Motor Sound', 69, 80, 43, c.text, { font: 'bold' });
-    cv.text(audioLabel(prefs, data, output), 1555, 79, 26, c.violet, { align: 'right' });
-    cv.roundRect(44, 118, 968, 278, 18, c.panel);
-    cv.roundRect(1032, 118, 524, 278, 18, c.panel);
-    cv.text('DREHZAHL', 77, 166, 22, c.sub, { font: 'bold', spacing: 2 });
-    cv.text(rpm, 78, 300, 112, c.text, { font: data.rpm === null ? 'bold' : 'num' });
-    cv.text('U/min', 435, 298, 28, c.sub);
-    cv.roundRect(78, 339, 895, 10, 5, c.line);
-    const meter = data.rpm === null ? 0 : Math.min(1, data.rpm / 6500);
-    if (meter > 0) cv.roundRect(78, 339, Math.max(10, 895 * meter), 10, 5, c.violet);
-
-    const values = [['Fahrmodus', mode], ['Motor', state], ['Gang', gear], ['Motorleerlauf', idle], ['Geschwindigkeit', speed]];
-    values.forEach((value, i) => {
-        const y = 169 + 46 * i;
-        cv.text(value[0], 1070, y, 25, c.sub);
-        cv.text(value[1], 1519, y, 25, c.text, { align: 'right', font: 'bold' });
-    });
-    cv.fillRect(44, 422, 1512, 1, c.line);
-    cv.text('Klangprofil', 46, 454, 22, c.sub);
-    cv.text(prefs.profileLabel || unknown, 46, 492, 28, c.text, { font: 'bold' });
-    cv.text('Lautsprechersystem', 544, 454, 22, c.sub);
-    cv.text(prefs.speaker.label, 544, 492, 28, c.text, { font: 'bold' });
-    cv.text('Pegel / Grenze', 1064, 454, 22, c.sub);
-    cv.text(Math.round(prefs.level * 100) + ' / ' + Math.round(prefs.limit * 100) + ' %', 1064, 492, 28, c.text, { font: 'bold' });
+for (const id of Object.keys(THEMES)) {
+    themes.THEMES[id] = Object.assign({}, themes.theme('ice'), kitTheme(THEMES[id]));
 }
 
 mgu.run({
-    background({ app, settings, log }) {
+    background({ app, settings, log, spec, dataDir }) {
         const vehicle = new Telemetry(clock);
         const output = new PcmOutput(clock);
         const synth = new Synth();
+        const pacing = new AudioClock();
+        const engine = { blocks: 0, frames: 0, active: false, lastPeak: 0, source: 'vehicle recording development bank',
+            soundQuality: synth.audio.bank.quality,
+            error: synth.error, events: synth.events, background: true };
+        const diagnostics = new AudioDiagnostics({ vehicle, output, settings, spec, dataDir, engine, effective: mode => effective(mode) });
         const get = key => settings.get(key);
         let stopVehicle = () => {};
         try {
@@ -86,44 +51,400 @@ mgu.run({
             return prefs;
         }
         const timer = setInterval(() => {
+            if (diagnostics.testing || diagnostics.changingMode) { engine.active = false; pacing.reset(); return; }
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
-            const active = cfg.enabled && cfg.profileId && cfg.gain > 0 && data.engine === 'running' && data.rpm !== null && data.rpm >= 400;
+            const active = synth.wantsAudio(data, cfg);
+            engine.error = synth.error; engine.pack = synth.currentPack;
+            engine.soundQuality = synth.audio.bank.quality;
             if (!active) {
-                if (output.socket) output.close();
+                engine.active = false;
+                engine.tailActive = false;
+                if (output.channels) output.close();
+                output.tick(false);
                 synth.reset();
+                pacing.reset();
                 return;
             }
             output.tick();
-            if (output.channels) output.write(synth.render(data, cfg, output.channels));
-            else synth.reset();
-        }, 20);
+            if (output.channels) {
+                const due = pacing.due(clock());
+                engine.clockSkippedBlocks = pacing.skippedBlocks;
+                for (let block = 0; block < due; block++) {
+                const currentData = block ? vehicle.snapshot() : data;
+                if (!synth.wantsAudio(currentData, cfg)) { pacing.reset(); break; }
+                const pcm = synth.render(currentData, cfg, output.channels);
+                let peak = 0;
+                for (let at = 0; at < pcm.length; at += 2) peak = Math.max(peak, Math.abs(pcm.readInt16LE(at)));
+                engine.lastPeak = peak;
+                output.write(pcm);
+                engine.blocks++; engine.frames += 960; engine.active = true;
+                engine.tailActive = synth.tailFrames > 0;
+                }
+            }
+            else { engine.active = false; synth.reset(); pacing.reset(); }
+        }, 8);
         app.once('shutdown', () => {
             clearInterval(timer);
             output.close();
+            diagnostics.cancelTest();
+            clearTimeout(diagnosticStart);
             stopVehicle();
         });
-        return { vehicle, output, effective };
+        const diagnosticStart = setTimeout(() => diagnostics.refresh().catch(error => log.warn(error.message)), 2000);
+        return { vehicle, output, effective, diagnostics };
     },
+
 
     start(ctx) {
         if (!ctx.background) return;
         const { vehicle, output, effective } = ctx.background;
-        let previous = null;
-        ctx.onLayout(() => { previous = null; });
-        ctx.loop('MAIN', 5, async () => {
+        const diagnostics = ctx.background.diagnostics || new AudioDiagnostics({ vehicle, output, effective, settings: ctx.settings, spec: ctx.spec, dataDir: ctx.dataDir });
+        const { ui, settings } = ctx;
+        let screen = 'MAIN';
+        let sliders = [];
+        let group = 'Motorsound';
+        let row = 0;
+        let choice = 0;
+        let tuneProfile = 'individual';
+        let tuneEffect = 0;
+        let effectSettings = null;
+        let refreshTuning = () => {};
+        let refreshSettings = () => {};
+        let refreshProfiles = () => {};
+        const pages = { home: 'MAIN', live: 'LIVE', profiles: 'PROFILES', info: 'INFO', audio: 'DIAG' };
+        const groups = { modes: 'Fahrmodi', speakers: 'Lautsprecher', design: 'Oberfläche' };
+        const categories = [...new Set(settings.schema.filter(item => !item.hidden).map(item => item.group))];
+
+        const viewTicks = {};
+        let physicalTick;
+        let nativeMenu;
+        let nativeVisible = false;
+        let opening = null;
+        const history = [];
+        const capture = () => ({ screen, group, row, choice, tuneProfile, tuneEffect, effectSettings });
+        function back() {
+            if (screen === 'DIAG' && diagnostics.backSub()) return;
+            diagnostics.cancelTest();
+            const previous = history.pop();
+            if (!previous) return screen === 'MAIN' ? openNative() : home();
+            ({ screen, group, row, choice, tuneProfile, tuneEffect, effectSettings } = previous);
+            return show(screen);
+        }
+        function home() {
+            history.length = 0; diagnostics.cancelTest(); return show('MAIN');
+        }
+
+        function graphicsReady() {
+            return !!(ctx.display && !ctx.display.blocked && ctx.display.ownable() && ctx.display.gpu.native && ctx.display.gpu.touch);
+        }
+
+        function graphicsStatus() {
+            if (graphicsReady()) {
+                return ctx.display.gpu.info && ctx.display.gpu.info.controller ? 'Touch und Controller verfügbar' : 'Touch verfügbar · Controller über BMW-Menü';
+            }
+            return 'BMW-Menü aktiv · mgu-render/1 mit Touch erforderlich';
+        }
+
+        function openNative() {
+            if (opening) return opening;
+            diagnostics.cancelTest();
+            nativeVisible = true;
+            opening = Promise.resolve(ui.close('MAIN')).then(() => {
+                if (nativeMenu) return nativeMenu.render();
+            }).then(() => {
+                if (!ui.isVisible('NATIVE')) return ui.open('NATIVE');
+            }).then(() => { opening = null; }, error => { opening = null; throw error; });
+            return opening;
+        }
+
+        function show(to) {
+            screen = to;
+            Object.keys(last).forEach(key => { last[key] = null; });
+            if (!graphicsReady()) return openNative();
+            nativeVisible = false;
+            if (physicalTick) physicalTick.kick();
+            return ui.isVisible('MAIN') ? Promise.resolve() : ui.open('MAIN');
+        }
+        function go(to, configure) {
+            const previous = capture();
+            if (configure) configure();
+            if (to !== previous.screen || configure) history.push(previous);
+            if (to === 'DIAG') { diagnostics.page = 'root'; diagnostics.offset = 0; void diagnostics.refresh(); }
+            return show(to);
+        }
+
+        function loop(name, fps, fn) {
+            viewTicks[name] = fn;
+            return { kick() { if (screen === name && physicalTick) physicalTick.kick(); } };
+        }
+
+        function chooseGroup(value) {
+            group = value;
+            effectSettings = null;
+            row = 0;
+            refreshSettings();
+        }
+
+        function offered(groupName, profile, effectId) {
+            const effect = effectId ? EFFECTS.find(item => item.id === effectId) : groupName ? null : effectSettings;
+            const selectedProfile = profile || tuneProfile;
+            return settings.schema.filter(item => item.group === (groupName || group) && settings.shown(item)
+                && (!effect || effect.settings.some(key => profileSetting(selectedProfile, key) === item.key))
+                && (output.channels === 5 || !item.key.endsWith('_engineCenter')));
+        }
+
+        function moveRow() {
+            const count = offered().length;
+            row = count ? (row + 1) % count : 0;
+            refreshSettings();
+        }
+
+        function changeRow(index, step) {
+            const item = offered()[index];
+            if (!item) return;
+            row = index;
+            if (item.type === 'bool') {
+                settings.set(item.key, settings.get(item.key) !== true);
+                return;
+            }
+            const list = item.type === 'choice' ? item.options.map(option => option[0]) : item.steps;
+            const position = list.indexOf(setting(item.key));
+            const next = item.type === 'choice' ? (position + step + list.length) % list.length
+                : Math.max(0, Math.min(list.length - 1, position + step));
+            settings.set(item.key, list[next]);
+        }
+
+        function goSettings(value) {
+            return go('CONFIG', () => chooseGroup(value || 'Motorsound'));
+        }
+
+        function moveProfile(step) {
+            choice = (choice + step + PROFILE_CARDS.length) % PROFILE_CARDS.length;
+            refreshProfiles();
+        }
+
+        function openTuning(profile) {
+            return go('TUNING', () => {
+            tuneProfile = editing(profile);
+            tuneEffect = 0;
+            refreshTuning();
+            });
+        }
+
+        function openEffect(index) {
+            return go('CONFIG', () => {
+            tuneEffect = index;
+            const card = PROFILE_CARDS.find(item => item.id === tuneProfile);
+            chooseGroup(card.name);
+            effectSettings = EFFECTS[index];
+            });
+        }
+
+        function toggleEffect(index) {
+            const key = profileSetting(tuneProfile, EFFECTS[index].id + 'On');
+            settings.set(key, setting(key) !== true);
+        }
+
+        function editing(profile) {
+            if (PROFILE_CARDS.some(card => card.id === profile)) return profile;
+            const manual = settings.get('manualProfile');
+            return PROFILE_CARDS.some(card => card.id === manual) ? manual : 'v8';
+        }
+
+        function currentProfile() {
+            return editing(effective(vehicle.snapshot().mode).profileId);
+        }
+
+        function setting(key) {
+            const value = settings.get(key);
+            const definition = settings.item(key);
+            return value === undefined && definition ? definition.default : value;
+        }
+
+        function level(key) {
+            const value = setting(key);
+            return Number.isFinite(value) ? Math.round(Math.max(0, Math.min(100, value))) : 0;
+        }
+
+        function applyLevel(layer, value) {
+            settings.set(profileSetting(currentProfile(), layer), Math.max(0, Math.min(100, value)));
+        }
+
+        const actions = {
+            toggle: () => settings.set('enabled', settings.get('enabled') !== true),
+            auto: () => settings.set('autoMode', settings.get('autoMode') === false),
+            power: () => actions.toggle(),
+            nav(key) {
+                if (key === 'native') return openNative();
+                if (key === 'home') return home();
+                if (key === 'individual') return openTuning('individual');
+                return pages[key] ? go(pages[key]) : goSettings(groups[key]);
+            },
+            tune: profile => openTuning(profile || currentProfile()),
+            select(profile) {
+                if (settings.get('manualProfile') !== profile) settings.set('manualProfile', profile);
+                if (settings.get('autoMode') !== false) settings.set('autoMode', false);
+            },
+            adjust(layer, offset) {
+                const old = level(profileSetting(currentProfile(), layer));
+                const step = offset > 0 ? Math.floor(old / 10) + 1 : Math.ceil(old / 10) - 1;
+                applyLevel(layer, step * 10);
+            },
+            flip(layer) {
+                const key = profileSetting(currentProfile(), layer + 'On');
+                settings.set(key, setting(key) !== true);
+            },
+            reset(requestedProfile) {
+                const profile = editing(requestedProfile || currentProfile());
+                const card = PROFILE_CARDS.find(row => row.id === profile);
+                settings.schema.filter(row => row.group === card.name).forEach(row => {
+                    if (settings.get(row.key) !== row.default) settings.set(row.key, row.default);
+                });
+            }
+        };
+
+        ui.onClick('BTN_BMW_MENU', openNative);
+        ui.onClick('BTN_BACK', back);
+        ui.onClick('BTN_HOME', home);
+        ui.onClick('BTN_AUDIO', () => go('DIAG'));
+        if (ctx.display) ctx.display.onBack = back;
+        ui.onClick('BTN_MUTE', () => settings.set('enabled', false));
+
+        const last = Object.create(null);
+        nativeMenu = new NativeMenu(ui, settings, ctx.background, {
+            select: actions.select, reset: actions.reset, offered,
+            diagnostics, graphicsStatus, canGraphics: graphicsReady, graphics: home
+        });
+        function paint(name, key, draw) {
+            if (last[name] === key) return;
+            const canvas = draw(ctx.canvas(WIDTH, HEIGHT));
+            if (name !== 'MAIN') navigation(canvas, ({ LIVE: 'Live-Fahrzeugdaten', PROFILES: 'Soundprofile',
+                TUNING: 'Sound-Tuning', CONFIG: group, INFO: 'Hilfe und Anleitung', DIAG: 'Audio-Diagnose' })[name], settings.get('theme'),
+                { back, home, native: openNative });
+            return Promise.resolve(ui.image('MAIN_GFX', canvas)).then(() => {
+                last[name] = key;
+            });
+        }
+
+        const homeTick = loop('MAIN', 8, () => {
             const data = vehicle.snapshot();
             const cfg = effective(data.mode);
-            const key = JSON.stringify([
-                data.rpm === null ? null : Math.round(data.rpm), data.speed === null ? null : Math.round(data.speed),
-                data.engine, data.stage, data.gear, data.mode, data.idle, output.state, output.channels,
-                cfg.profileLabel, cfg.speaker.label, cfg.enabled, cfg.level, cfg.limit
-            ]);
-            if (key === previous) return;
-            const cv = ctx.canvas(WIDTH, HEIGHT);
-            draw(cv, data, cfg, output);
-            await ctx.ui.image('MAIN_GFX', cv);
-            previous = key;
+            const profile = editing(cfg.profileId);
+            const effects = {};
+            for (const layer of ['turbo', 'exhaust', 'bang']) {
+                effects[layer] = { level: level(profileSetting(profile, layer)), on: setting(profileSetting(profile, layer + 'On')) === true };
+            }
+            const status = cfg.enabled ? audioStatus(cfg, data, output)
+                : 'Pegel ' + Math.round(cfg.level * 100) + ' %  ·  Grenze ' + Math.round(cfg.limit * 100) + ' %';
+            const values = { enabled: cfg.enabled, status, auto: cfg.auto, selected: profile, theme: settings.get('theme'),
+                label: PROFILE_CARDS.find(card => card.id === profile).name, effects };
+            const key = JSON.stringify([values, data.mode]);
+            return paint('MAIN', key, cv => { sliders = drawHome(cv, data, values, actions); return cv; });
         });
+        ctx.onTap((x, y) => {
+            if (screen !== 'MAIN') return;
+            const row = sliders.find(r => y >= r.top && y < r.bottom && x >= r.start && x <= r.stop);
+            if (row) applyLevel(row.name, 10 * Math.round((x - row.start) * 10 / (row.stop - row.start)));
+        });
+
+        let at = clock();
+        let needle = null;
+        const liveTick = loop('LIVE', 12, () => {
+            const data = vehicle.snapshot();
+            const cfg = effective(data.mode);
+            const now = clock();
+            needle = smoothGauge(needle, data.rpm, now - at);
+            at = now;
+            const theme = settings.get('theme');
+            const showAcceleration = settings.get('dashboardAccel');
+            const key = JSON.stringify([theme, showAcceleration,
+                data.rpm === null ? null : Math.round(data.rpm), data.speed === null ? null : Math.round(data.speed),
+                data.acceleration === null ? null : Math.round(data.acceleration * 10),
+                data.engine, data.stage, data.gear, data.mode, data.idle, output.state, output.channels,
+                cfg.profileLabel, cfg.speaker.label, cfg.enabled, cfg.level, cfg.limit,
+                needle === null ? null : Math.round(needle)
+            ]);
+            return paint('LIVE', key, cv => { drawLive(cv, data, cfg, output, needle, actions, theme, showAcceleration); return cv; });
+        });
+        const profileTick = loop('PROFILES', 6, () => {
+            const cfg = effective(vehicle.snapshot().mode);
+            const theme = settings.get('theme');
+            return paint('PROFILES', [cfg.profileId, cfg.auto, theme, choice].join('/'), cv => {
+                drawProfiles(cv, cfg, actions, theme, PROFILE_CARDS[choice].id);
+                return cv;
+            });
+        });
+        const infoTick = loop('INFO', 2, () =>
+            paint('INFO', ctx.spec.version + settings.get('theme'), cv => {
+                drawInfo(cv, actions.nav, ctx.spec.version, settings.get('theme'));
+                return cv;
+            }));
+        loop('DIAG', 6, () => { diagnostics.maybeRefresh(); return paint('DIAG', diagnostics.version + '/' + diagnostics.offset + '/' + diagnostics.page + '/' + settings.get('theme'), cv => {
+            drawDiagnostics(cv, diagnostics, settings.get('theme')); return cv;
+        }); });
+        const configTick = loop('CONFIG', 6, () => {
+            const rows = offered().map(item => ({
+                key: item.key, label: item.label,
+                value: item.type === 'bool' ? settings.get(item.key) ? 'Ein' : 'Aus' : settings.display(item.key)
+            }));
+            row = Math.max(0, Math.min(rows.length - 1, row));
+            const page = { groups: categories, group, index: row, rows, theme: settings.get('theme'),
+                title: effectSettings ? group + ' · ' + effectSettings.name : group,
+                status: group === 'Lautsprecher' || effectSettings ? channelStatus(output.channels) : null };
+            return paint('CONFIG', JSON.stringify(page), cv => {
+                drawSettings(cv, page, { group: chooseGroup, change: changeRow, page(delta) {
+                    row = Math.max(0, Math.min(rows.length - 1, row + delta));
+                    refreshSettings();
+                } });
+                return cv;
+            });
+        });
+        const tuningTick = loop('TUNING', 6, () => {
+            const model = {
+                theme: settings.get('theme'), channels: output.channels, focus: tuneEffect,
+                label: PROFILE_CARDS.find(card => card.id === tuneProfile).name,
+                effects: EFFECTS.map(effect => ({
+                    level: level(profileSetting(tuneProfile, effect.id)),
+                    on: setting(profileSetting(tuneProfile, effect.id + 'On')) === true
+                }))
+            };
+            return paint('TUNING', JSON.stringify(model), cv => {
+                drawTuning(cv, model, { open: openEffect, flip: toggleEffect });
+                return cv;
+            });
+        });
+        refreshTuning = () => tuningTick.kick();
+        refreshSettings = () => configTick.kick();
+        refreshProfiles = () => profileTick.kick();
+        physicalTick = ctx.loop('MAIN', 60, () => {
+            if (!graphicsReady()) return openNative();
+            const tick = viewTicks[screen] || viewTicks.MAIN;
+            return tick();
+        });
+        const nativeTimer = setInterval(() => {
+            if (nativeVisible && ui.isVisible('NATIVE')) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
+        }, 500);
+        ctx.app.once('shutdown', () => clearInterval(nativeTimer));
+        ctx.onLayout(() => {
+            Object.keys(last).forEach(name => { last[name] = null; });
+            if (!graphicsReady() && ui.isVisible('MAIN')) void openNative();
+        });
+        ui.onVisible((name, visible) => {
+            if (name === 'MAIN' && !visible) diagnostics.cancelTest();
+            if (name === 'NATIVE') {
+                const hardwareBack = visible && !nativeVisible && screen !== 'MAIN' && graphicsReady();
+                if (hardwareBack) { void back(); return; }
+                nativeVisible = visible;
+                if (visible) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
+            }
+        });
+        ctx.app.once('shutdown', () => diagnostics.cancelTest());
+        settings.onChange(() => {
+            Object.keys(last).forEach(name => { last[name] = null; });
+            if (physicalTick) physicalTick.kick();
+            if (nativeVisible) nativeMenu.render().catch(error => ctx.log.warn('BMW-Menü: ' + error.message));
+        });
+        return nativeMenu.render();
     }
-}).catch(() => {});
+}).catch(error => mgu.log.error('LUXO-Start: ' + (error && error.stack || error)));

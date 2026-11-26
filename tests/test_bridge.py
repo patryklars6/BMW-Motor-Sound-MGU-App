@@ -8,7 +8,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "tools"))
 import overlay_bridge as bridge
 
 class TestBridge(unittest.TestCase):
-    def run_client(self, payload, channels):
+    def run_client(self, payload, channels, exists=None):
         received = []
         stops = []
         class Device:
@@ -22,7 +22,7 @@ class TestBridge(unittest.TestCase):
         host, client = socket.socketpair()
         def run():
             with host:
-                bridge.serve_client(host, channels, Device)
+                bridge.serve_client(host, channels, Device, exists)
         thread = threading.Thread(target=run)
         thread.start()
         with client:
@@ -44,6 +44,18 @@ class TestBridge(unittest.TestCase):
     def test_invalid_format_cannot_open_audio(self):
         reply, frames, stops = self.run_client(b"UNSUPPORTED FORMAT\n", 2)
         self.assertEqual(reply, b"")
+        self.assertEqual(frames, [])
+        self.assertEqual(stops, [])
+
+    def test_probe_does_not_open_audio(self):
+        reply, frames, stops = self.run_client(b"PROBE\n", 2, lambda: True)
+        self.assertEqual(reply, b"STATUS available 2\n")
+        self.assertEqual(frames, [])
+        self.assertEqual(stops, [])
+
+    def test_missing_route_returns_a_specific_error(self):
+        reply, frames, stops = self.run_client(bridge.HELLO, 2, lambda: False)
+        self.assertEqual(reply, b"ERROR ALSA_ROUTE_MISSING\n")
         self.assertEqual(frames, [])
         self.assertEqual(stops, [])
 
